@@ -1,0 +1,16 @@
+__pycache__/
+*.py[cod]
+.venv*/
+venv*/
+.env
+.DS_Store
+data/runtime/
+
+# Local datasets (too large / licence-restricted); keep only the READMEs
+data/dataset-cnn/*
+!data/dataset-cnn/README.md
+data/dataset-posture/*
+!data/dataset-posture/.gitkeep
+
+# Personal notes kept out of the public repo
+.private/

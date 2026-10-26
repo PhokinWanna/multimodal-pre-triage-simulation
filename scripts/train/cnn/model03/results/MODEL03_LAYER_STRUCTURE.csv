@@ -1,0 +1,15 @@
+order,layer,type,output_shape_excluding_batch,trainable_parameters,non_trainable_parameters,total_parameters,activation_or_operation,details
+1,Input,InputLayer,64x64x3,0,0,0,None,Normalized CIELAB image input
+2,Random horizontal flip,RandomFlip,64x64x3,0,0,0,None,Training-only augmentation
+3,Random rotation,RandomRotation,64x64x3,0,0,0,None,Training-only augmentation factor 0.05 approximately plus or minus 18 degrees in Keras 2.15
+4,Conv2D,Conv2D,32x32x32,896,0,896,ReLU,"32 filters; kernel 3x3; stride 2; padding same; params=(3*3*3*32)+32"
+5,Batch normalization,BatchNormalization,32x32x32,64,64,128,Channel normalization,"32 channels; trainable gamma/beta=64; moving mean/variance=64"
+6,SeparableConv2D,SeparableConv2D,32x32x64,2400,0,2400,ReLU,"64 filters; kernel 3x3; depth multiplier 1; params=(3*3*32)+(32*64)+64"
+7,Batch normalization,BatchNormalization,32x32x64,128,128,256,Channel normalization,"64 channels; trainable gamma/beta=128; moving mean/variance=128"
+8,Max pooling,MaxPooling2D,16x16x64,0,0,0,2x2 maximum,"Pool 2x2; stride defaults to pool size"
+9,SeparableConv2D,SeparableConv2D,16x16x128,8896,0,8896,ReLU,"128 filters; kernel 3x3; depth multiplier 1; params=(3*3*64)+(64*128)+128"
+10,Batch normalization,BatchNormalization,16x16x128,256,256,512,Channel normalization,"128 channels; trainable gamma/beta=256; moving mean/variance=256"
+11,Global average pooling,GlobalAveragePooling2D,128,0,0,0,Spatial mean,"Average each 16x16 feature map to one scalar"
+12,Dropout,Dropout,128,0,0,0,None,Rate 0.30 during training; inactive at inference
+13,Output dense,Dense,1,129,0,129,Sigmoid,"One output; params=(128*1)+1; probability of Flushing"
+TOTAL,All layers,CIELAB_Skin_CNN,1,12769,448,13217,ReLU and sigmoid,Matches loaded Model-02 and both Model-03 checkpoint parameter counts

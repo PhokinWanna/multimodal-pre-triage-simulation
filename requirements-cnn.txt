@@ -1,0 +1,8 @@
+# Image extraction, CNN training/evaluation, and report plotting dependencies.
+# Install this set in a separate Python 3.11 environment from the kiosk runtime.
+numpy==1.26.4
+opencv-contrib-python==4.9.0.80
+mediapipe==0.10.9
+tensorflow==2.15.0
+scikit-learn==1.9.1
+matplotlib==3.10.8

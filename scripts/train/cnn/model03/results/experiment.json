@@ -1,0 +1,13 @@
+{
+  "seed": 42,
+  "source_image_count": 24938,
+  "unique_numeric_prefix_groups": 8097,
+  "class_mapping": {
+    "Normal": 0,
+    "Flushing": 1
+  },
+  "split_method": "70/15/15 numeric-filename-prefix-grouped, stratified by class presence",
+  "preprocessing": "OpenCV resize to 64x64, BGR to CIELAB, float32 / 255",
+  "source_directory": "split_dataset",
+  "warning": "Leading numeric filename prefixes are used only as grouping keys, not verified person identities. Different prefixes may refer to the same person, so person-disjointness and absence of identity leakage are not established."
+}

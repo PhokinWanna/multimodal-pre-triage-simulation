@@ -1,0 +1,12 @@
+# Kiosk runtime only. Use a separate Python 3.11 virtual environment from CNN
+# training; the CNN environment additionally installs TensorFlow and plotting tools.
+numpy==1.26.4
+opencv-contrib-python==4.9.0.80
+mediapipe==0.10.9
+ai-edge-litert==2.3.0
+requests==2.34.0
+gTTS==2.5.4
+SpeechRecognition==3.17.0
+PyAudio==0.2.14
+pygame==2.6.1
+faster-whisper==1.2.1
