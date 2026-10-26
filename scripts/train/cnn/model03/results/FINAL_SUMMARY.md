@@ -1,8 +1,12 @@
-# Model-02 to Model-03 CNN fine-tuning: full experiment summary
+# Model-01 to Model-03 CNN development: full experiment summary
 
 ## Executive summary
 
-Model-02 reported high ROC-AUC (0.9738) but low Flushing recall (0.2644) at a
+The skin CNN went through three stages. **Model-01** used the same
+architecture as Model-02 but standard binary cross-entropy loss (CEL) with
+unadjusted 0.5/0.5 class weighting: it caught most Flushing patches
+(recall 0.8832) but raised many false alarms (precision 0.5209). **Model-02**
+switched to binary focal loss to reduce those false alarms. Model-02 reported high ROC-AUC (0.9738) but low Flushing recall (0.2644) at a
 0.50 threshold. Investigation found two relevant issues:
 
 1. ROC-AUC measures ranking across thresholds; it does not imply that recall
@@ -52,23 +56,28 @@ model. `focal_alpha_025` is a retrained controlled baseline using Model-02's
 positive alpha; `focal_alpha_075` is the candidate fine-tuned model. Both were
 trained from scratch on the same corrected split.
 
-| Component | Model-02 original | Model-03 alpha 0.25 | Model-03 alpha 0.75 |
-| --- | --- | --- | --- |
-| Task/classes | Normal=0; Flushing=1 | Same | Same |
-| Input | 64×64×3 | Same | Same |
-| Color preprocessing | OpenCV BGR→CIELAB, float32 / 255 | Same | Same |
-| Augmentation | Random horizontal flip; random rotation 0.05 | Same | Same |
-| CNN | Conv2D 32 (stride 2) + BN; separable Conv2D 64 + BN + max-pool; separable Conv2D 128 + BN; global average pooling; dropout 0.3; Dense sigmoid | Same | Same |
-| Hidden activation | ReLU | Same | Same |
-| Output activation | Sigmoid | Same | Same |
-| Optimizer | Legacy Adam | Same | Same |
-| Learning rate | 0.0001 | Same | Same |
-| Batch size / max epochs | 32 / 35 | Same | Same |
-| Loss | Binary focal loss, gamma=2, alpha=0.25 | Same | Binary focal loss, gamma=2, **alpha=0.75** |
-| Positive-class weight in loss | Flushing receives 0.25; Normal 0.75 | Same | **Flushing 0.75; Normal 0.25** |
-| Data split | Old per-class numeric-prefix grouping; 1,033 prefix groups cross splits | New globally numeric-prefix-grouped split | Same split as alpha 0.25 |
-| Checkpoint selection | Best validation AUC; patience 8 | Same | Same |
-| Evaluation threshold | 0.50 in original report | 0.50 plus validation-selected thresholds | 0.50 plus validation-selected thresholds |
+| Component | Model-01 CEL | Model-02 original | Model-03 alpha 0.25 | Model-03 alpha 0.75 |
+| --- | --- | --- | --- | --- |
+| Task/classes | Same as Model-02 | Normal=0; Flushing=1 | Same | Same |
+| Input | Same as Model-02 | 64×64×3 | Same | Same |
+| Color preprocessing | Same as Model-02 | OpenCV BGR→CIELAB, float32 / 255 | Same | Same |
+| Augmentation | Same as Model-02 | Random horizontal flip; random rotation 0.05 | Same | Same |
+| CNN | Same as Model-02 | Conv2D 32 (stride 2) + BN; separable Conv2D 64 + BN + max-pool; separable Conv2D 128 + BN; global average pooling; dropout 0.3; Dense sigmoid | Same | Same |
+| Hidden activation | Same as Model-02 | ReLU | Same | Same |
+| Output activation | Same as Model-02 | Sigmoid | Same | Same |
+| Optimizer | Same as Model-02 | Legacy Adam | Same | Same |
+| Learning rate | Same as Model-02 | 0.0001 | Same | Same |
+| Batch size / max epochs | Same as Model-02 | 32 / 35 | Same | Same |
+| Loss | **Binary cross-entropy (CEL)** | Binary focal loss, gamma=2, alpha=0.25 | Same | Binary focal loss, gamma=2, **alpha=0.75** |
+| Positive-class weight in loss | **Unadjusted: Flushing 0.5; Normal 0.5** | Flushing receives 0.25; Normal 0.75 | Same | **Flushing 0.75; Normal 0.25** |
+| Data split | Historical holdout split (3,719 test patches) | Old per-class numeric-prefix grouping; 1,033 prefix groups cross splits | New globally numeric-prefix-grouped split | Same split as alpha 0.25 |
+| Checkpoint selection | Same as Model-02 | Best validation AUC; patience 8 | Same | Same |
+| Evaluation threshold | 0.50 on its holdout test set | 0.50 in original report | 0.50 plus validation-selected thresholds | 0.50 plus validation-selected thresholds |
+
+Model-01's settings are as reported by the project owner: it is the Model-02
+architecture and pipeline trained with plain binary cross-entropy and no
+class-weight tuning. Its metrics come from the original result plots and are
+stored in [`model01_reference_metrics.json`](model01_reference_metrics.json).
 
 No activation, architecture, learning rate, optimizer, augmentation, image
 preprocessing, gamma, batch size, or epoch limit was changed between the two
@@ -108,13 +117,20 @@ as directly comparable with the corrected Model-03 test split.
 
 ## Results
 
-### Historical Model-02 report versus corrected Model-03 test
+### Historical Model-01/Model-02 reports versus corrected Model-03 test
 
-| Model / evaluation split | ROC-AUC | PR-AUC (trapezoidal) | Precision @ 0.50 | Recall @ 0.50 | Specificity @ 0.50 | F1 @ 0.50 |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| Model-02, original validation (3,791) | 0.9738 | 0.9203 | 0.9821 | 0.2644 | 0.9986 | 0.4167 |
-| Model-03 alpha 0.25, prefix-grouped test (3,748) | 0.9842 | 0.9359 | 0.9442 | 0.6614 | 0.9891 | 0.7779 |
-| Model-03 alpha 0.75, prefix-grouped test (3,748) | **0.9926** | **0.9725** | **0.9537** | **0.8570** | 0.9884 | **0.9028** |
+| Model / evaluation split | Accuracy @ 0.50 | ROC-AUC | PR-AUC (trapezoidal) | Precision @ 0.50 | Recall @ 0.50 | Specificity @ 0.50 | F1 @ 0.50 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Model-01 CEL, historical holdout test (3,719) | 0.7989 | 0.9142 | n/a | 0.5209 | **0.8832** | 0.7756 | 0.6553 |
+| Model-02 focal loss, original validation (3,791) | 0.8375 | 0.9738 | 0.9203 | **0.9821** | 0.2644 | **0.9986** | 0.4167 |
+| Model-03 alpha 0.25, prefix-grouped test (3,748) | 0.9176 | 0.9842 | 0.9359 | 0.9442 | 0.6614 | 0.9891 | 0.7779 |
+| Model-03 alpha 0.75, prefix-grouped test (3,748) | **0.9597** | **0.9926** | **0.9725** | 0.9537 | 0.8570 | 0.9884 | **0.9028** |
+
+Model-01's PR-AUC was not recorded in its original results, so it is shown as
+n/a. The progression shows the trade-off each step addressed: Model-01 had
+high recall but many false positives (654); Model-02's focal loss removed
+almost all false positives (4) but missed most Flushing patches (612); Model-03
+alpha 0.75 keeps false positives low (34) while recovering recall (117 missed).
 
 For this cross-model table, PR-AUC is the trapezoidal area under the
 precision–recall curve, matching Model-02's reported PR-AUC convention.
@@ -122,8 +138,9 @@ Model-03 JSON also reports average precision (AP), a distinct metric: 0.9360
 for alpha 0.25 and 0.9726 for alpha 0.75 on test. Do not label these AP values
 as Model-02 PR-AUC or compare them as though the definitions were identical.
 
-The historical Model-02 row is included to explain the original concern. It is
-not a controlled head-to-head comparison: the split membership differs and
+The historical Model-01 and Model-02 rows are included to explain how the
+design evolved. They are not a controlled head-to-head comparison: each was
+evaluated on its own historical split, and for Model-02 the split membership differs and
 filename-prefix groups crossed boundaries in the old split. The controlled
 comparison is Model-03 alpha 0.25 versus alpha 0.75 because both runs used the
 identical numeric-prefix-grouped split and settings. Person-level separation
@@ -143,6 +160,7 @@ its caveats. Original Model-02 artifacts were not overwritten.
 
 | Model / split | TN | FP | FN | TP |
 | --- | ---: | ---: | ---: | ---: |
+| Model-01 CEL historical holdout test | 2,260 | 654 | 94 | 711 |
 | Model-02 original validation | 2,955 | 4 | 612 | 220 |
 | Model-03 alpha 0.25 grouped test | 2,898 | 32 | 277 | 541 |
 | Model-03 alpha 0.75 grouped test | 2,896 | 34 | 117 | 701 |
@@ -209,18 +227,19 @@ as a visual review document.
 
 ### Metric comparison
 
-Historical Model-02 validation is shown for context; Model-03 alpha 0.25 and
-0.75 are the controlled comparison on the same numeric-prefix-grouped test
-split. Person-level separation is unverified.
+Historical Model-01 (holdout test) and Model-02 (validation) results are shown
+for context on their own splits; Model-03 alpha 0.25 and 0.75 are the
+controlled comparison on the same numeric-prefix-grouped test split.
+Person-level separation is unverified.
 
-![Model-02 and Model-03 metric comparison](./figures/model_metric_comparison.png)
+![Model-01, Model-02, and Model-03 metric comparison](./figures/model_metric_comparison.png)
 
 ### Confusion matrices
 
 These show how predictions at threshold 0.50 distribute into true/false
 positives and negatives.
 
-![Confusion matrices for Model-02 and Model-03](./figures/confusion_matrices.png)
+![Confusion matrices for Model-01, Model-02, and Model-03](./figures/confusion_matrices.png)
 
 ### ROC and precision–recall curves
 

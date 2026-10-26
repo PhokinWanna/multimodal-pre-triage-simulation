@@ -70,6 +70,12 @@ TP=220. This is not directly comparable to the new results because the old
 split has cross-split group overlap and the new models were retrained on the
 globally grouped split.
 
+For further context, the earlier Model-01 baseline (same architecture, binary
+cross-entropy loss, unadjusted 0.5/0.5 class weighting) reported on its
+historical holdout test set (3,719 patches): accuracy 0.7989, ROC-AUC 0.9142,
+precision 0.5209, recall 0.8832, specificity 0.7756, F1 0.6553, with TN=2,260,
+FP=654, FN=94, TP=711. See `model01_reference_metrics.json`.
+
 ## Limitations and follow-up
 
 - **Identity leakage audit is inconclusive.** The current checkout has no
@@ -95,12 +101,14 @@ globally grouped split.
 ## Evidence files
 
 - `experiment.json`: split seed, counts, preprocessing, and grouping caveat.
-- `FINAL_SUMMARY.md`: detailed Model-02/Model-03 parameter comparison,
+- `FINAL_SUMMARY.md`: detailed Model-01/Model-02/Model-03 parameter comparison,
   methodology, data counts, results, interpretation, and figure guide.
 - `MODEL03_TECHNICAL_APPENDIX.md` and `MODEL03_LAYER_STRUCTURE.csv`: exact
   architecture, formulas, activations, learned-parameter counts, loss,
   optimizer, and training/evaluation procedure.
-- `figures/`: metric comparison, confusion matrices, training curves,
+- `model01_reference_metrics.json` and `model02_reference_metrics.json`:
+  historical baseline metrics used in the comparison figures.
+- `figures/`: four-model metric comparison and confusion matrices, training curves,
   threshold trade-off, and data split distribution. The older ROC/PR figure is
   excluded because it predates the filename-prefix identity clarification.
 - `split_counts.csv`: image and group counts for each split.
@@ -109,8 +117,8 @@ globally grouped split.
   filenames and group IDs.
 - `comparison.json`: machine-readable comparison of both controlled runs.
 
-The historical Model-02 values shown in the report/figures come from its
-original validation set; Model-03 values use the rebuilt numeric-prefix-
+The historical Model-01 values come from its holdout test set and the
+historical Model-02 values from its original validation set; Model-03 values use the rebuilt numeric-prefix-
 grouped test set. They are presented side by side for context, not as a
 perfectly matched benchmark or verified person-level evaluation. The two
 Model-03 alpha runs are the controlled comparison on the same prefix-grouped

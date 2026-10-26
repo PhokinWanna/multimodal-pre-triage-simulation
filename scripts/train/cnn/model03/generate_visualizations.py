@@ -95,103 +95,93 @@ def plot_training_curves(results_dir: Path, output_dir: Path) -> None:
     plt.close(fig)
 
 
-def plot_metric_comparison(
-    model02: dict,
-    model03: dict[str, dict],
-    model03_scores: dict[str, tuple[np.ndarray, np.ndarray]],
-    output_dir: Path,
-) -> None:
-    metric_specs = (
-        ("roc_auc", "ROC-AUC"),
-        ("pr_auc_trapezoidal", "PR-AUC (trapezoidal)"),
-        ("at_0.50", "Precision"),
-        ("at_0.50", "Recall"),
-        ("at_0.50", "Specificity"),
-        ("at_0.50", "F1"),
-    )
-    labels = ["Model-02\noriginal val", "Model-03\nalpha 0.25", "Model-03\nalpha 0.75"]
-    data = []
-    for key, subkey in metric_specs:
-        if key == "pr_auc_trapezoidal":
-            values = [float(model02[key])]
-            for run, _ in RUNS:
-                y_true, scores = model03_scores[run]
-                precision, recall, _ = precision_recall_curve(y_true, scores)
-                values.append(float(auc(recall, precision)))
-            data.append(values)
-            continue
-        if key == "at_0.50":
-            values = [
-                float(model02[subkey.lower() if subkey != "F1" else "f1"]),
-                float(model03["focal_alpha_025"]["test"]["at_0.50"][subkey.lower() if subkey != "F1" else "f1"]),
-                float(model03["focal_alpha_075"]["test"]["at_0.50"][subkey.lower() if subkey != "F1" else "f1"]),
-            ]
-        else:
-            values = [
-                float(model02[key]),
-                float(model03["focal_alpha_025"]["test"][key]),
-                float(model03["focal_alpha_075"]["test"][key]),
-            ]
-        data.append(values)
-    fig, ax = plt.subplots(figsize=(12.5, 6.6))
-    x = np.arange(len(metric_specs))
-    width = 0.24
-    colors = [COLORS["Model-02 original validation"], COLORS["Model-03 alpha 0.25"], COLORS["Model-03 alpha 0.75"]]
-    for i, (label, color) in enumerate(zip(labels, colors)):
-        bars = ax.bar(x + (i - 1) * width, [row[i] for row in data], width, label=label, color=color)
-        ax.bar_label(bars, fmt="%.3f", fontsize=8, padding=2)
-    ax.set_xticks(x, [name for _, name in metric_specs])
-    ax.set_ylim(0, 1.12)
+# Historical baselines (reported on their own splits) followed by the controlled
+# Model-03 comparison (same filename-prefix-grouped test split).
+COMPARISON_LABELS = (
+    ("Model-01 CEL", "Historical holdout test"),
+    ("Model-02 focal loss", "Original validation"),
+    ("Model-03 alpha 0.25", "Prefix-grouped test"),
+    ("Model-03 alpha 0.75", "Prefix-grouped test"),
+)
+COMPARISON_COLORS = ("#777777", "#8C6BB1", "#2878B5", "#E07A24")
+METRIC_SPECS = (
+    ("accuracy", "Accuracy"),
+    ("precision", "Precision"),
+    ("recall", "Recall"),
+    ("specificity", "Specificity"),
+    ("f1", "F1"),
+    ("roc_auc", "ROC-AUC"),
+)
+
+
+def comparison_rows(model01: dict, model02: dict, model03: dict[str, dict]) -> list[dict]:
+    """Return threshold-0.50 metrics and confusion counts for all four models."""
+    rows = [model01, model02]
+    for run, _ in RUNS:
+        test = model03[run]["test"]
+        rows.append({**test["at_0.50"], "roc_auc": test["roc_auc"], "sample_count": test["sample_count"]})
+    return rows
+
+
+def plot_metric_comparison(model01: dict, model02: dict, model03: dict[str, dict], output_dir: Path) -> None:
+    rows = comparison_rows(model01, model02, model03)
+    fig, ax = plt.subplots(figsize=(12.5, 6.8))
+    x = np.arange(len(METRIC_SPECS))
+    width = 0.19
+    for i, ((name, split), color) in enumerate(zip(COMPARISON_LABELS, COMPARISON_COLORS)):
+        values = [float(rows[i][key]) for key, _ in METRIC_SPECS]
+        bars = ax.bar(x + (i - 1.5) * width, values, width, label=f"{name}\n{split}", color=color)
+        ax.bar_label(bars, fmt="%.3f", fontsize=7, padding=2, rotation=90)
+    ax.set_xticks(x, [label for _, label in METRIC_SPECS])
+    ax.set_ylim(0, 1.14)
     ax.set_ylabel("Score")
-    ax.set_title("Reported Model-02 validation vs. Model-03 prefix-grouped test")
+    ax.set_title("Skin-classifier metrics at threshold 0.50")
     ax.grid(axis="y", alpha=0.25)
-    ax.legend(ncols=3, loc="upper left")
-    ax.text(
-        0.01,
-        -0.19,
-        "Caution: Model-02 is historical validation; Model-03 uses a filename-prefix-grouped test split.\n"
-        "Prefixes do not verify person identity. Compare alpha 0.25 vs 0.75 on the same split; historical bars are context.",
-        transform=ax.transAxes,
+    ax.legend(ncols=2, loc="upper center", bbox_to_anchor=(0.5, -0.1), fontsize=9)
+    fig.text(
+        0.5,
+        -0.02,
+        "Historical Model-01/02 results use their reported test/validation splits. "
+        "Model-03 alpha comparison uses the same grouped test split.",
+        ha="center",
         fontsize=9,
-        va="top",
-        bbox={"facecolor": "#FFF4D6", "edgecolor": "#C49A36", "boxstyle": "round,pad=0.5"},
     )
     fig.tight_layout()
     fig.savefig(output_dir / "model_metric_comparison.png", dpi=220, bbox_inches="tight")
     plt.close(fig)
 
 
-def plot_confusion_matrices(
-    model02: dict, model03: dict[str, dict], output_dir: Path
-) -> None:
-    matrices = [
-        ("Model-02 original validation\nthreshold 0.50", [model02["tn"], model02["fp"], model02["fn"], model02["tp"]]),
-        ("Model-03 alpha 0.25\nprefix-grouped test, 0.50", [model03["focal_alpha_025"]["test"]["at_0.50"][key] for key in ("tn", "fp", "fn", "tp")]),
-        ("Model-03 alpha 0.75\nprefix-grouped test, 0.50", [model03["focal_alpha_075"]["test"]["at_0.50"][key] for key in ("tn", "fp", "fn", "tp")]),
-    ]
-    fig, axes = plt.subplots(1, 3, figsize=(12, 4.3))
-    for ax, (title, values) in zip(axes, matrices):
-        matrix = np.asarray(values).reshape(2, 2)
+def plot_confusion_matrices(model01: dict, model02: dict, model03: dict[str, dict], output_dir: Path) -> None:
+    rows = comparison_rows(model01, model02, model03)
+    sample_counts = (
+        model01["test_samples"],
+        model02["validation_samples"],
+        rows[2]["sample_count"],
+        rows[3]["sample_count"],
+    )
+    fig, axes = plt.subplots(2, 2, figsize=(10, 9))
+    for ax, row, (name, split), count in zip(axes.flat, rows, COMPARISON_LABELS, sample_counts):
+        matrix = np.asarray([row[key] for key in ("tn", "fp", "fn", "tp")]).reshape(2, 2)
         ax.imshow(matrix, cmap="Blues")
-        ax.set_xticks((0, 1), ("Normal", "Flushing"))
-        ax.set_yticks((0, 1), ("Normal", "Flushing"))
+        ax.set_xticks((0, 1), CLASS_NAMES)
+        ax.set_yticks((0, 1), CLASS_NAMES)
         ax.set_xlabel("Predicted")
         ax.set_ylabel("Actual")
-        ax.set_title(title, fontsize=10)
+        ax.set_title(f"{name}\n{split}, threshold 0.50\nN={count:,}", fontsize=11)
         threshold = matrix.max() / 2
-        for row in range(2):
-            for col in range(2):
-                ax.text(col, row, f"{matrix[row, col]:,}", ha="center", va="center",
-                        color="white" if matrix[row, col] > threshold else "black", fontsize=13, fontweight="bold")
-    fig.suptitle("Confusion matrices: Normal=0, Flushing=1", fontsize=13)
+        for r in range(2):
+            for c in range(2):
+                ax.text(c, r, f"{matrix[r, c]:,}", ha="center", va="center",
+                        color="white" if matrix[r, c] > threshold else "black", fontsize=14, fontweight="bold")
+    fig.suptitle("Skin-classification confusion matrices: Normal=0, Flushing=1", fontsize=13)
     fig.text(
         0.5,
-        -0.01,
-        "Different split membership; Model-03 filename prefixes do not verify person identities.",
+        0.005,
+        "Historical CEL/FL use their reported splits; Model-03 runs share a filename-prefix-grouped test split.",
         ha="center",
         fontsize=9,
     )
-    fig.tight_layout()
+    fig.tight_layout(rect=(0, 0.02, 1, 0.97))
     fig.savefig(output_dir / "confusion_matrices.png", dpi=220, bbox_inches="tight")
     plt.close(fig)
 
@@ -333,6 +323,7 @@ def main() -> None:
     results_dir = args.results_dir.expanduser().resolve()
     output_dir = results_dir / "figures"
     output_dir.mkdir(parents=True, exist_ok=True)
+    model01_metrics = read_json(results_dir / "model01_reference_metrics.json")
     model02_metrics = read_json(results_dir / "model02_reference_metrics.json")
     model03_metrics = {run: read_json(results_dir / run / "metrics.json") for run, _ in RUNS}
     model02_scores = load_model02_validation(
@@ -345,8 +336,8 @@ def main() -> None:
     }
 
     plot_training_curves(results_dir, output_dir)
-    plot_metric_comparison(model02_metrics, model03_metrics, model03_scores, output_dir)
-    plot_confusion_matrices(model02_metrics, model03_metrics, output_dir)
+    plot_metric_comparison(model01_metrics, model02_metrics, model03_metrics, output_dir)
+    plot_confusion_matrices(model01_metrics, model02_metrics, model03_metrics, output_dir)
     plot_curves(model02_scores, model03_scores, output_dir)
     plot_threshold_tradeoff(model03_scores, output_dir)
     plot_split_distribution(results_dir / "split_counts.csv", output_dir)

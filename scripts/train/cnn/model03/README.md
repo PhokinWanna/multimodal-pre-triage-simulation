@@ -39,6 +39,11 @@ Test data is not used to select a threshold.
 The dataset provenance, license, access, and preparation limitations are
 documented in [`docs/data/README.md`](../../../../docs/data/README.md).
 
+Model-01, the earliest baseline, used the same CNN with binary cross-entropy
+loss and unadjusted 0.5/0.5 class weighting. On its historical holdout test set
+(3,719 patches) it reached recall 0.8832 but precision only 0.5209 (654 false
+positives). Model-02 switched to focal loss to reduce those false alarms.
+
 The old Model-02 report was reproduced on its original validation split:
 ROC-AUC 0.9738, precision 0.9821, and recall 0.2644 at threshold 0.50. Because
 the old split has cross-split numeric-prefix overlap, and neither split has
@@ -64,13 +69,15 @@ point trade-off; it is not a clinical threshold recommendation.
 Detailed confusion matrices, all threshold results, and score files are in
 `results/focal_alpha_025/` and `results/focal_alpha_075/`. `results/REPORT.md`
 summarizes the experiment and its limitations. `results/FINAL_SUMMARY.md` is the
-complete Model-02/Model-03 comparison, method, split description, interpretation,
+complete Model-01/Model-02/Model-03 comparison, method, split description, interpretation,
 and visualization guide. The `results/figures/` folder contains the generated
 plots; the older ROC/PR figure was excluded because it predates the split
 identity clarification.
 
 Regenerate the figures (the Model-02 checkpoint and original validation images
-are read-only inputs):
+are read-only inputs; the Model-01 and Model-02 baselines in the comparison
+figures are read from `results/model01_reference_metrics.json` and
+`results/model02_reference_metrics.json`):
 
 ```bash
 python generate_visualizations.py \

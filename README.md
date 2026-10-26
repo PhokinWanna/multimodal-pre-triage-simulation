@@ -42,19 +42,28 @@ flowchart LR
 
 ## Results: skin-flushing CNN
 
-A controlled fine-tuning experiment (Model-03) compared the focal-loss weight
-for the *Flushing* class on the same split. The held-out test set has
-3,748 patches (818 Flushing), threshold 0.50:
+The skin CNN was developed in three stages, all at threshold 0.50:
 
-| Focal α (Flushing) | ROC-AUC | Precision | Recall | Specificity | F1 |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| 0.25 (previous setting) | 0.984 | 0.944 | 0.661 | 0.989 | 0.778 |
-| **0.75** | **0.993** | **0.954** | **0.857** | **0.988** | **0.903** |
+| Model | Loss / class weighting | Evaluation set | Accuracy | Precision | Recall | Specificity | F1 | ROC-AUC |
+| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Model-01 | Cross-entropy, 0.5/0.5 | Historical test (3,719) | 0.799 | 0.521 | 0.883 | 0.776 | 0.655 | 0.914 |
+| Model-02 | Focal loss, α=0.25 | Original validation (3,791) | 0.838 | 0.982 | 0.264 | 0.999 | 0.417 | 0.974 |
+| Model-03 | Focal loss, α=0.25 | Grouped test (3,748) | 0.918 | 0.944 | 0.661 | 0.989 | 0.778 | 0.984 |
+| **Model-03** | **Focal loss, α=0.75** | Grouped test (3,748) | **0.960** | **0.954** | **0.857** | **0.988** | **0.903** | **0.993** |
 
-Increasing α to 0.75 raised Flushing recall by about 20 percentage points
-without losing precision.
+- **Model-01** caught most flushing but raised many false alarms (654).
+- **Model-02** used focal loss to cut false alarms to 4, but missed most
+  flushing (recall 0.26).
+- **Model-03** re-weighted the Flushing class (α 0.25 → 0.75) on a rebuilt
+  split. In this controlled comparison on the same test set, recall rose by
+  about 20 percentage points without losing precision.
+
+Model-01 and Model-02 were evaluated on their own historical splits, so only
+the two Model-03 rows are a like-for-like comparison.
 
 ![Model metric comparison](scripts/train/cnn/model03/results/figures/model_metric_comparison.png)
+
+![Confusion matrices](scripts/train/cnn/model03/results/figures/confusion_matrices.png)
 
 **Limitations:** the evaluation is patch-level and grouped by filename prefix,
 not verified person-disjoint, so identity leakage is possible. The Model-03
