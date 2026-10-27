@@ -208,8 +208,10 @@ agreement.
    loss by alpha; hence 0.75 increases the penalty contribution for Flushing
    errors.
 6. **Selected checkpoints on validation data.** Monitored validation AUC with
-   early stopping (patience 8), checkpointed the best validation-AUC model, and
-   restored the best weights. Validation recall shown in epoch plots uses
+   early stopping (patience 8) and checkpointed the best validation-AUC model.
+   Keras 2.15 restores the best weights only when training stops early; both
+   runs reached the 35-epoch limit (best validation AUC at epoch 33), so the
+   reported metrics use the epoch-35 weights. Validation recall shown in epoch plots uses
    Keras's default 0.50 decision threshold.
 7. **Evaluated and calibrated the operating point.** Computed exact
    scikit-learn ROC-AUC, average precision, confusion matrix metrics, and

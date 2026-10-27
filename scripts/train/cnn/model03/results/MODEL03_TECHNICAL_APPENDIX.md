@@ -226,8 +226,10 @@ statistics are updated from batches, not by Adam.
    visualization is [`split_distribution.png`](./figures/split_distribution.png).
 2. Create a fresh model for each alpha run, set the random seed, and train with
    batch size 32 for at most 35 epochs.
-3. Monitor validation AUC. Early stopping uses patience 8 and restores the
-   weights from the best monitored epoch. `ModelCheckpoint` saves the best
+3. Monitor validation AUC. Early stopping uses patience 8; in Keras 2.15 it
+   restores the best epoch's weights only when it actually stops training
+   early, so a run that reaches 35 epochs is evaluated with its final-epoch
+   weights. `ModelCheckpoint` saves the best
    validation-AUC checkpoint. There is no learning-rate scheduler.
 4. Predict probabilities on validation and held-out test patches. Exact
    scikit-learn ROC-AUC and average precision are computed from scores, before

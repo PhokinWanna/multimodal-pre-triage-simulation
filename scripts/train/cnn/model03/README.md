@@ -99,6 +99,24 @@ python train_and_evaluate.py \
   --source-dir /path/to/your/split_dataset
 ```
 
+### Alpha sweep
+
+To measure how the focal-loss weight changes the results, train several alpha
+values on the same split, seed, and settings, then summarize them:
+
+```bash
+python train_and_evaluate.py --source-dir /path/to/your/split_dataset \
+  --output-dir results_alpha_sweep --alphas 0 0.25 0.5 0.75 1.0
+python analyze_alpha_sweep.py --results-dir results_alpha_sweep
+```
+
+`analyze_alpha_sweep.py` writes a table (`alpha_sweep_table.md`/`.csv`) and
+line graphs of the metrics, confusion counts, score distributions, and
+ROC/PR curves against alpha to `results_alpha_sweep/alpha_sweep/`. Add
+`--skip-existing` to resume an interrupted sweep. Each run also scores its
+best-validation-AUC checkpoint (`best_checkpoint` in `metrics.json`); use
+`--weights best` to summarize those instead of the final-epoch weights.
+
 Results are written to `results/` by default. They can be placed elsewhere with
 `--output-dir`. The source directory must contain `train`, `val`, and `test`
 subdirectories, each with `Normal` and `Flushing` class folders.

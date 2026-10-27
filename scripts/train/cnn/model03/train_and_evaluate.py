@@ -1,4 +1,13 @@
-"""Train and compare CNN loss settings on a numeric-prefix-grouped split."""
+"""Train and compare CNN focal-loss settings on a numeric-prefix-grouped split.
+
+Every run uses the same grouped split, seed, architecture, and training
+settings; only the positive-class focal-loss weight (alpha) changes. By default
+the original alpha 0.25 vs 0.75 comparison is reproduced. Pass ``--alphas`` to
+run a sweep, for example::
+
+    python train_and_evaluate.py --source-dir /path/to/split_dataset \
+        --output-dir results_alpha_sweep --alphas 0 0.25 0.5 0.75 1.0
+"""
 
 from __future__ import annotations
 
@@ -7,6 +16,7 @@ import csv
 import json
 import random
 import re
+import time
 from collections import defaultdict
 from pathlib import Path
 
@@ -33,6 +43,7 @@ SEED = 42
 CLASSES = {"Normal": 0, "Flushing": 1}
 IMAGE_SUFFIXES = {".jpg", ".jpeg", ".png"}
 PRECISION_FLOORS = (0.95, 0.90, 0.80, 0.70)
+DEFAULT_ALPHAS = (0.25, 0.75)
 
 
 def prefix_group_from_name(filename: str) -> str:
@@ -287,11 +298,17 @@ def write_split_counts(
             )
 
 
+def run_name(alpha: float) -> str:
+    """Folder name for an alpha value, e.g. 0.25 -> focal_alpha_025, 1.0 -> focal_alpha_100."""
+    return f"focal_alpha_{int(round(alpha * 100)):03d}"
+
+
 def train_run(
     name: str,
     alpha: float,
     splits: dict[str, list[tuple[Path, int]]],
     output_dir: Path,
+    epochs: int = EPOCHS,
 ) -> dict:
     tf.keras.backend.clear_session()
     random.seed(SEED)
@@ -300,6 +317,7 @@ def train_run(
 
     run_dir = output_dir / name
     run_dir.mkdir(parents=True, exist_ok=True)
+    started = time.perf_counter()
     train_sequence = ImageSequence(splits["train"], shuffle=True)
     val_sequence = ImageSequence(splits["val"])
     test_sequence = ImageSequence(splits["test"])
@@ -319,7 +337,7 @@ def train_run(
     history = model.fit(
         train_sequence,
         validation_data=val_sequence,
-        epochs=EPOCHS,
+        epochs=epochs,
         callbacks=callbacks,
         verbose=2,
     )
@@ -331,20 +349,46 @@ def train_run(
     selected_thresholds = thresholds_for_precision(
         val_labels, val_scores, PRECISION_FLOORS
     )
+    # Keras 2.15 EarlyStopping only restores the best weights when training
+    # stops early. If all epochs run, the model above holds the final-epoch
+    # weights. Evaluate the saved best-validation-AUC checkpoint as well so both
+    # are on record ("test" = weights in memory, "best_checkpoint" = best epoch).
+    stopped_early = len(history.history["loss"]) < epochs
+    best_model = tf.keras.models.load_model(run_dir / "best_model.keras", compile=False)
+    best_val_scores = best_model.predict(val_images, batch_size=BATCH_SIZE, verbose=0).reshape(-1)
+    best_test_scores = best_model.predict(test_images, batch_size=BATCH_SIZE, verbose=0).reshape(-1)
+    best_thresholds = thresholds_for_precision(val_labels, best_val_scores, PRECISION_FLOORS)
+
     result = {
         "name": name,
         "focal_alpha_positive_class": alpha,
+        "focal_alpha_negative_class": 1.0 - alpha,
+        "focal_gamma": 2.0,
+        "max_epochs": epochs,
         "epochs_completed": len(history.history["loss"]),
+        "best_epoch": int(np.argmax(history.history["val_auc"])) + 1,
+        "training_seconds": round(time.perf_counter() - started, 1),
         "best_validation_auc_keras_approx": float(max(history.history["val_auc"])),
         "validation": evaluate(val_labels, val_scores, selected_thresholds),
+        "evaluated_weights": (
+            "best validation-AUC epoch (restored by early stopping)"
+            if stopped_early else "final epoch (training reached max epochs)"
+        ),
         "test": evaluate(test_labels, test_scores, selected_thresholds),
         "thresholds_selected_on_validation": selected_thresholds,
+        "best_checkpoint": {
+            "epoch": int(np.argmax(history.history["val_auc"])) + 1,
+            "validation": evaluate(val_labels, best_val_scores, best_thresholds),
+            "test": evaluate(test_labels, best_test_scores, best_thresholds),
+            "thresholds_selected_on_validation": best_thresholds,
+        },
     }
     (run_dir / "metrics.json").write_text(
         json.dumps(result, indent=2) + "\n", encoding="utf-8"
     )
     write_predictions(run_dir / "validation_scores.csv", val_labels, val_scores)
     write_predictions(run_dir / "test_scores.csv", test_labels, test_scores)
+    write_predictions(run_dir / "test_scores_best_checkpoint.csv", test_labels, best_test_scores)
     print(f"\n{name}: val ROC-AUC={result['validation']['roc_auc']:.4f}, "
           f"test ROC-AUC={result['test']['roc_auc']:.4f}")
     return result
@@ -358,7 +402,28 @@ def main() -> None:
         type=Path,
         default=Path(__file__).parent / "results",
     )
+    parser.add_argument(
+        "--alphas",
+        type=float,
+        nargs="+",
+        default=list(DEFAULT_ALPHAS),
+        help="Positive-class (Flushing) focal-loss weights to train, each in [0, 1].",
+    )
+    parser.add_argument(
+        "--epochs",
+        type=int,
+        default=EPOCHS,
+        help=f"Maximum epochs per run (default {EPOCHS}; use the default for reported results).",
+    )
+    parser.add_argument(
+        "--skip-existing",
+        action="store_true",
+        help="Reuse runs whose metrics.json already exists (resume an interrupted sweep).",
+    )
     args = parser.parse_args()
+    alphas = sorted(set(args.alphas))
+    if any(not 0.0 <= alpha <= 1.0 for alpha in alphas):
+        parser.error("every --alphas value must be between 0 and 1")
     source_dir = args.source_dir.expanduser().resolve()
     output_dir = args.output_dir.expanduser().resolve()
     records = collect_records(source_dir)
@@ -373,6 +438,9 @@ def main() -> None:
         "split_method": "70/15/15 numeric-filename-prefix-grouped, stratified by class presence",
         "preprocessing": "OpenCV resize to 64x64, BGR to CIELAB, float32 / 255",
         "source_directory": source_dir.name,
+        "focal_alphas": alphas,
+        "focal_gamma": 2.0,
+        "max_epochs": args.epochs,
         "warning": (
             "Leading numeric filename prefixes are used only as grouping keys, "
             "not verified person identities. Different prefixes may refer to "
@@ -386,13 +454,21 @@ def main() -> None:
     print(json.dumps(metadata, indent=2))
     print("Split sizes:", {name: len(samples) for name, samples in splits.items()})
 
-    results = [
-        train_run("focal_alpha_025", 0.25, splits, output_dir),
-        train_run("focal_alpha_075", 0.75, splits, output_dir),
-    ]
-    (output_dir / "comparison.json").write_text(
-        json.dumps(results, indent=2) + "\n", encoding="utf-8"
-    )
+    results = []
+    for index, alpha in enumerate(alphas, start=1):
+        name = run_name(alpha)
+        existing = output_dir / name / "metrics.json"
+        if args.skip_existing and existing.is_file():
+            print(f"\n[{index}/{len(alphas)}] {name}: reusing {existing}")
+            results.append(json.loads(existing.read_text(encoding="utf-8")))
+        else:
+            print(f"\n[{index}/{len(alphas)}] Training {name} (alpha={alpha:.2f}, "
+                  f"Normal weight={1 - alpha:.2f})")
+            results.append(train_run(name, alpha, splits, output_dir, epochs=args.epochs))
+        # Save after every run so an interruption never loses finished results.
+        (output_dir / "comparison.json").write_text(
+            json.dumps(results, indent=2) + "\n", encoding="utf-8"
+        )
     print(f"\nSaved experiment results to {output_dir}")
 
 

@@ -1,0 +1,4 @@
+split,prefix_groups,normal_images,flushing_images
+train,5667,13753,3742
+val,1215,2910,785
+test,1215,2930,818
