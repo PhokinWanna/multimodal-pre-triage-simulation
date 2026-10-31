@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Sign in · Pre-Triage Dashboard{% endblock %}
+{% block content %}
+<section class="card login-card">
+  <h1>Staff sign in</h1>
+  <p class="muted">Nurse station access only.</p>
+  {% if error %}<div class="alert alert-error" role="alert">{{ error }}</div>{% endif %}
+  <form method="post" action="/login" class="form">
+    <input type="hidden" name="next" value="{{ next }}">
+    <label for="username">Username</label>
+    <input id="username" name="username" autocomplete="username" required autofocus value="{{ username or '' }}">
+    <label for="password">Password</label>
+    <input id="password" name="password" type="password" autocomplete="current-password" required>
+    <button class="btn btn-primary" type="submit">Sign in</button>
+  </form>
+</section>
+{% endblock %}

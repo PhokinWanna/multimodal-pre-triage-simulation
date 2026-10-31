@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Pre-Triage Dashboard{% endblock %}</title>
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/static/css/dashboard.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/"><span class="brand-dot"></span>Pre-Triage Dashboard</a>
+    {% if user %}
+    <nav class="nav">
+      {% block nav %}{% endblock %}
+    </nav>
+    <div class="who">
+      <span>{{ user.display_name or user.username }}{% if user.role.value == 'admin' %} · admin{% endif %}</span>
+      <form method="post" action="/logout"><button class="btn btn-ghost" type="submit">Sign out</button></form>
+    </div>
+    {% endif %}
+  </header>
+  <main class="page">
+    {% block content %}{% endblock %}
+  </main>
+  <footer class="foot">Research prototype — decision support only. Final triage is made by clinical staff.</footer>
+</body>
+</html>

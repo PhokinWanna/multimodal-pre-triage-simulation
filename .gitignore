@@ -5,6 +5,8 @@ venv*/
 .env
 .DS_Store
 data/runtime/
+# Nurse-dashboard database (contains patient data, never commit)
+data/dashboard/
 
 # Local datasets (too large / licence-restricted); keep only the READMEs
 data/dataset-cnn/*

@@ -113,7 +113,18 @@ python analyze_alpha_sweep.py --results-dir results_alpha_sweep
 `analyze_alpha_sweep.py` writes a table (`alpha_sweep_table.md`/`.csv`) and
 line graphs of the metrics, confusion counts, score distributions, and
 ROC/PR curves against alpha to `results_alpha_sweep/alpha_sweep/`. Add
-`--skip-existing` to resume an interrupted sweep. Each run also scores its
+`--skip-existing` to resume an interrupted sweep.
+
+For report-ready figures (side-by-side confusion matrices, sensitivity vs
+specificity and error-count bars, an alpha x threshold heatmap) plus an
+interactive HTML page with a rotatable 3D surface, run:
+
+```bash
+python report_figures_alpha_sweep.py --results-dir results_alpha_sweep
+```
+
+Outputs go to `results_alpha_sweep/report_figures/` as PNG (300 dpi), PDF, and
+`alpha_sweep_interactive.html` (open in any browser; works offline). Each run also scores its
 best-validation-AUC checkpoint (`best_checkpoint` in `metrics.json`); use
 `--weights best` to summarize those instead of the final-epoch weights.
 

@@ -11,83 +11,16 @@ import logging
 import os
 import cv2
 import time
-import json
-import queue
 import threading
-import uuid
-import requests
 
 from .config import SystemConfig, KioskState, ExitReason
 from .consent import prepare_pdpa_refusal_handoff
+from .outbox import ConveyorBeltWorker
 from .vision.engine import VisionEngine
 from .audio.engine import AudioEngine
 from .triage.reasoning import ReasoningEngine
 
 logger = logging.getLogger(__name__)
-
-
-class ConveyorBeltWorker(threading.Thread):
-    """Background Outbox Spooler (The Conveyor Belt)."""
-    def __init__(self, spool_dir: str, endpoint: str):
-        super().__init__(daemon=True)
-        self.spool_dir = spool_dir
-        self.endpoint = endpoint
-        self.queue = queue.Queue()
-        self.running = True
-        os.makedirs(self.spool_dir, exist_ok=True)
-
-    def enqueue_case(self, case_container: dict):
-        case_id = case_container.get("case_id", f"CASE-{int(time.time())}")
-        disk_path = os.path.join(self.spool_dir, f"{case_id}.json")
-
-        try:
-            with open(disk_path, "w", encoding="utf-8") as f:
-                json.dump(case_container, f, ensure_ascii=False, indent=2)
-        except Exception as e:
-            logger.warning(f"Failed to spool case to local disk: {e}")
-
-        self.queue.put((f"Case {case_id}", disk_path, case_container))
-        logger.info(f"[Conveyor Belt]: Case {case_id} queued for background transmission.")
-
-    def enqueue_nurse_assistance(self, event: dict):
-        """Persist and enqueue an anonymous, minimal nurse-assistance event."""
-        event_id = uuid.uuid4().hex
-        disk_path = os.path.join(self.spool_dir, f"nurse-assistance-{event_id}.json")
-
-        try:
-            with open(disk_path, "x", encoding="utf-8") as f:
-                json.dump(event, f, ensure_ascii=False, indent=2)
-        except OSError as e:
-            logger.error(f"Failed to persist consent-refusal nurse handoff: {e}")
-            raise
-
-        self.queue.put(("Anonymous nurse-assistance event", disk_path, event))
-        logger.info("Anonymous nurse-assistance event queued for dashboard delivery.")
-
-    def run(self):
-        while self.running:
-            try:
-                item_label, disk_path, payload = self.queue.get(timeout=1.0)
-            except queue.Empty:
-                continue
-
-            transmitted = False
-            while not transmitted and self.running:
-                try:
-                    res = requests.post(self.endpoint, json=payload, timeout=SystemConfig.HTTP_TIMEOUT)
-                    if res.status_code in [200, 201]:
-                        logger.info(f"[Conveyor Belt]: {item_label} delivered to Nurse Dashboard.")
-                        transmitted = True
-                        if os.path.exists(disk_path):
-                            os.remove(disk_path)
-                    else:
-                        logger.warning(f"[Conveyor Belt]: {item_label}; dashboard status {res.status_code}. Retrying in {SystemConfig.CONVEYOR_RETRY_INTERVAL}s...")
-                        time.sleep(SystemConfig.CONVEYOR_RETRY_INTERVAL)
-                except requests.exceptions.RequestException:
-                    logger.warning(f"[Conveyor Belt]: Dashboard unreachable for {item_label}. Retrying in {SystemConfig.CONVEYOR_RETRY_INTERVAL}s...")
-                    time.sleep(SystemConfig.CONVEYOR_RETRY_INTERVAL)
-
-            self.queue.task_done()
 
 
 class SmartReceptionTriageKiosk:

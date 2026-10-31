@@ -8,6 +8,23 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+
+    # PostgreSQL for the nurse-dashboard tests (they also run on SQLite).
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: triage
+          POSTGRES_PASSWORD: triage
+          POSTGRES_DB: triage_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U triage"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
     steps:
       - uses: actions/checkout@v4
 
@@ -15,7 +32,9 @@ jobs:
         with:
           python-version: "3.11"
           cache: pip
-          cache-dependency-path: "requirements-test.txt" # 👈 เพิ่มบรรทัดนี้เข้าไปครับ
+          cache-dependency-path: |
+            requirements-test.txt
+            requirements-dashboard.txt
 
       - name: Install system libraries for OpenCV
         run: sudo apt-get update && sudo apt-get install -y libgl1 libglib2.0-0
@@ -25,7 +44,8 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -r requirements-test.txt
 
-      - name: Run unit tests
+      - name: Run unit tests (dashboard on SQLite and PostgreSQL)
         env:
           PYTHONPATH: src
+          TEST_POSTGRES_URL: postgresql+psycopg://triage:triage@localhost:5432/triage_test
         run: python -m pytest -v
