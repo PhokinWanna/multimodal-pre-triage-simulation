@@ -156,6 +156,10 @@ class SystemConfig:
 
     # --- Background "Conveyor Belt" Outbox Spooler ---
     OUTBOX_SPOOL_DIR = str(PROJECT_ROOT / "data" / "runtime" / "spool_outbox")
-    NURSE_DASHBOARD_ENDPOINT = "http://127.0.0.1:8000/api/triage/submit_case"
+    NURSE_DASHBOARD_ENDPOINT = os.getenv(
+        "NURSE_DASHBOARD_ENDPOINT", "http://127.0.0.1:8000/api/triage/submit_case"
+    )
+    # Shared secret sent as the X-Kiosk-Key header; must match DASHBOARD_KIOSK_KEY on the dashboard.
+    NURSE_DASHBOARD_KEY = os.getenv("NURSE_DASHBOARD_KEY", "")
     HTTP_TIMEOUT = 3.0
     CONVEYOR_RETRY_INTERVAL = 30.0            # Seconds between dispatch retry attempts

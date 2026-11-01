@@ -27,10 +27,13 @@ NURSE_ASSISTANCE_PREFIX = "nurse-assistance-"
 class ConveyorBeltWorker(threading.Thread):
     """Background Outbox Spooler (The Conveyor Belt)."""
 
-    def __init__(self, spool_dir: str, endpoint: str, recover_existing: bool = True):
+    def __init__(self, spool_dir: str, endpoint: str, recover_existing: bool = True,
+                 api_key: str | None = None):
         super().__init__(daemon=True)
         self.spool_dir = spool_dir
         self.endpoint = endpoint
+        key = SystemConfig.NURSE_DASHBOARD_KEY if api_key is None else api_key
+        self.headers = {"X-Kiosk-Key": key} if key else {}
         self.queue = queue.Queue()
         self.running = True
         os.makedirs(self.spool_dir, exist_ok=True)
@@ -133,12 +136,18 @@ class ConveyorBeltWorker(threading.Thread):
             transmitted = False
             while not transmitted and self.running:
                 try:
-                    res = requests.post(self.endpoint, json=payload, timeout=SystemConfig.HTTP_TIMEOUT)
+                    res = requests.post(self.endpoint, json=payload, headers=self.headers,
+                                        timeout=SystemConfig.HTTP_TIMEOUT)
                     if res.status_code in [200, 201]:
                         logger.info(f"[Conveyor Belt]: {item_label} delivered to Nurse Dashboard.")
                         transmitted = True
                         if os.path.exists(disk_path):
                             os.remove(disk_path)
+                    elif res.status_code == 401:
+                        logger.error(f"[Conveyor Belt]: Dashboard rejected the kiosk key for {item_label}. "
+                                     f"Check NURSE_DASHBOARD_KEY matches DASHBOARD_KIOSK_KEY. "
+                                     f"Retrying in {SystemConfig.CONVEYOR_RETRY_INTERVAL}s...")
+                        time.sleep(SystemConfig.CONVEYOR_RETRY_INTERVAL)
                     else:
                         logger.warning(f"[Conveyor Belt]: {item_label}; dashboard status {res.status_code}. Retrying in {SystemConfig.CONVEYOR_RETRY_INTERVAL}s...")
                         time.sleep(SystemConfig.CONVEYOR_RETRY_INTERVAL)

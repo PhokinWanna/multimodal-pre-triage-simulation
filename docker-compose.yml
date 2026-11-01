@@ -1,0 +1,52 @@
+# Nurse dashboard + PostgreSQL.
+#
+#   1. cp .env.example .env   and change the passwords/keys in .env
+#   2. docker compose up -d --build
+#   3. docker compose exec dashboard python -m nurse_dashboard create-admin
+#   4. open http://127.0.0.1:8000
+#
+# The kiosk keeps running on the host as usual; set NURSE_DASHBOARD_KEY there to
+# the same value as DASHBOARD_KIOSK_KEY below.
+
+services:
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: triage
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: triage
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U triage"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile.dashboard
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DASHBOARD_DATABASE_URL: postgresql+psycopg://triage:${POSTGRES_PASSWORD}@db:5432/triage
+      DASHBOARD_SECRET_KEY: ${DASHBOARD_SECRET_KEY:?set DASHBOARD_SECRET_KEY in .env}
+      DASHBOARD_KIOSK_KEY: ${DASHBOARD_KIOSK_KEY:?set DASHBOARD_KIOSK_KEY in .env}
+      DASHBOARD_EVIDENCE_DIR: /evidence
+      DASHBOARD_RETENTION_DAYS: ${DASHBOARD_RETENTION_DAYS:-30}
+      DASHBOARD_SERVICE_POINT: ${DASHBOARD_SERVICE_POINT:-ED}
+      DASHBOARD_TIMEZONE: Asia/Bangkok
+    volumes:
+      # The kiosk's photo folder, so the dashboard can show (and later delete) photos.
+      - ./data/runtime/evidence:/evidence
+    ports:
+      # Only this computer can reach the dashboard. Change to "8000:8000" for LAN use
+      # ONLY behind HTTPS (see docs/nurse_dashboard/USER_MANUAL.md, part C).
+      - "127.0.0.1:8000:8000"
+
+volumes:
+  pgdata:

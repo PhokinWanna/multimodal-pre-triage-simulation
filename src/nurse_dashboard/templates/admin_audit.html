@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Audit log · Pre-Triage Dashboard{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1>Audit log</h1><p class="muted">Who did what, and when. Personal details (names, HN values) are never written here.</p></div>
+  <div class="page-tools"><a class="btn btn-ghost" href="/admin/users">Staff accounts</a></div>
+</div>
+<form class="card filters" method="get" action="/admin/audit">
+  <div class="field"><label for="action">Action</label>
+    <select id="action" name="action"><option value="">All</option>
+      {% for key, text in ACTIONS.items() %}<option value="{{ key }}" {{ 'selected' if f.action == key else '' }}>{{ text }}</option>{% endfor %}
+    </select></div>
+  <div class="field"><label for="actor">Staff username</label><input id="actor" name="actor" value="{{ f.actor }}"></div>
+  <div class="field field-btn"><button class="btn btn-primary" type="submit">Filter</button></div>
+</form>
+{% if rows %}
+<table class="queue">
+  <thead><tr><th>Time</th><th>Who</th><th>What</th><th>Item</th><th>Details</th></tr></thead>
+  <tbody>
+  {% for a in rows %}
+  <tr>
+    <td class="num small" data-label="Time">{{ L.date_time(a.at, tz) }}</td>
+    <td class="small" data-label="Who">{{ a.actor }}</td>
+    <td>{{ ACTIONS.get(a.action, a.action) }}</td>
+    <td class="small" data-label="Item">{{ a.target_id or '' }}</td>
+    <td class="small muted" data-label="Details">{% for k, v in (a.detail or {}).items() %}{{ k }}: {{ v | join(', ') if v is iterable and v is not string else v }}{% if not loop.last %} · {% endif %}{% endfor %}</td>
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+<nav class="pager">
+  {% if page > 1 %}<a class="btn btn-ghost" href="/admin/audit?action={{ f.action }}&actor={{ f.actor }}&page={{ page - 1 }}">← Newer</a>{% endif %}
+  <span class="muted">Page {{ page }}</span>
+  {% if has_next %}<a class="btn btn-ghost" href="/admin/audit?action={{ f.action }}&actor={{ f.actor }}&page={{ page + 1 }}">Older →</a>{% endif %}
+</nav>
+{% else %}<div class="card empty"><p>No entries.</p></div>{% endif %}
+{% endblock %}

@@ -1,0 +1,31 @@
+{# Small reusable pieces. #}
+{% macro level_badge(n, L, size='') -%}
+  {%- set lv = L.level(n) -%}
+  {%- if lv -%}
+    <span class="lvl lvl-{{ lv.number }} {{ size }}" title="ESI {{ lv.number }} · MOPH {{ lv.code }}">
+      <b>{{ lv.number }}</b><span class="lvl-name">{{ lv.name }}</span>
+    </span>
+  {%- else -%}
+    <span class="lvl lvl-none {{ size }}" title="No level suggested"><b>?</b><span class="lvl-name">Nurse to triage</span></span>
+  {%- endif -%}
+{%- endmacro %}
+
+{% macro status_chip(case) -%}
+  {%- if case.status.value == 'NEW' -%}<span class="chip chip-new">New</span>
+  {%- elif case.status.value == 'ACKNOWLEDGED' -%}<span class="chip chip-seen">Seen</span>
+  {%- elif case.status.value == 'REVIEWED' -%}<span class="chip chip-done">Decided</span>
+  {%- else -%}<span class="chip">Closed</span>{%- endif -%}
+{%- endmacro %}
+
+{% macro signs_list(case, L) -%}
+  {%- set signs = [] -%}
+  {%- if case.chest_clutching %}{% set _ = signs.append(L.VISUAL_SIGNS['chest_clutching']) %}{% endif -%}
+  {%- if case.abdominal_clutching %}{% set _ = signs.append(L.VISUAL_SIGNS['abdominal_clutching']) %}{% endif -%}
+  {%- if case.head_clutching %}{% set _ = signs.append(L.VISUAL_SIGNS['head_clutching']) %}{% endif -%}
+  {%- if case.skin_status == 'FLUSHING' %}{% set _ = signs.append(L.SKIN_STATUS['FLUSHING']) %}{% endif -%}
+  {{ signs | join('; ') if signs else '—' }}
+{%- endmacro %}
+
+{% macro waited(case, L) -%}
+  <span class="waited" data-since="{{ L.utc_iso(case.received_at) }}">{{ L.waited_minutes(case.received_at) }} min</span>
+{%- endmacro %}

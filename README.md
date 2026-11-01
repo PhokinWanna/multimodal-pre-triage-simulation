@@ -26,6 +26,10 @@ and suggest an Emergency Severity Index (ESI) level before a nurse sees them.
   never sent to external text-to-speech.
 - **Safety rules:** emergency keywords interrupt the interview (ESI 1–2), and
   three off-topic answers in a row are flagged as possible altered mental status.
+- **Nurse dashboard:** a browser-based staff view (FastAPI, SQLite or PostgreSQL)
+  with a live queue, a case page laid out like a triage note, nurse-entered
+  vital signs and identification, and a human-in-the-loop review where the
+  nurse confirms or changes the kiosk's suggested level.
 
 ## Architecture
 
@@ -37,7 +41,9 @@ flowchart LR
     AUD --> FSM
     FSM <--> LLM["Reasoning engine<br/>Llama 3.2 via Ollama<br/>+ rule-based fallback"]
     FSM --> TTS["Voice prompts<br/>Thai / English"]
-    FSM --> OUT["Case outbox<br/>JSON → nurse dashboard endpoint"]
+    FSM --> OUT["Case outbox<br/>JSON spool + retry"]
+    OUT --> DASH["Nurse dashboard<br/>FastAPI + SQLite/PostgreSQL"]
+    DASH --> RN(["Nurse review<br/>confirm or change level"])
 ```
 
 ## Results: skin-flushing CNN
@@ -75,8 +81,10 @@ details are in
 
 | Path | Contents |
 | --- | --- |
-| `src/triage_kiosk/` | Kiosk application: `vision/`, `audio/`, `triage/`, consent and TTS privacy helpers |
-| `tests/` | Unit tests for consent, TTS privacy, vision preprocessing, and triage fallback |
+| `src/triage_kiosk/` | Kiosk application: `vision/`, `audio/`, `triage/`, consent, outbox and TTS privacy helpers |
+| `src/nurse_dashboard/` | Nurse dashboard: API, pages, review, reports, admin, retention |
+| `tests/` | Unit tests for the kiosk; `tests/dashboard/` for the dashboard (SQLite and PostgreSQL) |
+| `docs/nurse_dashboard/` | [Dashboard user manual](docs/nurse_dashboard/USER_MANUAL.md) with screenshots |
 | `models/` | TFLite skin classifier used by the kiosk |
 | `assets/audio/` | Pre-recorded Thai and English voice prompts |
 | `scripts/data/` | Face-patch extraction for CNN training |
@@ -113,6 +121,21 @@ python -m pip install -r requirements-test.txt
 PYTHONPATH=src python -m pytest
 ```
 
+### Nurse dashboard
+
+Use a separate environment (Python 3.11 or newer):
+
+```bash
+python -m venv .venv-dashboard && source .venv-dashboard/bin/activate
+python -m pip install -r requirements-dashboard.txt
+PYTHONPATH=src python -m nurse_dashboard create-admin
+PYTHONPATH=src python -m uvicorn nurse_dashboard.app:app --port 8000
+python scripts/dashboard/send_demo_cases.py     # optional: fake kiosk cases
+```
+
+Open `http://127.0.0.1:8000`. Full guide for nurses, admins and setup:
+[`docs/nurse_dashboard/USER_MANUAL.md`](docs/nurse_dashboard/USER_MANUAL.md).
+
 ### CNN training pipeline
 
 Use a separate environment with `requirements-cnn.txt`. The image dataset is
@@ -129,10 +152,10 @@ More detail: [`scripts/train/cnn/SPLIT_README.md`](scripts/train/cnn/SPLIT_READM
 
 ## Current status
 
-- The nurse dashboard is planned but not built yet; the kiosk currently posts
-  cases to a configurable endpoint.
-- Some pre-recorded alerts mention notifying a nurse; treat these as simulated
-  until the dashboard exists.
+- The nurse dashboard is built and tested, but has not yet been evaluated with
+  nurses; a System Usability Scale (SUS) session is planned.
+- The kiosk does not measure vital signs or collect identity; nurses add both
+  at the dashboard.
 - Systematic LLM scenario testing is planned work.
 
 ## License

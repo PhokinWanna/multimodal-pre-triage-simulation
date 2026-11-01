@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Queue · Pre-Triage Dashboard{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Waiting patients</h1>
+    <p class="muted">From the pre-triage kiosk. Most urgent first, then longest wait. Updates automatically.</p>
+  </div>
+  <div class="page-tools">
+    <span id="live-status" class="live live-off" aria-live="polite">Connecting…</span>
+    <button id="sound-toggle" class="btn btn-ghost" type="button" aria-pressed="false">Turn on alert sound</button>
+  </div>
+</div>
+<div id="queue" data-fragment-url="/queue/fragment">
+  {% include "_queue.html" %}
+</div>
+{% endblock %}
+{% block scripts %}<script src="/static/js/dashboard.js" defer></script>{% endblock %}

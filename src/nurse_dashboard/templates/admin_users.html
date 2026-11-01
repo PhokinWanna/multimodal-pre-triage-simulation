@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Staff accounts · Pre-Triage Dashboard{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1>Staff accounts</h1><p class="muted">Add nurses, reset passwords and switch accounts off. Accounts are never deleted, so the audit trail stays complete.</p></div>
+  <div class="page-tools"><a class="btn btn-ghost" href="/admin/audit">Audit log</a></div>
+</div>
+{% if message %}<div class="alert alert-ok" role="status">{{ message }}</div>{% endif %}
+{% if error %}<div class="alert alert-error" role="alert">{{ error }}</div>{% endif %}
+
+<div class="admin-grid">
+  <section class="card section">
+    <h2>Accounts</h2>
+    <table class="queue">
+      <thead><tr><th>Name</th><th>Username</th><th>Role</th><th>Status</th><th><span class="sr-only">Actions</span></th></tr></thead>
+      <tbody>
+      {% for u in users %}
+      <tr class="{{ '' if u.is_active else 'row-off' }}">
+        <td><strong>{{ u.display_name }}</strong>{% if u.id == user.id %} <span class="muted small">(you)</span>{% endif %}</td>
+        <td class="small">{{ u.username }}</td>
+        <td class="small">{{ 'Admin' if u.role.value == 'admin' else 'Nurse' }}</td>
+        <td>{% if u.is_active %}<span class="chip chip-done">Active</span>{% else %}<span class="chip">Off</span>{% endif %}</td>
+        <td>
+          <div class="actions">
+            <details class="inline-form">
+              <summary class="btn btn-small btn-ghost">Reset password</summary>
+              <form method="post" action="/admin/users/{{ u.id }}/password">
+                <label class="sr-only" for="pw-{{ u.id }}">New password for {{ u.username }}</label>
+                <input id="pw-{{ u.id }}" name="password" type="password" minlength="8" placeholder="New password (8+)" required autocomplete="new-password">
+                <button class="btn btn-small btn-primary" type="submit">Save</button>
+              </form>
+            </details>
+            {% if u.id != user.id %}
+            <form method="post" action="/admin/users/{{ u.id }}/active">
+              <input type="hidden" name="active" value="{{ '0' if u.is_active else '1' }}">
+              <button class="btn btn-small btn-ghost" type="submit">{{ 'Switch off' if u.is_active else 'Switch on' }}</button>
+            </form>
+            {% endif %}
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </section>
+
+  <div class="case-col">
+    <form class="card section form" method="post" action="/admin/users">
+      <h2>Add an account</h2>
+      <label for="display_name">Full name</label>
+      <input id="display_name" name="display_name" placeholder="e.g. Nurse Malee" value="{{ form.get('display_name', '') }}" required>
+      <label for="username">Username</label>
+      <input id="username" name="username" placeholder="letters, numbers, . _ -" value="{{ form.get('username', '') }}" required autocomplete="off">
+      <label for="password">First password</label>
+      <input id="password" name="password" type="password" minlength="8" required autocomplete="new-password">
+      <p class="muted small">Give it to the nurse in person. They can ask you to reset it any time.</p>
+      <label for="role">Role</label>
+      <select id="role" name="role">
+        <option value="nurse">Nurse — queue, cases, decisions, history, statistics</option>
+        <option value="admin" {{ 'selected' if form.get('role') == 'admin' else '' }}>Admin — also accounts, audit log and data export</option>
+      </select>
+      <button class="btn btn-primary" type="submit">Add account</button>
+    </form>
+
+    <section class="card section">
+      <h2>Data protection settings</h2>
+      <dl class="facts small">
+        <dt>Keep cases for</dt><dd>{% if settings.retention_days > 0 %}{{ settings.retention_days }} days, then deleted automatically (with kiosk photos){% else %}<span class="warn">Forever — automatic deletion is off</span>{% endif %}</dd>
+        <dt>Kiosk key</dt><dd>{% if settings.kiosk_key %}Set — the kiosk must send the shared key{% else %}<span class="warn">Not set — only safe when the kiosk runs on this computer</span>{% endif %}</dd>
+        <dt>Secure cookie (HTTPS)</dt><dd>{{ 'On' if settings.cookie_secure else 'Off (local use)' }}</dd>
+        <dt>Database</dt><dd>{{ 'SQLite (single file)' if settings.is_sqlite else 'PostgreSQL' }}</dd>
+      </dl>
+      <p class="muted small">These are set when the server starts (see the manual, "Settings").</p>
+    </section>
+  </div>
+</div>
+{% endblock %}

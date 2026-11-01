@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% from "_macros.html" import level_badge, status_chip %}
+{% block title %}History · Pre-Triage Dashboard{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Case history</h1><p class="muted">Search past kiosk cases. Shows the last 7 days unless you choose dates.</p></div></div>
+<form class="card filters" method="get" action="/history">
+  <div class="field"><label for="date_from">From</label><input type="date" id="date_from" name="date_from" value="{{ f.date_from }}"></div>
+  <div class="field"><label for="date_to">To</label><input type="date" id="date_to" name="date_to" value="{{ f.date_to }}"></div>
+  <div class="field"><label for="level">Level</label>
+    <select id="level" name="level"><option value="">All</option>
+      {% for n, lv in L.LEVELS.items() %}<option value="{{ n }}" {{ 'selected' if f.level == n|string else '' }}>{{ n }} — {{ lv.name }}</option>{% endfor %}
+    </select></div>
+  <div class="field"><label for="status">Status</label>
+    <select id="status" name="status"><option value="">All</option>
+      <option value="NEW" {{ 'selected' if f.status == 'NEW' else '' }}>New</option>
+      <option value="ACKNOWLEDGED" {{ 'selected' if f.status == 'ACKNOWLEDGED' else '' }}>Seen</option>
+      <option value="REVIEWED" {{ 'selected' if f.status == 'REVIEWED' else '' }}>Decided</option>
+    </select></div>
+  <div class="field field-grow"><label for="q">HN, name or case number</label><input id="q" name="q" value="{{ f.q }}"></div>
+  <div class="field field-btn"><button class="btn btn-primary" type="submit">Search</button></div>
+</form>
+
+{% if cases %}
+<table class="queue">
+  <thead><tr><th>Arrived</th><th>Kiosk level</th><th>Final level</th><th>Chief complaint (CC)</th><th>Patient</th><th>Send to</th><th>Status</th></tr></thead>
+  <tbody>
+  {% for c in cases %}
+  <tr>
+    <td class="num" data-label="Arrived">{{ L.date_time(c.received_at, tz) }}</td>
+    <td>{{ level_badge(c.ai_esi, L, 'lvl-sm') }}</td>
+    <td>{% if c.final_esi %}{{ level_badge(c.final_esi, L) }}{% else %}<span class="muted">—</span>{% endif %}</td>
+    <td class="cc"><a href="/cases/{{ c.id }}">{{ L.chief_complaint(c.conversation) or 'No complaint recorded' }}</a></td>
+    <td class="small" data-label="Patient">{{ c.hn or '' }}{% if c.hn and c.patient_name %} · {% endif %}{{ c.patient_name or '' }}{% if not (c.hn or c.patient_name) %}<span class="muted">—</span>{% endif %}</td>
+    <td class="small" data-label="Send to">{{ L.DISPOSITIONS.get(c.disposition, '—') }}</td>
+    <td>{{ status_chip(c) }}</td>
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+<nav class="pager">
+  {% set qs = 'date_from=' ~ f.date_from ~ '&date_to=' ~ f.date_to ~ '&level=' ~ f.level ~ '&status=' ~ f.status ~ '&q=' ~ (f.q | urlencode) %}
+  {% if page > 1 %}<a class="btn btn-ghost" href="/history?{{ qs }}&page={{ page - 1 }}">← Newer</a>{% endif %}
+  <span class="muted">Page {{ page }}</span>
+  {% if has_next %}<a class="btn btn-ghost" href="/history?{{ qs }}&page={{ page + 1 }}">Older →</a>{% endif %}
+</nav>
+{% else %}
+<div class="card empty"><p><strong>No cases found.</strong></p><p class="muted">Try a wider date range.</p></div>
+{% endif %}
+{% endblock %}

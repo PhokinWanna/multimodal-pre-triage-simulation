@@ -31,8 +31,9 @@ class EventStatus(str, Enum):
 
 
 class ReviewDecision(str, Enum):
-    CONFIRMED = "CONFIRMED"
-    REVISED = "REVISED"
+    CONFIRMED = "CONFIRMED"   # nurse kept the suggested level
+    REVISED = "REVISED"       # nurse changed the suggested level
+    ASSIGNED = "ASSIGNED"     # no suggestion existed; nurse set the level
 
 
 class Role(str, Enum):
@@ -87,11 +88,30 @@ class Case(SQLModel, table=True):
     check_notes: list[str] = Field(default_factory=list, sa_column=Column(JSON))
     raw_payload: dict[str, Any] = Field(default_factory=dict, sa_column=Column(JSON))
 
+    # --- completed by the nurse at the desk (the kiosk cannot collect these) ---
+    # Identification is done by staff, not by the kiosk (PDPA data minimisation).
+    hn: Optional[str] = Field(default=None, index=True, max_length=32)   # hospital number
+    patient_name: Optional[str] = Field(default=None, max_length=128)
+    heart_rate: Optional[int] = None            # beats/min
+    resp_rate: Optional[int] = None             # breaths/min
+    systolic_bp: Optional[int] = None           # mmHg
+    diastolic_bp: Optional[int] = None          # mmHg
+    temperature_c: Optional[float] = None       # degrees Celsius
+    spo2: Optional[int] = None                  # %
+    pain_score: Optional[int] = None            # 0-10
+    allergies: Optional[str] = Field(default=None, sa_column=Column(Text))
+    medications: Optional[str] = Field(default=None, sa_column=Column(Text))
+    past_history: Optional[str] = Field(default=None, sa_column=Column(Text))
+    nurse_note: Optional[str] = Field(default=None, sa_column=Column(Text))
+    nurse_data_at: Optional[datetime] = None
+    nurse_data_by: Optional[int] = Field(default=None, foreign_key="users.id")
+
     # --- staff workflow ---
     status: CaseStatus = Field(default=CaseStatus.NEW, index=True)
     acknowledged_at: Optional[datetime] = None
     acknowledged_by: Optional[int] = Field(default=None, foreign_key="users.id")
     final_esi: Optional[int] = None
+    disposition: Optional[str] = Field(default=None, max_length=32)
     reviewed_at: Optional[datetime] = None
     closed_at: Optional[datetime] = None
 
@@ -121,6 +141,8 @@ class Review(SQLModel, table=True):
     decision: ReviewDecision
     ai_esi: Optional[int] = None
     final_esi: int
+    disposition: Optional[str] = Field(default=None, max_length=32)
+    patient_identified: bool = True             # False = reviewed before ID was available
     reason: Optional[str] = Field(default=None, sa_column=Column(Text))
     reviewed_at: datetime = Field(default_factory=utcnow)
 

@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}Statistics · Pre-Triage Dashboard{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1>Statistics</h1><p class="muted">Kiosk suggestion compared with the nurse's final decision. Last 30 days unless you choose dates.</p></div>
+</div>
+<form class="card filters" method="get" action="/stats">
+  <div class="field"><label for="date_from">From</label><input type="date" id="date_from" name="date_from" value="{{ f.date_from }}"></div>
+  <div class="field"><label for="date_to">To</label><input type="date" id="date_to" name="date_to" value="{{ f.date_to }}"></div>
+  <div class="field field-btn"><button class="btn btn-primary" type="submit">Show</button></div>
+  {% if user.role.value == 'admin' %}
+  <div class="field field-btn field-right"><a class="btn btn-ghost" href="/export.csv?date_from={{ f.date_from }}&date_to={{ f.date_to }}">Download CSV (de-identified)</a></div>
+  {% endif %}
+</form>
+
+<div class="tiles">
+  <div class="tile"><div class="tile-label">Kiosk cases</div><div class="tile-value">{{ s.total }}</div><div class="muted small">{{ s.waiting }} still waiting</div></div>
+  <div class="tile"><div class="tile-label">Decided by nurse</div><div class="tile-value">{{ s.reviewed }}</div><div class="muted small">{{ s.compared }} with a kiosk suggestion</div></div>
+  <div class="tile"><div class="tile-label">Nurse agreed with kiosk</div><div class="tile-value">{{ s.agree_pct if s.agree_pct is not none else '—' }}{% if s.agree_pct is not none %}<small>%</small>{% endif %}</div><div class="muted small">{{ s.agree }} of {{ s.compared }}</div></div>
+  <div class="tile"><div class="tile-label">Median time to first look</div><div class="tile-value">{{ s.median_ack if s.median_ack is not none else '—' }}{% if s.median_ack is not none %}<small> min</small>{% endif %}</div><div class="muted small">to decision: {{ s.median_review if s.median_review is not none else '—' }}{% if s.median_review is not none %} min{% endif %}</div></div>
+</div>
+
+<div class="stats-grid">
+  <section class="card section">
+    <h2>Kiosk level vs nurse decision</h2>
+    <p class="muted small">Rows: kiosk suggestion. Columns: nurse's final level. The diagonal is agreement.
+      Below the diagonal (red) the kiosk was <strong>less urgent</strong> than the nurse (under-triage); above it (blue), <strong>more urgent</strong> (over-triage).</p>
+    {% set ns = namespace(mx=0) %}{% for v in s.matrix.values() %}{% if v > ns.mx %}{% set ns.mx = v %}{% endif %}{% endfor %}
+    <table class="matrix">
+      <thead><tr><th scope="col">Kiosk ↓ / Nurse →</th>{% for n in L.LEVELS %}<th scope="col">{{ n }}</th>{% endfor %}</tr></thead>
+      <tbody>
+      {% for a in L.LEVELS %}
+        <tr><th scope="row">{{ a }} {{ L.LEVELS[a].name }}</th>
+        {% for n in L.LEVELS %}
+          {% set v = s.matrix[(a, n)] %}
+          {% set alpha = (v / ns.mx) if ns.mx else 0 %}
+          <td class="{{ 'diag' if a == n else ('under' if a > n else 'over') }}" style="--a: {{ '%.2f' % alpha }}">{{ v if v else '' }}</td>
+        {% endfor %}</tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    <dl class="facts small">
+      <dt>Under-triage (kiosk less urgent)</dt><dd>{{ s.under }}{% if s.under_pct is not none %} ({{ s.under_pct }}%){% endif %}</dd>
+      <dt>Over-triage (kiosk more urgent)</dt><dd>{{ s.over }}{% if s.over_pct is not none %} ({{ s.over_pct }}%){% endif %}</dd>
+    </dl>
+  </section>
+
+  <section class="card section">
+    <h2>Levels</h2>
+    {% set lm = namespace(mx=1) %}
+    {% for n in L.LEVELS %}{% if s.ai_levels.get(n, 0) > lm.mx %}{% set lm.mx = s.ai_levels.get(n, 0) %}{% endif %}{% if s.final_levels.get(n, 0) > lm.mx %}{% set lm.mx = s.final_levels.get(n, 0) %}{% endif %}{% endfor %}
+    <div class="legend small"><span class="key key-ai"></span>Kiosk suggestion <span class="key key-final"></span>Nurse decision</div>
+    <table class="bars">
+      {% for n, lv in L.LEVELS.items() %}
+      <tr><th scope="row">{{ n }} {{ lv.name }}</th>
+        <td>
+          <div class="bar-row"><div class="bar bar-ai" style="width: {{ (85 * s.ai_levels.get(n, 0) / lm.mx) | round(1) }}%"></div><span class="bar-val">{{ s.ai_levels.get(n, 0) }}</span></div>
+          <div class="bar-row"><div class="bar bar-final" style="width: {{ (85 * s.final_levels.get(n, 0) / lm.mx) | round(1) }}%"></div><span class="bar-val">{{ s.final_levels.get(n, 0) }}</span></div>
+        </td></tr>
+      {% endfor %}
+    </table>
+    <h3>Data quality</h3>
+    <dl class="facts small">
+      <dt>No kiosk level</dt><dd>{{ s.no_level }}</dd>
+      <dt>Backup rules used</dt><dd>{{ s.fallback }}</dd>
+      <dt>Incomplete kiosk data</dt><dd>{{ s.needs_check }}</dd>
+      <dt>Nurse-assistance alerts</dt><dd>{{ s.assistance }}</dd>
+    </dl>
+  </section>
+
+  <section class="card section">
+    <h2>How kiosk sessions ended</h2>
+    {% if s.exit_reasons %}<table class="plain-table">{% for reason, n in s.exit_reasons %}<tr><td>{{ L.exit_reason(reason) }}</td><td class="num">{{ n }}</td></tr>{% endfor %}</table>
+    {% else %}<p class="muted">No cases.</p>{% endif %}
+  </section>
+
+  <section class="card section">
+    <h2>Where patients were sent</h2>
+    {% if s.dispositions %}<table class="plain-table">{% for d, n in s.dispositions %}<tr><td>{{ L.DISPOSITIONS.get(d, d) }}</td><td class="num">{{ n }}</td></tr>{% endfor %}</table>
+    {% else %}<p class="muted">No decisions yet.</p>{% endif %}
+  </section>
+</div>
+<p class="muted small">Prototype statistics for evaluation only. Agreement with a nurse is not the same as clinical accuracy.</p>
+{% endblock %}

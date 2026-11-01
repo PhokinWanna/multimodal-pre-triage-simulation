@@ -81,3 +81,35 @@ class NurseAssistanceEventTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class KioskKeyHeaderTests(unittest.TestCase):
+    def test_key_is_sent_as_header_and_401_is_retried(self):
+        from unittest import mock
+
+        import triage_kiosk.outbox as outbox
+
+        with tempfile.TemporaryDirectory() as spool:
+            worker = ConveyorBeltWorker(spool, ENDPOINT, api_key="k-123")
+            worker.enqueue_case({"case_id": "CASE-K"})
+
+            calls = []
+
+            def fake_post(url, json=None, headers=None, timeout=None):
+                calls.append(headers)
+                if len(calls) >= 2:
+                    worker.running = False
+                return mock.Mock(status_code=401 if len(calls) == 1 else 201)
+
+            with mock.patch.object(outbox.requests, "post", side_effect=fake_post), \
+                 mock.patch.object(outbox.time, "sleep"), \
+                 mock.patch.object(outbox.SystemConfig, "CONVEYOR_RETRY_INTERVAL", 0):
+                worker.run()
+
+            self.assertEqual(calls[0], {"X-Kiosk-Key": "k-123"})
+            self.assertEqual(len(calls), 2)                       # 401 kept the case and retried
+            self.assertFalse(os.path.exists(os.path.join(spool, "CASE-K.json")))
+
+    def test_no_key_sends_no_header(self):
+        with tempfile.TemporaryDirectory() as spool:
+            self.assertEqual(ConveyorBeltWorker(spool, ENDPOINT, api_key="").headers, {})

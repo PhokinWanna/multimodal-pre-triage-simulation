@@ -1,0 +1,88 @@
+{# Nurse decision: the human-in-the-loop review. Included from case.html. #}
+{% from "_macros.html" import level_badge %}
+{% set df = decision_form or {} %}
+{% set de = decision_errors or {} %}
+{% set chosen = (df.get('final_esi') or (case.final_esi if case.final_esi else case.ai_esi) or '') | string %}
+{% set chosen_disp = df.get('disposition') or case.disposition or '' %}
+
+{% macro decision_form() %}
+<form method="post" action="/cases/{{ case.id }}/review" class="decision-form">
+  {% if de %}<div class="alert alert-error" role="alert">Please complete the highlighted parts.</div>{% endif %}
+
+  <fieldset class="{{ 'has-error' if de.get('final_esi') else '' }}">
+    <legend>Triage level{% if case.ai_esi %} <span class="muted small">— kiosk suggested {{ case.ai_esi }}</span>{% endif %}</legend>
+    <div class="level-picker">
+      {% for n, lv in L.LEVELS.items() %}
+      <label class="pick lvl-{{ n }}">
+        <input type="radio" name="final_esi" value="{{ n }}" {{ 'checked' if chosen == n|string else '' }}>
+        <b>{{ n }}</b><span>{{ lv.name }}</span>
+        {% if case.ai_esi == n %}<em class="small">suggested</em>{% endif %}
+      </label>
+      {% endfor %}
+    </div>
+    {% if de.get('final_esi') %}<div class="field-error">{{ de['final_esi'] }}</div>{% endif %}
+  </fieldset>
+
+  <fieldset class="{{ 'has-error' if de.get('disposition') else '' }}">
+    <legend>Send patient to</legend>
+    <div class="disp-picker">
+      {% for key, text in L.DISPOSITIONS.items() %}
+      <label class="pick-line"><input type="radio" name="disposition" value="{{ key }}" {{ 'checked' if chosen_disp == key else '' }}> {{ text }}</label>
+      {% endfor %}
+    </div>
+    {% if de.get('disposition') %}<div class="field-error">{{ de['disposition'] }}</div>{% endif %}
+  </fieldset>
+
+  <div class="field field-wide {{ 'has-error' if de.get('reason') else '' }}">
+    <label for="reason">Reason / note <span class="muted small">(required if you change the suggested level)</span></label>
+    <textarea id="reason" name="reason" rows="2">{{ df.get('reason', '') }}</textarea>
+    {% if de.get('reason') %}<div class="field-error">{{ de['reason'] }}</div>{% endif %}
+  </div>
+
+  {% if not (case.hn or case.patient_name) %}
+  <div class="notice notice-warn {{ 'has-error' if de.get('identity') else '' }}">
+    <strong>Patient not identified yet.</strong> Record the HN or name in "Completed by nurse" first.
+    <label class="pick-line"><input type="checkbox" name="unidentified_ok" value="1" {{ 'checked' if df.get('unidentified_ok') else '' }}>
+      Patient not yet identified (e.g. unconscious, no documents) — continue anyway</label>
+    {% if de.get('identity') %}<div class="field-error">{{ de['identity'] }}</div>{% endif %}
+  </div>
+  {% endif %}
+
+  <button class="btn btn-primary" type="submit">Confirm decision</button>
+</form>
+{% endmacro %}
+
+<section class="card section" id="decision">
+  <h2>Nurse decision</h2>
+  {% if reviewed %}<div class="alert alert-ok" role="status">Decision saved. The patient has left the waiting queue.</div>{% endif %}
+
+  {% if reviews %}
+    {% set r = reviews[0] %}
+    <div class="decision-summary">
+      {{ level_badge(r.final_esi, L, 'lvl-lg') }}
+      <div>
+        <div class="decision-title">Level {{ r.final_esi }} — {{ L.LEVELS[r.final_esi].name }}</div>
+        <div class="muted">
+          {% if r.decision.value == 'CONFIRMED' %}Confirmed the kiosk suggestion
+          {% elif r.decision.value == 'REVISED' %}Changed from suggested level {{ r.ai_esi }}
+          {% else %}Set by nurse (no kiosk suggestion){% endif %}
+          · {{ L.DISPOSITIONS.get(r.disposition, r.disposition or '—') }}
+        </div>
+        {% if r.reason %}<div class="decision-reason">"{{ r.reason }}"</div>{% endif %}
+        <div class="muted small">{{ people[r.reviewer_id].display_name if r.reviewer_id in people else 'Unknown' }} · {{ L.date_time(r.reviewed_at, tz) }}{% if not r.patient_identified %} · patient was not yet identified{% endif %}</div>
+      </div>
+    </div>
+    {% if reviews|length > 1 %}
+    <details class="earlier"><summary>Earlier decisions ({{ reviews|length - 1 }})</summary>
+      <ul class="plain small">
+        {% for old in reviews[1:] %}
+        <li>Level {{ old.final_esi }} · {{ L.DISPOSITIONS.get(old.disposition, '—') }} · {{ people[old.reviewer_id].display_name if old.reviewer_id in people else '' }} · {{ L.date_time(old.reviewed_at, tz) }}{% if old.reason %} — "{{ old.reason }}"{% endif %}</li>
+        {% endfor %}
+      </ul>
+    </details>
+    {% endif %}
+    <details class="change" {{ 'open' if de else '' }}><summary>Change this decision</summary>{{ decision_form() }}</details>
+  {% else %}
+    {{ decision_form() }}
+  {% endif %}
+</section>

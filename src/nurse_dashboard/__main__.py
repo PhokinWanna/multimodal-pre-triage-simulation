@@ -6,6 +6,7 @@
     PYTHONPATH=src python -m nurse_dashboard deactivate   USERNAME
     PYTHONPATH=src python -m nurse_dashboard activate     USERNAME
     PYTHONPATH=src python -m nurse_dashboard list-users
+    PYTHONPATH=src python -m nurse_dashboard purge        # delete data older than the retention period
 """
 
 from __future__ import annotations
@@ -53,6 +54,7 @@ def main(argv: list[str] | None = None) -> None:
     for name in ("set-password", "deactivate", "activate"):
         sub.add_parser(name).add_argument("username")
     sub.add_parser("list-users")
+    sub.add_parser("purge", help="delete cases older than DASHBOARD_RETENTION_DAYS now")
     args = parser.parse_args(argv)
 
     settings = get_settings()
@@ -80,6 +82,14 @@ def main(argv: list[str] | None = None) -> None:
             audit.record(session, "cli", f"user_{args.command}d", "user", user.username)
             session.commit()
             print(f"User '{user.username}' is now {'active' if user.is_active else 'deactivated'}.")
+        elif args.command == "purge":
+            from .retention import purge_old_data
+            if settings.retention_days <= 0:
+                print("Automatic deletion is off (DASHBOARD_RETENTION_DAYS=0). Nothing deleted.")
+            else:
+                r = purge_old_data(engine, settings, actor="cli")
+                print(f"Deleted data older than {settings.retention_days} days: {r.cases} cases, "
+                      f"{r.reviews} decisions, {r.events} alerts, {r.photos} photos.")
         elif args.command == "list-users":
             users = session.exec(select(User).order_by(User.username)).all()
             if not users:

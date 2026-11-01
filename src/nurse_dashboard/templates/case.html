@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+{% from "_macros.html" import level_badge, status_chip, signs_list, waited %}
+{% block title %}Case {{ case.case_id }} · Pre-Triage Dashboard{% endblock %}
+
+{% macro field(name, label, unit='', kind='number', step='1', placeholder='') -%}
+  {%- set value = form[name] if form else (case[name] if case[name] is not none else '') -%}
+  <div class="field {{ 'has-error' if errors.get(name) else '' }}">
+    <label for="{{ name }}">{{ label }}{% if unit %} <span class="unit">({{ unit }})</span>{% endif %}</label>
+    <input id="{{ name }}" name="{{ name }}" type="{{ 'text' if kind == 'text' else 'text' }}"
+           {% if kind == 'number' %}inputmode="decimal"{% endif %} value="{{ value }}" placeholder="{{ placeholder }}"
+           {% if errors.get(name) %}aria-invalid="true" aria-describedby="{{ name }}-err"{% endif %}>
+    {% if errors.get(name) %}<div class="field-error" id="{{ name }}-err">{{ errors[name] }}</div>{% endif %}
+  </div>
+{%- endmacro %}
+
+{% macro area(name, label, hint='') -%}
+  {%- set value = form[name] if form else (case[name] or '') -%}
+  <div class="field field-wide {{ 'has-error' if errors.get(name) else '' }}">
+    <label for="{{ name }}">{{ label }}</label>
+    <textarea id="{{ name }}" name="{{ name }}" rows="2" placeholder="{{ hint }}">{{ value }}</textarea>
+    {% if errors.get(name) %}<div class="field-error">{{ errors[name] }}</div>{% endif %}
+  </div>
+{%- endmacro %}
+
+{% block content %}
+{% set lv = L.level(case.ai_esi) %}
+{% set cc = L.chief_complaint(case.conversation) %}
+{% set flags = L.vital_flags(case) %}
+
+<p class="crumbs"><a href="/">← Back to queue</a></p>
+
+{# 1. Header strip #}
+<section class="case-head card">
+  <div class="case-head-main">
+    {{ level_badge(case.ai_esi, L, 'lvl-lg') }}
+    <div>
+      <h1>{{ cc or 'No complaint recorded' }}</h1>
+      <div class="meta">
+        <span>Case {{ case.case_id }}</span>
+        <span>Arrived {{ L.clock(case.received_at, tz) }}</span>
+        <span>Waiting {{ waited(case, L) }}</span>
+        <span>{{ L.LANGUAGES.get(case.language, case.language or '—') }}</span>
+        {% if case.hn %}<span>HN {{ case.hn }}</span>{% endif %}
+        {{ status_chip(case) }}
+      </div>
+    </div>
+  </div>
+  {% if case.status.value == 'NEW' %}
+  <form method="post" action="/cases/{{ case.id }}/ack"><button class="btn btn-primary" type="submit">Mark as seen</button></form>
+  {% elif ack_user %}
+  <p class="muted small">Seen by {{ ack_user.display_name }} at {{ L.clock(case.acknowledged_at, tz) }}</p>
+  {% endif %}
+</section>
+
+{% if saved %}<div class="alert alert-ok" role="status">Saved.</div>{% endif %}
+
+<div class="case-grid">
+<div class="case-col">
+
+  {# 2. Situation #}
+  <section class="card section">
+    <h2>Situation</h2>
+    <dl class="facts">
+      <dt>Chief complaint (CC)</dt><dd>{{ cc or '—' }}</dd>
+      <dt>Suggested level</dt>
+      <dd>{% if lv %}{{ level_badge(case.ai_esi, L, 'lvl-sm') }} ESI {{ lv.number }} · MOPH {{ lv.code }} — {{ lv.name }}{% if case.ai_urgency %} <span class="muted">({{ case.ai_urgency }})</span>{% endif %}
+          {% else %}No level suggested — please triage this patient yourself.{% endif %}</dd>
+      <dt>Kiosk session</dt><dd>{{ L.exit_reason(case.exit_reason) }}</dd>
+      {% if case.scenario_type %}<dt>Evidence</dt><dd>{{ L.SCENARIOS.get(case.scenario_type, case.scenario_type) }}</dd>{% endif %}
+    </dl>
+    <div class="notice">
+      <strong>The kiosk cannot measure vital signs.</strong>
+      This suggestion is based on the patient's words and camera observations only (no BP, HR, RR, temperature or SpO₂).
+      Check vital signs before confirming the level.
+    </div>
+    {% if L.is_fallback(case.audit_mode) %}
+    <div class="notice notice-warn"><strong>Backup rules were used.</strong> The AI reasoning step did not complete, so this suggestion comes from simple rules. Review it with extra care.</div>
+    {% endif %}
+    {% if case.needs_check %}
+    <div class="notice notice-warn"><strong>Some kiosk data is incomplete.</strong> Details are under "System details" at the bottom.</div>
+    {% endif %}
+  </section>
+
+  {# 3. Observations (kiosk) #}
+  <section class="card section">
+    <h2>Observed by the kiosk camera</h2>
+    <div class="obs">
+      <dl class="facts">
+        <dt>Posture</dt>
+        <dd>{% set any_sign = case.chest_clutching or case.abdominal_clutching or case.head_clutching %}
+          {% if any_sign %}<ul class="plain">
+            {% if case.chest_clutching %}<li>{{ L.VISUAL_SIGNS['chest_clutching'] }}</li>{% endif %}
+            {% if case.abdominal_clutching %}<li>{{ L.VISUAL_SIGNS['abdominal_clutching'] }}</li>{% endif %}
+            {% if case.head_clutching %}<li>{{ L.VISUAL_SIGNS['head_clutching'] }}</li>{% endif %}
+          </ul>{% else %}No holding of chest, abdomen or head detected{% endif %}</dd>
+        <dt>Face colour</dt><dd>{{ L.SKIN_STATUS.get(case.skin_status, case.skin_status or '—') }}</dd>
+      </dl>
+      {% if case.evidence_path %}
+      <figure class="photo"><img src="/cases/{{ case.id }}/evidence" alt="Kiosk photo of the patient, to help identify them"><figcaption class="muted small">Kiosk photo — use it to find the patient</figcaption></figure>
+      {% endif %}
+    </div>
+    <p class="muted small">Camera signs support, but do not replace, the nurse's own assessment.</p>
+  </section>
+
+  {# 4. System assessment #}
+  <section class="card section">
+    <h2>System assessment and suggested plan</h2>
+    <p class="muted small">Generated by the kiosk. A suggestion only — not a clinical decision.</p>
+    <dl class="facts">
+      <dt>Subjective (S)</dt><dd>{{ case.subjective or '—' }}</dd>
+      <dt>Objective (O)</dt><dd>{{ case.objective or '—' }}</dd>
+      <dt>Assessment (A)</dt><dd>{{ case.assessment or '—' }}</dd>
+      <dt>Plan (P)</dt><dd>{{ case.plan or '—' }}</dd>
+    </dl>
+  </section>
+
+  {# 5. Nurse decision (human-in-the-loop review) #}
+  {% include "_decision.html" %}
+
+  {# 6. Conversation #}
+  <section class="card section">
+    <h2>Kiosk conversation</h2>
+    {% if case.conversation %}
+    <ol class="chat">
+      {% for t in case.conversation %}
+      <li class="{{ 'from-patient' if L.is_patient(t.role) else 'from-kiosk' }}"><span class="who-said">{{ L.speaker(t.role) }}</span>{{ t.text }}</li>
+      {% endfor %}
+    </ol>
+    {% else %}<p class="muted">No conversation recorded.</p>{% endif %}
+  </section>
+
+  {# 7. System details #}
+  <details class="card section details">
+    <summary>System details (for staff checking data quality)</summary>
+    <dl class="facts small">
+      <dt>Case ID</dt><dd>{{ case.case_id }}</dd>
+      <dt>Kiosk start time</dt><dd>{{ case.start_time or '—' }}</dd>
+      <dt>Received</dt><dd>{{ L.date_time(case.received_at, tz) }}</dd>
+      <dt>Times sent by kiosk</dt><dd>{{ case.delivery_count }}</dd>
+      <dt>Reasoning mode</dt><dd>{{ case.audit_mode or '—' }}</dd>
+      <dt>Scenario</dt><dd>{{ case.scenario_type or '—' }}</dd>
+      <dt>Exit code</dt><dd>{{ case.exit_reason or '—' }}</dd>
+      <dt>Data notes</dt><dd>{% if case.check_notes %}<ul class="plain">{% for n in case.check_notes %}<li>{{ n }}</li>{% endfor %}</ul>{% else %}None{% endif %}</dd>
+    </dl>
+  </details>
+</div>
+
+{# Right column: what the nurse completes #}
+<div class="case-col">
+  <form method="post" action="/cases/{{ case.id }}/nurse-data" class="card section nurse-form" id="nurse">
+    <h2>Completed by nurse</h2>
+    {% if errors %}<div class="alert alert-error" role="alert">Please correct the highlighted fields.</div>{% endif %}
+
+    <h3>Identification</h3>
+    <p class="muted small">The kiosk does not collect identity. Record it from the ID card or passport when you meet the patient.</p>
+    <div class="fields">
+      {{ field('hn', 'HN', kind='text') }}
+      {{ field('patient_name', 'Patient name', kind='text', placeholder='As on ID card or passport') }}
+    </div>
+
+    <h3>Vital signs <span class="muted small">(not measured by kiosk)</span></h3>
+    {% if flags %}
+    <div class="notice notice-danger" role="alert">
+      <strong>Vital signs in the ESI danger zone:</strong>
+      <ul class="plain">{% for f in flags %}<li>{{ f }}</li>{% endfor %}</ul>
+      Consider level 2 (ESI decision point D).
+    </div>
+    {% endif %}
+    <div class="fields vitals">
+      {{ field('systolic_bp', 'BP systolic', 'mmHg') }}
+      {{ field('diastolic_bp', 'BP diastolic', 'mmHg') }}
+      {{ field('heart_rate', 'HR', '/min') }}
+      {{ field('resp_rate', 'RR', '/min') }}
+      {{ field('temperature_c', 'Temp', '°C', step='0.1') }}
+      {{ field('spo2', 'SpO₂', '%') }}
+      {{ field('pain_score', 'Pain score', '0–10') }}
+    </div>
+
+    <h3>Background</h3>
+    <div class="fields">
+      {{ area('allergies', 'Allergies', 'e.g. penicillin, none known') }}
+      {{ area('medications', 'Current medications') }}
+      {{ area('past_history', 'Past history (PMH)') }}
+      {{ area('nurse_note', 'Nurse note') }}
+    </div>
+
+    <div class="form-foot">
+      <button class="btn btn-primary" type="submit">Save</button>
+      {% if nurse_user %}<span class="muted small">Last saved by {{ nurse_user.display_name }} at {{ L.clock(case.nurse_data_at, tz) }}</span>{% endif %}
+    </div>
+  </form>
+</div>
+</div>
+{% endblock %}
+{% block scripts %}<script src="/static/js/dashboard.js" defer></script>{% endblock %}

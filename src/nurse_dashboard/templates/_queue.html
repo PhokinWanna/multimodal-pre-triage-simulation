@@ -1,0 +1,54 @@
+{% from "_macros.html" import level_badge, status_chip, signs_list, waited %}
+<div id="queue-inner" data-alert-keys="{% for c in urgent %}c{{ c.id }} {% endfor %}{% for e in events %}e{{ e.id }} {% endfor %}">
+
+{% for e in events %}
+  <div class="banner banner-assist" role="alert">
+    <div><strong>A patient at the kiosk needs a nurse</strong>
+      <span class="muted">· {{ 'Declined consent' if e.reason == 'consent_refused' else e.reason }} · {{ L.clock(e.received_at, tz) }}</span></div>
+    <form method="post" action="/assistance/{{ e.id }}/attend"><button class="btn btn-small" type="submit">Attended</button></form>
+  </div>
+{% endfor %}
+
+{% for c in urgent %}
+  {% set lv = L.level(c.ai_esi) %}
+  <div class="banner banner-urgent" role="alert">
+    <div>{{ level_badge(c.ai_esi, L, 'lvl-sm') }}
+      <strong>{{ lv.name }} — not yet seen</strong>
+      <span class="muted">· waiting {{ waited(c, L) }} · {{ L.chief_complaint(c.conversation) or 'no complaint recorded' }}</span></div>
+    <div class="banner-actions">
+      <a class="btn btn-small btn-light" href="/cases/{{ c.id }}">Open</a>
+      <form method="post" action="/cases/{{ c.id }}/ack"><button class="btn btn-small" type="submit">Seen</button></form>
+    </div>
+  </div>
+{% endfor %}
+
+{% if cases %}
+<table class="queue">
+  <thead><tr>
+    <th scope="col">Suggested level</th><th scope="col">Waiting</th><th scope="col">Arrived</th>
+    <th scope="col">Chief complaint (CC)</th><th scope="col">Observed signs</th><th scope="col">Status</th><th scope="col"><span class="sr-only">Actions</span></th>
+  </tr></thead>
+  <tbody>
+  {% for c in cases %}
+    <tr class="{{ 'row-new' if c.status.value == 'NEW' else '' }}">
+      <td>{{ level_badge(c.ai_esi, L) }}</td>
+      <td class="num" data-label="Waiting">{{ waited(c, L) }}</td>
+      <td class="num" data-label="Arrived">{{ L.clock(c.received_at, tz) }}</td>
+      <td class="cc"><a href="/cases/{{ c.id }}">{{ L.chief_complaint(c.conversation) or ('Cancelled at kiosk' if c.exit_reason == 'USER_CANCELLED' else 'No complaint recorded') }}</a>
+        {% if c.exit_reason == 'USER_CANCELLED' %}<div class="muted small">Patient cancelled at the kiosk — check if still waiting</div>{% endif %}
+        {% if c.hn %}<div class="muted small">HN {{ c.hn }}</div>{% endif %}
+        {% if c.needs_check %}<div class="warn small">Kiosk data incomplete</div>{% endif %}</td>
+      <td class="small" data-label="Observed">{{ signs_list(c, L) }}</td>
+      <td>{{ status_chip(c) }}</td>
+      <td><div class="actions">
+        {% if c.status.value == 'NEW' %}<form method="post" action="/cases/{{ c.id }}/ack"><button class="btn btn-small btn-ghost" type="submit">Seen</button></form>{% endif %}
+        <a class="btn btn-small btn-primary" href="/cases/{{ c.id }}">Open</a>
+      </div></td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<div class="card empty"><p><strong>No patients waiting.</strong></p><p class="muted">New kiosk cases appear here automatically.</p></div>
+{% endif %}
+</div>

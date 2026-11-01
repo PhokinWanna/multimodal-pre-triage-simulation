@@ -29,7 +29,13 @@ class Settings:
             "DASHBOARD_EVIDENCE_DIR", str(PROJECT_ROOT / "data" / "runtime" / "evidence")
         )
     )
+    # PDPA data minimisation: cases (and their kiosk photos) older than this are deleted.
+    # 0 disables automatic deletion.
     retention_days: int = field(default_factory=lambda: int(os.getenv("DASHBOARD_RETENTION_DAYS", "30")))
+    purge_interval_hours: float = field(default_factory=lambda: float(os.getenv("DASHBOARD_PURGE_INTERVAL_HOURS", "6")))
+    # Shared secret the kiosk must send in the X-Kiosk-Key header. Empty = no check
+    # (acceptable only when kiosk and dashboard run on the same computer, 127.0.0.1).
+    kiosk_key: str = field(default_factory=lambda: os.getenv("DASHBOARD_KIOSK_KEY", ""))
     # Signs the login cookie. If unset, a random key is created once and kept in
     # data/dashboard/secret_key (git-ignored), so logins survive a server restart.
     secret_key: Optional[str] = field(default_factory=lambda: os.getenv("DASHBOARD_SECRET_KEY") or None)
@@ -40,6 +46,10 @@ class Settings:
     )
     # A login lasts one long shift at most.
     session_hours: int = field(default_factory=lambda: int(os.getenv("DASHBOARD_SESSION_HOURS", "12")))
+    # Where the kiosk is deployed: "ED" (emergency triage) or "OPD" (outpatient screening point).
+    service_point: str = field(default_factory=lambda: os.getenv("DASHBOARD_SERVICE_POINT", "ED").upper())
+    # Times are stored in UTC and shown in this time zone.
+    timezone: str = field(default_factory=lambda: os.getenv("DASHBOARD_TIMEZONE", "Asia/Bangkok"))
     # Set to 1 when the dashboard is served over HTTPS (LAN deployment).
     cookie_secure: bool = field(default_factory=lambda: os.getenv("DASHBOARD_COOKIE_SECURE", "0") == "1")
 

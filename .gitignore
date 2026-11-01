@@ -17,3 +17,6 @@ data/dataset-posture/*
 # Personal notes kept out of the public repo
 .private/
 docs/agent
+
+# Scratch files from the AI assistant (not part of the project)
+Claude_outputs/
