@@ -33,7 +33,7 @@ def test_full_case_is_stored_with_201(client, session, settings, full_case):
     assert case.ai_esi == 2 and case.ai_urgency == "Emergent"
     assert case.scenario_type == "SCENARIO_A_CONFIRMED"
     assert case.chest_clutching and not case.abdominal_clutching
-    assert case.skin_status == "FLUSHING"
+    assert case.skin_status == "RED_FLUSHING"
     assert case.conversation[2] == {"role": "patient", "text": "เจ็บหน้าอกมากครับ"}  # Thai survives
     assert case.evidence_path == os.path.realpath(img)
     assert case.final_esi is None and case.check_notes == []

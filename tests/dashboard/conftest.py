@@ -64,14 +64,14 @@ FULL_CASE = {
         {"role": "patient", "text": "เจ็บหน้าอกมากครับ"},
     ],
     "cumulative_visual_signs": {"chest_clutching": True, "abdominal_clutching": False, "head_clutching": False},
-    "facial_skin_status": "FLUSHING",
+    "facial_skin_status": "RED_FLUSHING",   # exactly what the kiosk sends
     "visual_evidence_path": None,  # filled per test
     "triage_verdict": {
         "esi_level": 2,
         "urgency": "Emergent",
         "scenario_type": "SCENARIO_A_CONFIRMED",
         "subjective": "เจ็บหน้าอกมากครับ",
-        "objective": "Visual signs: chest clutching; Facial Skin Status (CNN): FLUSHING",
+        "objective": "Visual signs: chest clutching; Facial Skin Status (CNN): RED_FLUSHING",
         "assessment": "Possible acute coronary syndrome.",
         "plan": "Immediate ECG and physician review.",
         "audit_mode": "LLM_INFERENCE_VALIDATED",

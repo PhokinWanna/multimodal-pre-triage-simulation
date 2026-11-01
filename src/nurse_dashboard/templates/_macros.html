@@ -22,7 +22,7 @@
   {%- if case.chest_clutching %}{% set _ = signs.append(L.VISUAL_SIGNS['chest_clutching']) %}{% endif -%}
   {%- if case.abdominal_clutching %}{% set _ = signs.append(L.VISUAL_SIGNS['abdominal_clutching']) %}{% endif -%}
   {%- if case.head_clutching %}{% set _ = signs.append(L.VISUAL_SIGNS['head_clutching']) %}{% endif -%}
-  {%- if case.skin_status == 'FLUSHING' %}{% set _ = signs.append(L.SKIN_STATUS['FLUSHING']) %}{% endif -%}
+  {%- if L.is_flushed(case.skin_status) %}{% set _ = signs.append(L.SKIN_STATUS['RED_FLUSHING']) %}{% endif -%}
   {{ signs | join('; ') if signs else '—' }}
 {%- endmacro %}
 

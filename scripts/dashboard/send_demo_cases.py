@@ -47,7 +47,7 @@ def demo_payloads() -> list[dict]:
         _case(1, "th", "EMERGENCY_INTERRUPT",
               [("pdpa_response", "ยินยอมครับ"), ("kiosk_proactive", "วันนี้มีอาการอะไรครับ"),
                ("patient", "เจ็บแน่นหน้าอกมาก ร้าวไปแขนซ้าย เหงื่อออกครับ")],
-              {"chest_clutching": True}, "FLUSHING",
+              {"chest_clutching": True}, "RED_FLUSHING",
               _verdict(2, "Emergent", "SCENARIO_A_CONFIRMED", "Severe chest tightness radiating to left arm, sweating.",
                        "Chest clutching sustained; facial flushing.", "Possible acute coronary syndrome.",
                        "Immediate ECG and physician review.")),

@@ -328,4 +328,4 @@ Epoch 23/35
 
 focal_alpha_100: val ROC-AUC=0.8350, test ROC-AUC=0.8340
 
-Saved experiment results to /Users/petch_phokin/Desktop/All_Project/multimodal-pre-triage-simulation/scripts/train/cnn/model03/results_alpha_sweep
+Saved experiment results to ./scripts/train/cnn/model03/results_alpha_sweep

@@ -57,8 +57,13 @@ VISUAL_SIGNS = {
 
 SKIN_STATUS = {
     "NORMAL": "No facial redness detected",
-    "FLUSHING": "Face appears flushed (red)",
+    "RED_FLUSHING": "Face appears flushed (red)",   # value the kiosk vision engine sends
+    "FLUSHING": "Face appears flushed (red)",       # older/demo spelling
 }
+
+
+def is_flushed(skin_status: Optional[str]) -> bool:
+    return skin_status in ("RED_FLUSHING", "FLUSHING")
 
 SPEAKERS = {
     "patient": "Patient",

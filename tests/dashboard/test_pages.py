@@ -50,6 +50,7 @@ def test_queue_uses_nurse_words_not_system_terms(client, session, nurse):
     html = _logged_in(client, nurse).get("/").text
     assert "เจ็บหน้าอกมากครับ" in html                 # chief complaint in the patient's words
     assert "Emergency" in html and "Holding chest" in html
+    assert "Face appears flushed" in html and "RED_FLUSHING" not in html   # kiosk value shown in plain words
     for internal in ("chest_clutching", "LLM_INFERENCE_VALIDATED", "SCENARIO_A", "NORMAL_COMPLETE"):
         assert internal not in html
 

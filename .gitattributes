@@ -1,0 +1,3 @@
+# Generated interactive Plotly chart (bundles the Plotly library): exclude from
+# GitHub's language statistics so the repo shows its real languages.
+scripts/train/cnn/model03/results_alpha_sweep/report_figures/*.html linguist-generated=true
