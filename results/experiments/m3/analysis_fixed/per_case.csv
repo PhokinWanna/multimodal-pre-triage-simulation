@@ -1,0 +1,31 @@
+id,esi_reference,esi_pred_A,esi_pred_B_majority,B_share_ESI_1_2,B_consistency,image_file,image_file_skin,sharpness_posture_photo,sharpness_skin_photo,true_posture,camera_posture,true_flushing,camera_skin,skin_probability,correct_A,direction_A,error_source_A,fallback_A,llm_latency_s_A
+S01,1,2,2,1.0,1.0,Posture/S01_body.jpg,skin/S01_skin.jpg,47.5,62.0,chest,chest,yes,yes,0.8820725679397583,False,under,reasoning,False,8.48
+S02,1,2,2,1.0,1.0,skin/S02_skin.jpg,,421.3,421.3,none,none,yes,no,0.3608148992061615,False,under,camera: skin,False,6.45
+S03,1,2,2,0.9,0.9,Posture/S03_body.jpg,skin/S03_skin.jpg,1740.9,22.2,head,none,yes,yes,0.5774945020675659,False,under,camera: posture,False,9.03
+S04,1,2,2,1.0,1.0,Posture/S04_body.jpg,,446.2,446.2,chest,chest,no,no,0.4787193536758423,False,under,reasoning,False,6.51
+S05,1,2,2,1.0,1.0,Posture/S05_body.jpg,,248.6,248.6,none,none,no,yes,0.645293136437734,False,under,camera: skin,False,7.51
+S06,1,3,3,0.0,1.0,skin/S06_skin.jpg,,82.0,82.0,none,none,yes,no,0.4703778326511383,False,under,camera: skin,False,6.33
+S07,2,2,2,1.0,1.0,Posture/S07_body.jpg,,129.0,129.0,chest,chest,no,no,0.3324487805366516,True,,,False,6.65
+S08,2,2,2,1.0,1.0,Posture/S08_body.jpg,skin/S08_skin.jpg,319.3,114.9,chest,chest,yes,yes,0.8558593591054281,True,,,False,6.8
+S09,2,3,4,0.0,0.6,Posture/S09_body.jpg,,16.3,16.3,none,none,no,yes,0.8569888472557068,False,under,camera: skin,False,8.04
+S10,2,4,4,0.0,1.0,Posture/S10_body.jpg,,1002.9,1002.9,head,none,no,yes,0.6319770316282908,False,under,camera: posture,False,7.3
+S11,2,2,2,1.0,1.0,Posture/S11_body.jpg,,337.1,337.1,abdomen,abdomen,no,no,0.53616434832414,True,,,False,7.23
+S12,2,3,3,0.0,1.0,Posture/S12_body.jpg,,110.9,110.9,chest,chest,no,no,0.23648037016391754,False,under,reasoning,False,7.1
+S13,3,3,3,0.0,1.0,Posture/S13_body.jpg,,161.4,161.4,abdomen,abdomen,no,no,0.13529599085450172,True,,,False,5.84
+S14,3,3,3,0.3,0.7,Posture/S14_body.jpg,skin/S14_skin.jpg,343.4,683.1,abdomen,abdomen,yes,yes,0.74873286485672,True,,,False,7.59
+S15,3,4,4,0.0,1.0,skin/S15_skin.jpg,,122.1,122.1,none,none,yes,yes,0.658789873123169,False,under,reasoning,False,8.02
+S16,3,3,3,0.0,1.0,Posture/S16_body.jpg,skin/S16_skin.jpg,515.9,297.8,head,head,yes,no,0.392602801322937,True,,,False,7.34
+S17,3,4,4,0.0,0.7,Posture/S17_body.jpg,,11.3,11.3,none,none,no,yes,0.7925657629966736,False,under,camera: skin,False,9.02
+S18,3,4,4,0.0,1.0,Posture/S18_body.jpg,skin/S18_skin.jpg,179.6,186.5,abdomen,abdomen,yes,no,0.4808274259169896,False,under,camera: skin,False,6.03
+S19,4,4,4,0.0,1.0,Posture/S19_body.jpg,,198.6,198.6,none,none,no,yes,0.7199053764343262,True,,,False,7.61
+S20,4,2,2,1.0,1.0,skin/S20_skin.jpg,,39.3,39.3,none,chest,yes,yes,0.7445258696873983,False,over,camera: posture,False,6.68
+S21,4,4,4,0.0,1.0,Posture/S21_body.jpg,,308.9,308.9,abdomen,none,no,no,0.5031582117080688,True,,,False,5.15
+S22,4,4,4,0.0,1.0,Posture/S22_body.jpg,,39.4,39.4,none,none,no,unknown,,True,,,False,6.12
+S23,4,4,4,0.0,1.0,skin/S23_skin.jpg,,149.3,149.3,none,none,yes,yes,0.9041243592898051,True,,,False,8.58
+S24,4,4,4,0.0,1.0,Posture/S24_body.jpg,,23.6,23.6,none,none,no,yes,0.7377117474873861,True,,,False,7.95
+S25,5,5,5,0.0,1.0,Posture/S25_body.jpg,,21.0,21.0,none,none,no,yes,0.8054224848747253,True,,,False,7.29
+S26,5,4,4,0.0,1.0,Posture/S26_body.jpg,,127.3,127.3,head,none,no,no,0.41217026114463806,False,over,camera: posture,False,7.19
+S27,5,4,4,0.0,1.0,skin/S27_skin.jpg,,262.8,262.8,none,none,yes,yes,0.8073506951332092,False,over,reasoning,False,6.37
+S28,5,4,4,0.0,1.0,Posture/S28_body.jpg,,22.4,22.4,none,none,no,yes,0.9308321475982666,False,over,camera: skin,False,8.92
+S29,5,4,4,0.0,1.0,skin/S29_skin.jpg,,1143.3,1143.3,none,none,yes,yes,0.666567474603653,False,over,reasoning,False,10.37
+S30,5,4,4,0.0,1.0,Posture/S30_body.jpg,skin/S30_skin.jpg,166.8,177.9,head,none,yes,yes,0.6749840577443441,False,over,camera: posture,False,8.61

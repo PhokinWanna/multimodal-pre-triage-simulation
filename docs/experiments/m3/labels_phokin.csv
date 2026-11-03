@@ -1,0 +1,31 @@
+id,esi,decision_point,notes
+S01,1,A: immediate lifesaving intervention,"Ischemic-type chest pain with signs of shock/hypoperfusion (diaphoresis, cold skin, near-syncope, cannot stand). Needs immediate resus bay: monitor, 12-lead ECG <10 min, IV access, O2 if SpO2 <90%, physician at bedside."
+S02,1,A: immediate lifesaving intervention,"Anaphylaxis after bee sting with lip/tongue angioedema and airway compromise (throat closing, dyspnea). Needs immediate IM epinephrine and airway management."
+S03,1,A: immediate lifesaving intervention,"Anaphylaxis to antibiotic 30 min ago: flushing, dizziness (possible hypotension), wheeze and dyspnea = skin + respiratory + circulatory involvement. Immediate IM epinephrine, O2, IV fluids."
+S04,1,A: immediate lifesaving intervention,"Severe respiratory distress, worsening over 1 h, speaks only a few words. Impending respiratory failure; may need NIV/airway support immediately."
+S05,1,A: immediate lifesaving intervention,"Large-volume fresh hematemesis x2 with tachycardia, cold skin, presyncope = hemorrhagic shock (upper GI bleed). Immediate large-bore IV x2, fluid/blood resuscitation."
+S06,1,A: immediate lifesaving intervention,"Heat stroke: altered mental status, hot dry skin (anhidrosis), near-syncope after sun exertion. Immediate active cooling is lifesaving. (If vitals stable and only mild confusion, some raters would give ESI 2.)"
+S07,2,B: high-risk situation,"Classic ACS: chest pain 30 min radiating to left arm and jaw, diaphoresis, age 60, HTN. High risk; ECG within 10 min, should not wait. Upgrade to 1 if hypotensive/unstable."
+S08,2,B: high-risk situation,Palpitations with chest pain and dizziness for 20 min: possible tachyarrhythmia (SVT/AF/VT) or ACS. Needs immediate ECG and monitor; check HR/BP (danger-zone vitals).
+S09,2,B: high-risk situation,"Acute stroke signs (sudden right-sided weakness, dysarthria, facial droop), onset 1 h ago = within thrombolysis window. Activate stroke fast track; CT now."
+S10,2,B: high-risk situation,Thunderclap 'worst headache of life' with neck stiffness and photophobia: suspected subarachnoid hemorrhage or meningitis. Time-critical; check GCS/vitals.
+S11,2,B: high-risk situation (severe pain 9/10),"Suspected ruptured/ectopic pregnancy: severe RLQ pain 9/10, 7 weeks amenorrhea, vaginal bleeding. Risk of internal hemorrhage; also meets severe pain criterion. Upgrade to 1 if signs of shock."
+S12,2,B: high-risk situation,Stoic diabetic with chest pressure and fatigue: atypical ACS presentation (diabetics often have silent/atypical MI). Words minimize but hand on chest; do not under-triage. ECG within 10 min.
+S13,3,C: 2+ resources,"RLQ pain 6/10 since morning with nausea: possible appendicitis. Needs labs, imaging (US/CT), IV fluids/analgesia (>=2 resources). Stable, not high-risk if vitals normal. Check D: vitals."
+S14,3,C: 2+ resources,"Vomiting and fever x2 days, poor oral intake: likely gastroenteritis with dehydration. Needs labs + IV fluids +/- IV antiemetic. Check vitals/dehydration signs; upgrade to 2 if tachycardic/hypotensive or lethargic."
+S15,3,C: 2+ resources; check D,"Fever 39 C x3 days, cough, pleuritic chest pain: suspected pneumonia. Needs CXR + labs +/- IV antibiotics. Check SpO2, RR, HR; upgrade to 2 if SpO2 <92% or sepsis criteria."
+S16,3,C: 2+ resources; check D,"Dengue-like illness day 3 (high fever, headache, retro-orbital pain, myalgia). Needs CBC/hematocrit/platelets, NS1, possible IV fluids. Entering critical phase: screen warning signs (abdominal pain, persistent vomiting, bleeding, lethargy) and vitals; upgrade to 2 if present."
+S17,3,C: 2+ resources,"Motorbike fall: swollen ankle, unable to bear weight (Ottawa positive) + arm lacerations. Needs X-ray + wound care/repair +/- splint (>=2 resources). Confirm no head injury, high-speed mechanism or other injury."
+S18,3,C: 2+ resources,Abdominal pain with fever since yesterday; patient minimizes but holds abdomen and looks flushed. Fever + abdominal pain needs labs + imaging +/- IV meds. Do not under-triage a stoic patient; check vitals for sepsis.
+S19,4,C: 1 resource,"Dysuria and frequency x2 days, afebrile: likely simple cystitis. Urinalysis only (1 resource), oral antibiotics."
+S20,4,C: 1 resource,"Shrimp allergy with facial flushing, itching and hives only, no airway/breathing/GI/circulatory signs: skin-only allergic reaction. Antihistamine +/- observation. Re-assess: upgrade to 1-2 if any lip/tongue swelling, wheeze, dyspnea or hypotension (biphasic risk)."
+S21,4,C: 1 resource,Mild lower abdominal pain 3/10 with dysuria: likely UTI. Urinalysis (+ urine pregnancy test if female; labs count as one resource). Stable.
+S22,4,C: 1 resource,"Wrist injury yesterday, swollen and painful, fingers move (neurovascular intact). X-ray only (1 resource), splint/sling is not a resource."
+S23,4,C: 1 resource,"Fever 38 C and sore throat x2 days, eating well: likely pharyngitis. Possible rapid strep/throat swab (1 lab resource). Check for drooling/stridor/trismus (would upgrade)."
+S24,4,C: 1 resource,"2 cm gaping finger laceration from kitchen knife, bleeding controlled. Simple repair (suture/strips) = 1 resource. Check tendon/nerve function and tetanus status."
+S25,5,C: 0 resources,"Medication refill only, asymptomatic. No ED resources needed; refer to OPD/clinic. Check BP."
+S26,5,C: 0 resources,"Mild headache since yesterday attributed to stress and lack of sleep, no red flags described: tension-type headache. Oral analgesic only. Screen red flags (sudden onset, neuro deficit, fever, neck stiffness) despite head-holding posture."
+S27,5,C: 0 resources,"First-degree sunburn, no blisters, no fever. Exam + topical care/advice only."
+S28,5,C: 0 resources,"Common cold: runny nose and mild cough x2 days, afebrile, functioning normally. Exam + symptomatic advice."
+S29,5,C: 0 resources,"Alcohol flush reaction (ALDH2 variant, common in East/Southeast Asians) after one beer; no chest tightness, itching or dyspnea. Reassurance/advice only. Facial redness is benign here."
+S30,5,C: 0 resources,"Mild viral URI: mild headache, low-grade fever 37.8 C, runny nose, eating/drinking normally. Exam + oral antipyretic/advice."

@@ -1,0 +1,92 @@
+{
+  "model": "SkinCNN-FL-α0.75 (best checkpoint)",
+  "threshold": 0.5489389300346375,
+  "classes": {
+    "Normal": {
+      "n": 200,
+      "results": {
+        "original": {
+          "mean_prob": 0.0946,
+          "mean_change": 0.0,
+          "pct_called_flushing": 0.5,
+          "pct_decision_flipped": 0.0
+        },
+        "blur": {
+          "mean_prob": 0.7238,
+          "mean_change": 0.6292,
+          "pct_called_flushing": 84.5,
+          "pct_decision_flipped": 84.0
+        },
+        "grain": {
+          "mean_prob": 0.0382,
+          "mean_change": -0.0564,
+          "pct_called_flushing": 0.0,
+          "pct_decision_flipped": 0.5
+        },
+        "flat": {
+          "mean_prob": 0.9996,
+          "mean_change": 0.9049,
+          "pct_called_flushing": 100.0,
+          "pct_decision_flipped": 99.5
+        },
+        "redder": {
+          "mean_prob": 0.0774,
+          "mean_change": -0.0173,
+          "pct_called_flushing": 0.5,
+          "pct_decision_flipped": 0.0
+        },
+        "less_red": {
+          "mean_prob": 0.1023,
+          "mean_change": 0.0076,
+          "pct_called_flushing": 0.5,
+          "pct_decision_flipped": 0.0
+        }
+      }
+    },
+    "Flushing": {
+      "n": 200,
+      "results": {
+        "original": {
+          "mean_prob": 0.7812,
+          "mean_change": 0.0,
+          "pct_called_flushing": 88.5,
+          "pct_decision_flipped": 0.0
+        },
+        "blur": {
+          "mean_prob": 0.9171,
+          "mean_change": 0.1359,
+          "pct_called_flushing": 100.0,
+          "pct_decision_flipped": 11.5
+        },
+        "grain": {
+          "mean_prob": 0.2444,
+          "mean_change": -0.5368,
+          "pct_called_flushing": 20.0,
+          "pct_decision_flipped": 68.5
+        },
+        "flat": {
+          "mean_prob": 0.9997,
+          "mean_change": 0.2184,
+          "pct_called_flushing": 100.0,
+          "pct_decision_flipped": 11.5
+        },
+        "redder": {
+          "mean_prob": 0.7445,
+          "mean_change": -0.0368,
+          "pct_called_flushing": 81.0,
+          "pct_decision_flipped": 11.5
+        },
+        "less_red": {
+          "mean_prob": 0.7175,
+          "mean_change": -0.0638,
+          "pct_called_flushing": 82.0,
+          "pct_decision_flipped": 7.5
+        }
+      }
+    }
+  },
+  "sources": {
+    "Normal": "patches cut from data/dataset-cnn/Normal with the training extraction",
+    "Flushing": "patches cut from data/dataset-cnn/Flushing with the training extraction"
+  }
+}

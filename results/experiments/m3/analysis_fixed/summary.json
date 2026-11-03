@@ -1,0 +1,243 @@
+{
+  "config_a": {
+    "created": "2026-11-03T01:40:46",
+    "git_commit": "564da0651bdd33c1ee51050193e6e34a640c4192",
+    "mode": "A",
+    "pipeline": "fixed",
+    "runs_per_scenario": 1,
+    "temperature": 0.0,
+    "seeds": [
+      0
+    ],
+    "llm_timeout_s": 60.0,
+    "kiosk_timeout_s": 6.0,
+    "llm": {
+      "name": "llama3.2:latest",
+      "digest": "a80c4f17acd55265feec403c7aef86be0c25983ab279d83f3bcd3abbcb5b8b72",
+      "size": 2019393189
+    },
+    "posture_rules": "v2",
+    "skin_pipeline": "patch",
+    "skin_model": {
+      "name": "SkinCNN-FL-α0.75 (best checkpoint)",
+      "threshold": 0.5489389300346375
+    },
+    "modalities": {
+      "posture": true,
+      "skin": true
+    },
+    "scenarios_sha256": "fac2f2b2aacfdf3e238418476b601e9a30990404cc0e94124ad12c40a069d868",
+    "n_scenarios": 30
+  },
+  "n": 30,
+  "option_A": {
+    "accuracy": {
+      "value": 0.4,
+      "ci_low": 0.23333333333333334,
+      "ci_high": 0.6
+    },
+    "within_one": {
+      "value": 0.9,
+      "ci_low": 0.7666666666666667,
+      "ci_high": 1.0
+    },
+    "kappa_linear": {
+      "value": 0.4927536231884059,
+      "ci_low": 0.3229148854309165,
+      "ci_high": 0.6473354231974922
+    },
+    "kappa_quadratic": {
+      "value": 0.6896551724137931,
+      "ci_low": 0.5013523901716824,
+      "ci_high": 0.8139008270657905
+    },
+    "under_triage": {
+      "value": 0.4,
+      "ci_low": 0.23333333333333334,
+      "ci_high": 0.5666666666666667
+    },
+    "over_triage": {
+      "value": 0.2,
+      "ci_low": 0.06666666666666667,
+      "ci_high": 0.36666666666666664
+    },
+    "high_acuity_sensitivity": {
+      "value": 0.6666666666666666,
+      "ci_low": 0.38461538461538464,
+      "ci_high": 0.9166666666666666
+    },
+    "high_acuity_specificity": {
+      "value": 0.9444444444444444,
+      "ci_low": 0.8125,
+      "ci_high": 1.0
+    },
+    "auc_high_acuity": {
+      "value": 0.8981481481481481,
+      "ci_low": 0.7622007575757576,
+      "ci_high": 0.9907407407407407
+    },
+    "recall_per_level": {
+      "1": 0.0,
+      "2": 0.5,
+      "3": 0.5,
+      "4": 0.8333333333333334,
+      "5": 0.16666666666666666
+    },
+    "invalid_predictions": 0,
+    "n": 30
+  },
+  "config_b": {
+    "created": "2026-11-03T01:48:45",
+    "git_commit": "564da0651bdd33c1ee51050193e6e34a640c4192",
+    "mode": "B",
+    "pipeline": "fixed",
+    "runs_per_scenario": 10,
+    "temperature": 0.8,
+    "seeds": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "llm_timeout_s": 60.0,
+    "kiosk_timeout_s": 6.0,
+    "llm": {
+      "name": "llama3.2:latest",
+      "digest": "a80c4f17acd55265feec403c7aef86be0c25983ab279d83f3bcd3abbcb5b8b72",
+      "size": 2019393189
+    },
+    "posture_rules": "v2",
+    "skin_pipeline": "patch",
+    "skin_model": {
+      "name": "SkinCNN-FL-α0.75 (best checkpoint)",
+      "threshold": 0.5489389300346375
+    },
+    "modalities": {
+      "posture": true,
+      "skin": true
+    },
+    "scenarios_sha256": "fac2f2b2aacfdf3e238418476b601e9a30990404cc0e94124ad12c40a069d868",
+    "n_scenarios": 30
+  },
+  "option_B_majority": {
+    "accuracy": {
+      "value": 0.4,
+      "ci_low": 0.23333333333333334,
+      "ci_high": 0.6
+    },
+    "within_one": {
+      "value": 0.8666666666666667,
+      "ci_low": 0.7333333333333333,
+      "ci_high": 0.9666666666666667
+    },
+    "kappa_linear": {
+      "value": 0.47115384615384615,
+      "ci_low": 0.2878111570685113,
+      "ci_high": 0.6287128712871287
+    },
+    "kappa_quadratic": {
+      "value": 0.6590909090909092,
+      "ci_low": 0.45482158028887004,
+      "ci_high": 0.800604761083645
+    },
+    "under_triage": {
+      "value": 0.4,
+      "ci_low": 0.23333333333333334,
+      "ci_high": 0.5666666666666667
+    },
+    "over_triage": {
+      "value": 0.2,
+      "ci_low": 0.06666666666666667,
+      "ci_high": 0.36666666666666664
+    },
+    "high_acuity_sensitivity": {
+      "value": 0.6666666666666666,
+      "ci_low": 0.38461538461538464,
+      "ci_high": 0.9166666666666666
+    },
+    "high_acuity_specificity": {
+      "value": 0.9444444444444444,
+      "ci_low": 0.8125,
+      "ci_high": 1.0
+    },
+    "auc_high_acuity": {
+      "value": 0.7939814814814815,
+      "ci_low": 0.6267918227283553,
+      "ci_high": 0.9418650793650789
+    },
+    "recall_per_level": {
+      "1": 0.0,
+      "2": 0.5,
+      "3": 0.5,
+      "4": 0.8333333333333334,
+      "5": 0.16666666666666666
+    },
+    "invalid_predictions": 0,
+    "n": 30
+  },
+  "option_B_mean_consistency": 0.9633333333333333,
+  "camera": {
+    "posture_accuracy": 0.8,
+    "skin_accuracy": 0.5666666666666667
+  },
+  "sharpness": {
+    "posture_correct_median": 155.35000000000002,
+    "posture_wrong_median": 237.85,
+    "skin_correct_median": 149.3,
+    "skin_wrong_median": 82.0
+  },
+  "errors_by_source_A": {
+    "reasoning": 6,
+    "camera: skin": 7,
+    "camera: posture": 5
+  },
+  "latency_A": {
+    "median_s": 7.295,
+    "max_s": 10.37,
+    "calls_over_6s": 28,
+    "fallbacks": 0
+  },
+  "confusion_matrix_A": [
+    [
+      0,
+      5,
+      1,
+      0,
+      0
+    ],
+    [
+      0,
+      3,
+      2,
+      1,
+      0
+    ],
+    [
+      0,
+      0,
+      3,
+      3,
+      0
+    ],
+    [
+      0,
+      1,
+      0,
+      5,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      5,
+      1
+    ]
+  ]
+}

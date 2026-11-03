@@ -48,9 +48,19 @@ class SystemConfig:
     CROSSED_ARMS_WRIST_RATIO = 0.45          # Crossed Arms Filter ratio
     THINKING_FOREARM_MIN_ANGLE = 65.0        # Thinking Pose vertical forearm angle
 
+    # Posture rules: "v2" = corrected rules (default), "v1" = original rules (kept for comparison).
+    POSTURE_RULES_VERSION = os.getenv("POSTURE_RULES_VERSION", "v2")
+    # Optional overrides of the v2 values in vision/posture.py (PostureConfig); tuned on dev images only.
+    POSTURE_V2_PARAMS: dict = {}
+
     # --- TensorFlow Lite / CNN Skin Model ---
     TFLITE_SKIN_MODEL_PATH = str(PROJECT_ROOT / "models" / "skin_classifier.tflite")
-    SKIN_CONFIDENCE_THRESHOLD = 0.65         # Minimum probability to classify as RED_FLUSHING
+    SKIN_CONFIDENCE_THRESHOLD = 0.65         # Used ONLY for a model without metadata (the original model).
+                                             # Converted models carry their validation threshold in models/skin_classifier.json
+    # "patch" = forehead/cheek patches as in CNN training (default); "legacy_whole_face" = original behaviour.
+    SKIN_PIPELINE = os.getenv("SKIN_PIPELINE", "patch")
+    # 1 = stop with an error if the skin model cannot be loaded (use in experiments).
+    SKIN_REQUIRE_MODEL = os.getenv("SKIN_REQUIRE_MODEL", "0").strip().lower() in {"1", "true", "yes"}
 
     # --- Audio Subsystem: Wake-Word & Fast-Whisper ---
     WAKE_WORDS_TH = ["สวัสดี", "หวัดดี", "เริ่ม", "ช่วยด้วย", "ตรวจ", "ฮัลโหล"]

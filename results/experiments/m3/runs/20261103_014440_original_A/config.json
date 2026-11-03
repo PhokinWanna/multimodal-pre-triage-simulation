@@ -1,0 +1,30 @@
+{
+  "created": "2026-11-03T01:44:40",
+  "git_commit": "564da0651bdd33c1ee51050193e6e34a640c4192",
+  "mode": "A",
+  "pipeline": "original",
+  "runs_per_scenario": 1,
+  "temperature": 0.0,
+  "seeds": [
+    0
+  ],
+  "llm_timeout_s": 60.0,
+  "kiosk_timeout_s": 6.0,
+  "llm": {
+    "name": "llama3.2:latest",
+    "digest": "a80c4f17acd55265feec403c7aef86be0c25983ab279d83f3bcd3abbcb5b8b72",
+    "size": 2019393189
+  },
+  "posture_rules": "v1",
+  "skin_pipeline": "legacy_whole_face",
+  "skin_model": {
+    "name": "skin_classifier_original.tflite",
+    "threshold": 0.65
+  },
+  "modalities": {
+    "posture": true,
+    "skin": true
+  },
+  "scenarios_sha256": "fac2f2b2aacfdf3e238418476b601e9a30990404cc0e94124ad12c40a069d868",
+  "n_scenarios": 30
+}

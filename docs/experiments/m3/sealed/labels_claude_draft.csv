@@ -1,0 +1,31 @@
+id,esi,decision_point,rationale
+S01,1,A,"Chest pain with cold sweat, near-syncope and inability to stand: signs of shock; needs immediate life-saving intervention."
+S02,1,A,Anaphylaxis with airway involvement: immediate adrenaline/airway intervention.
+S03,1,A,Drug reaction with wheeze and breathing difficulty (anaphylaxis): immediate intervention.
+S04,1,A,Severe respiratory distress (speaks only a few words): immediate airway/breathing support.
+S05,1,A,"Large haematemesis with palpitations, cold skin, near-syncope: haemorrhagic shock signs; immediate resuscitation."
+S06,1,A,Suspected heat stroke (hyperthermia + confusion): immediate cooling is life-saving.
+S07,2,B,Possible acute coronary syndrome in a 60-year-old with hypertension: high-risk situation.
+S08,2,B,Chest pain with palpitations and dizziness: high risk (arrhythmia/ACS).
+S09,2,B,Acute stroke symptoms within the treatment window: high risk.
+S10,2,B,Thunderclap headache with neck stiffness and photophobia (possible subarachnoid haemorrhage/meningitis): high risk.
+S11,2,B,Severe pain (9/10) with missed period and bleeding: possible ectopic pregnancy; high risk / severe pain.
+S12,2,B,"Chest pressure in a person with diabetes (atypical ACS presentation), visible chest-holding despite minimising: high risk."
+S13,3,C,"Stable, moderate pain; likely labs + imaging (possible appendicitis): 2+ resources."
+S14,3,C,Vomiting and fever with poor intake: labs + IV fluids (2+ resources); no instability described.
+S15,3,C,Possible pneumonia: chest X-ray + labs (2+ resources); no distress described.
+S16,3,C,Possible dengue: blood tests (repeat CBC) and possibly IV fluids: 2+ resources.
+S17,3,C,Ankle X-ray + wound repair/care and analgesia: 2 resources.
+S18,3,C,Abdominal pain with fever: labs ± imaging (2+ resources) despite minimising.
+S19,4,C,Likely uncomplicated UTI: urinalysis only (1 resource).
+S20,4,C,Mild allergic reaction without airway or breathing involvement: one medication by injection or observation (1 resource).
+S21,4,C,Mild lower abdominal pain with dysuria: urinalysis (1 resource).
+S22,4,C,Wrist injury: X-ray (1 resource).
+S23,4,C,"Fever with sore throat, eating well: throat test or one lab (1 resource)."
+S24,4,C,Gaping 2 cm laceration: simple repair (1 resource).
+S25,5,C,Prescription refill: no resources.
+S26,5,C,Mild tension-type headache without red flags; oral medication only (not a resource).
+S27,5,C,Mild sunburn: advice and oral analgesia only (no resources).
+S28,5,C,Common cold symptoms: no resources.
+S29,5,C,Alcohol flush reaction without symptoms: advice only (no resources).
+S30,5,C,Mild viral illness: oral medication and advice (no resources).

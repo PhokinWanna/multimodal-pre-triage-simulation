@@ -59,6 +59,7 @@ SKIN_STATUS = {
     "NORMAL": "No facial redness detected",
     "RED_FLUSHING": "Face appears flushed (red)",   # value the kiosk vision engine sends
     "FLUSHING": "Face appears flushed (red)",       # older/demo spelling
+    "UNKNOWN": "Face colour could not be checked",
 }
 
 

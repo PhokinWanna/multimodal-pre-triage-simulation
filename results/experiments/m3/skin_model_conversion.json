@@ -1,0 +1,16 @@
+{
+  "model_name": "SkinCNN-FL-α0.75 (best checkpoint)",
+  "keras_model": "scripts/train/cnn/model03/results_alpha_sweep/focal_alpha_075/best_model.keras",
+  "keras_sha256": "516e09209f6307d60d1e8f2b963aee45be479c4edfb3715ac77002166678cbc4",
+  "best_epoch": 33,
+  "threshold": 0.5489389300346375,
+  "threshold_rule": "validation-selected, precision >= 0.95, best checkpoint",
+  "check_inputs": "real patches: 200 Normal, 200 Flushing (patches cut from data/dataset-cnn/Flushing with the training extraction)",
+  "max_abs_difference": 1.7285346984863281e-06,
+  "mean_abs_difference": 2.235712599940598e-07,
+  "decision_agreement": 1.0,
+  "passed": true,
+  "tensorflow": "2.15.0",
+  "created": "2026-11-02T17:09:38",
+  "tflite_bytes": 58524
+}

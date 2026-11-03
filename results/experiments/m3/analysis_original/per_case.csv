@@ -1,0 +1,31 @@
+id,esi_reference,esi_pred_A,esi_pred_B_majority,B_share_ESI_1_2,B_consistency,image_file,image_file_skin,sharpness_posture_photo,sharpness_skin_photo,true_posture,camera_posture,true_flushing,camera_skin,skin_probability,correct_A,direction_A,error_source_A,fallback_A,llm_latency_s_A
+S01,1,3,,,,Posture/S01_body.jpg,skin/S01_skin.jpg,47.5,62.0,chest,none,yes,no,0.0,False,under,camera: posture,False,10.33
+S02,1,2,,,,skin/S02_skin.jpg,,421.3,421.3,none,none,yes,no,0.0,False,under,camera: skin,False,7.13
+S03,1,3,,,,Posture/S03_body.jpg,skin/S03_skin.jpg,1740.9,22.2,head,none,yes,no,0.0,False,under,camera: posture,False,9.77
+S04,1,2,,,,Posture/S04_body.jpg,,446.2,446.2,chest,none,no,no,0.0,False,under,camera: posture,False,4.9
+S05,1,2,,,,Posture/S05_body.jpg,,248.6,248.6,none,abdomen,no,no,0.0,False,under,camera: posture,False,6.53
+S06,1,3,,,,skin/S06_skin.jpg,,82.0,82.0,none,none,yes,no,0.0,False,under,camera: skin,False,6.29
+S07,2,3,,,,Posture/S07_body.jpg,,129.0,129.0,chest,none,no,no,0.0,False,under,camera: posture,False,8.04
+S08,2,3,,,,Posture/S08_body.jpg,skin/S08_skin.jpg,319.3,114.9,chest,none,yes,no,0.0,False,under,camera: posture,False,7.68
+S09,2,3,,,,Posture/S09_body.jpg,,16.3,16.3,none,none,no,no,0.0,False,under,reasoning,False,6.6
+S10,2,4,,,,Posture/S10_body.jpg,,1002.9,1002.9,head,abdomen,no,no,0.0,False,under,camera: posture,False,6.39
+S11,2,4,,,,Posture/S11_body.jpg,,337.1,337.1,abdomen,none,no,no,0.0,False,under,camera: posture,False,9.02
+S12,2,4,,,,Posture/S12_body.jpg,,110.9,110.9,chest,none,no,no,0.0,False,under,camera: posture,False,8.4
+S13,3,4,,,,Posture/S13_body.jpg,,161.4,161.4,abdomen,none,no,no,0.0,False,under,camera: posture,False,7.8
+S14,3,4,,,,Posture/S14_body.jpg,skin/S14_skin.jpg,343.4,683.1,abdomen,none,yes,no,0.0,False,under,camera: posture,False,9.01
+S15,3,4,,,,skin/S15_skin.jpg,,122.1,122.1,none,none,yes,no,0.0,False,under,camera: skin,False,8.21
+S16,3,3,,,,Posture/S16_body.jpg,skin/S16_skin.jpg,515.9,297.8,head,head,yes,no,0.00390625,True,,,False,7.86
+S17,3,4,,,,Posture/S17_body.jpg,,11.3,11.3,none,none,no,no,0.0,False,under,reasoning,False,8.63
+S18,3,4,,,,Posture/S18_body.jpg,skin/S18_skin.jpg,179.6,186.5,abdomen,none,yes,no,0.0,False,under,camera: posture,False,7.76
+S19,4,4,,,,Posture/S19_body.jpg,,198.6,198.6,none,none,no,no,0.0,True,,,False,8.32
+S20,4,4,,,,skin/S20_skin.jpg,,39.3,39.3,none,none,yes,no,0.0,True,,,False,6.58
+S21,4,4,,,,Posture/S21_body.jpg,,308.9,308.9,abdomen,abdomen,no,no,0.0,True,,,False,6.08
+S22,4,4,,,,Posture/S22_body.jpg,,39.4,39.4,none,none,no,no,0.0,True,,,False,8.4
+S23,4,4,,,,skin/S23_skin.jpg,,149.3,149.3,none,none,yes,no,0.0,True,,,False,8.35
+S24,4,4,,,,Posture/S24_body.jpg,,23.6,23.6,none,none,no,no,0.0,True,,,False,7.28
+S25,5,5,,,,Posture/S25_body.jpg,,21.0,21.0,none,none,no,no,0.0,True,,,False,6.92
+S26,5,4,,,,Posture/S26_body.jpg,,127.3,127.3,head,none,no,no,0.0390625,False,over,camera: posture,False,7.39
+S27,5,4,,,,skin/S27_skin.jpg,,262.8,262.8,none,none,yes,no,0.00390625,False,over,camera: skin,False,6.29
+S28,5,4,,,,Posture/S28_body.jpg,,22.4,22.4,none,none,no,no,0.0,False,over,reasoning,False,8.21
+S29,5,4,,,,skin/S29_skin.jpg,,1143.3,1143.3,none,none,yes,no,0.0,False,over,camera: skin,False,9.92
+S30,5,4,,,,Posture/S30_body.jpg,skin/S30_skin.jpg,166.8,177.9,head,none,yes,no,0.0,False,over,camera: posture,False,8.8

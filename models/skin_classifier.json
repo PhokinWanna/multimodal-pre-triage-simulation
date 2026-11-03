@@ -1,0 +1,10 @@
+{
+  "name": "SkinCNN-FL-α0.75 (best checkpoint)",
+  "threshold": 0.5489389300346375,
+  "combine": "mean",
+  "source": "scripts/train/cnn/model03/results_alpha_sweep/focal_alpha_075/best_model.keras",
+  "keras_sha256": "516e09209f6307d60d1e8f2b963aee45be479c4edfb3715ac77002166678cbc4",
+  "threshold_rule": "validation-selected, precision >= 0.95, best checkpoint",
+  "input": "64x64 forehead/cheek patch, BGR->CIELAB, /255",
+  "created": "2026-11-02T17:09:38"
+}

@@ -284,8 +284,14 @@ Output ONLY valid JSON:
     # -------------------------------------------------------------------------
     # 6. FINAL CLINICAL SYNTHESIS
     # -------------------------------------------------------------------------
-    def evaluate_final_case(self, conversation_history: list, visual_signs: dict, skin_status: str, exit_reason: any, language: str) -> dict:
-        """Synthesizes the complete patient encounter into the final ESI Level + SOAP note."""
+    def evaluate_final_case(self, conversation_history: list, visual_signs: dict, skin_status: str, exit_reason: any,
+                            language: str, temperature: float = 0.0, seed: int | None = None,
+                            timeout: float | None = None) -> dict:
+        """Synthesizes the complete patient encounter into the final ESI Level + SOAP note.
+
+        ``temperature``, ``seed`` and ``timeout`` exist for experiments (M3 replay); the kiosk
+        uses the defaults (temperature 0, no seed, SystemConfig.OLLAMA_TIMEOUT).
+        """
         transcript = " ".join([t["text"] for t in conversation_history if t.get("role") == "patient"])
         scenario = self.evaluate_scenario(transcript, visual_signs)
 
@@ -329,13 +335,16 @@ Return ONLY a valid JSON object matching this schema:
             "prompt": prompt,
             "stream": False,
             "format": "json",
-            "options": {"temperature": 0.0, "num_predict": 256},
+            "options": {"temperature": float(temperature), "num_predict": 256},
             "keep_alive": -1
         }
+        if seed is not None:
+            payload["options"]["seed"] = int(seed)
+        request_timeout = timeout if timeout is not None else getattr(SystemConfig, "OLLAMA_TIMEOUT", 10.0)
 
         try:
             start_t = time.time()
-            res = requests.post(self.endpoint, json=payload, timeout=getattr(SystemConfig, "OLLAMA_TIMEOUT", 10.0))
+            res = requests.post(self.endpoint, json=payload, timeout=request_timeout)
             if res.status_code == 200:
                 out = json.loads(res.json().get("response", "{}"))
                 out["scenario_details"] = scenario
