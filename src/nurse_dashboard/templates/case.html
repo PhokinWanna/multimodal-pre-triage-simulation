@@ -62,6 +62,11 @@
     <h2>Situation</h2>
     <dl class="facts">
       <dt>Chief complaint (CC)</dt><dd>{{ cc or '—' }}</dd>
+      {% set intake = (case.raw_payload or {}).get('intake') %}
+      {% if intake %}
+      <dt>Pain score (patient)</dt><dd>{% if intake.get('pain_score_0_10') is not none %}{{ intake.get('pain_score_0_10') }}/10{% elif intake.get('severity') %}{{ intake.get('severity') }} (no number given){% else %}not stated{% endif %}</dd>
+      <dt>Onset</dt><dd>{{ 'not sure' if intake.get('onset') == 'unknown' else (intake.get('onset') or 'not stated') }}</dd>
+      {% endif %}
       <dt>Suggested level</dt>
       <dd>{% if lv %}{{ level_badge(case.ai_esi, L, 'lvl-sm') }} ESI {{ lv.number }} · MOPH {{ lv.code }} — {{ lv.name }}{% if case.ai_urgency %} <span class="muted">({{ case.ai_urgency }})</span>{% endif %}
           {% else %}No level suggested — please triage this patient yourself.{% endif %}</dd>

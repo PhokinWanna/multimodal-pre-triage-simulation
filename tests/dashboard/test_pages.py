@@ -214,3 +214,20 @@ def test_labels_cover_all_kiosk_exit_reasons():
 def test_service_point_label_shown(app, client, nurse):
     html = _logged_in(client, nurse).get("/").text
     assert "Emergency triage" in html
+
+
+def test_case_page_shows_structured_intake(client, session, nurse):
+    _send(client, "CASE-I", esi=3, intake={"complaint": "ปวดหัวค่ะ", "pain_score_0_10": 7,
+                                          "severity": "severe", "onset": "เมื่อเช้า", "not_answered": []})
+    case = _case(session, "CASE-I")
+    html = _logged_in(client, nurse).get(f"/cases/{case.id}").text
+    assert "Pain score (patient)" in html and "7/10" in html and "เมื่อเช้า" in html
+
+
+def test_kiosk_fault_banner_label(client, session, nurse):
+    r = client.post("/api/triage/submit_case", json={"event_type": "nurse_assistance_requested",
+                                                      "reason": "kiosk_fault", "event_id": "f1"},
+                    headers={"X-Kiosk-Key": os.environ.get("DASHBOARD_KIOSK_KEY", "")})
+    assert r.status_code in (200, 201)
+    html = _logged_in(client, nurse).get("/").text
+    assert "Kiosk fault" in html

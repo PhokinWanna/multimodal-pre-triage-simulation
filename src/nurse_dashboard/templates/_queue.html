@@ -4,7 +4,7 @@
 {% for e in events %}
   <div class="banner banner-assist" role="alert">
     <div><strong>A patient at the kiosk needs a nurse</strong>
-      <span class="muted">· {{ 'Declined consent' if e.reason == 'consent_refused' else e.reason }} · {{ L.clock(e.received_at, tz) }}</span></div>
+      <span class="muted">· {{ L.assistance_reason(e.reason) }} · {{ L.clock(e.received_at, tz) }}</span></div>
     <form method="post" action="/assistance/{{ e.id }}/attend"><button class="btn btn-small" type="submit">Attended</button></form>
   </div>
 {% endfor %}

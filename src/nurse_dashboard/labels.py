@@ -47,7 +47,18 @@ EXIT_REASONS = {
     "USER_CANCELLED": "Patient cancelled at the kiosk",
     "HUMAN_NURSE_SUMMONED": "Patient asked for a nurse",
     "PDPA_DENIED": "Patient declined consent",
+    "SYSTEM_FAULT": "Stopped: kiosk hardware/software fault",
 }
+
+ASSISTANCE_REASONS = {
+    "consent_refused": "Declined consent",
+    "consent_unclear": "Consent answer unclear - please ask in person",
+    "kiosk_fault": "Kiosk fault (microphone / speech / software) - check the kiosk",
+}
+
+
+def assistance_reason(value: Optional[str]) -> str:
+    return ASSISTANCE_REASONS.get(value or "", value or "Unknown")
 
 VISUAL_SIGNS = {
     "chest_clutching": "Holding chest (3 s or longer)",

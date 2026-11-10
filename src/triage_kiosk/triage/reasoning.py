@@ -7,13 +7,17 @@ rule-based fallbacks when the LLM is unavailable or times out.
 
 import logging
 import json
+import re
 import time
 import requests
 from ..config import SystemConfig
+from ..intent import is_cancel_request, is_end_of_interview
 
 logger = logging.getLogger(__name__)
 
 class ReasoningEngine:
+    LLM_TURN_ACTIONS = {"CONTINUE_TRIAGE", "SWITCH_LANGUAGE", "CANCEL_AND_EXIT", "CALL_HUMAN_NURSE"}
+
     def __init__(self):
         self.endpoint = f"{SystemConfig.OLLAMA_HOST}/api/generate"
         self.warmup()
@@ -21,33 +25,23 @@ class ReasoningEngine:
     def warmup(self):
         """Pre-warms Llama 3.2 in VRAM on boot with a 15-second cold-load runway."""
         logger.info("Pre-warming Llama 3.2 in VRAM (Pre-Flight Test)...")
-        payload = {
-            "model": SystemConfig.OLLAMA_MODEL,
-            "prompt": "ok",
-            "stream": False,
-            "options": {"num_predict": 1},
-            "keep_alive": -1
-        }
-        try:
-            # 15s timeout specifically for cold SSD-to-RAM loading
-            requests.post(self.endpoint, json=payload, timeout=15.0)
-            logger.info("Llama 3.2 is hot and pinned in VRAM.")
-        except Exception as e:
-            logger.warning(f"Warmup Notice: Ollama not reachable on boot: {e}")
+        for model in dict.fromkeys([SystemConfig.OLLAMA_MODEL, SystemConfig.OLLAMA_TURN_MODEL]):
+            payload = {"model": model, "prompt": "ok", "stream": False,
+                       "options": {"num_predict": 1}, "keep_alive": -1}
+            try:
+                # up to 60 s: the first load after a reboot can take ~20-30 s on the M1
+                requests.post(self.endpoint, json=payload, timeout=60.0)
+                logger.info(f"{model} is hot and pinned in memory.")
+            except Exception as e:
+                logger.warning(f"Warmup Notice: Ollama not reachable for {model}: {e}")
 
     # -------------------------------------------------------------------------
     # 1. STOPPING INTENT DETECTOR
     # -------------------------------------------------------------------------
     @staticmethod
     def is_stopping_phrase(utterance: str, lang: str = "th") -> bool:
-        """Detects if patient indicates they are done explaining."""
-        text = utterance.strip().lower()
-        if len(text) == 0:
-            return False
-
-        phrases = getattr(SystemConfig, "STOP_PHRASES_TH", ["หมดแล้ว", "แค่นี้", "ไม่มีแล้ว", "พอแค่นี้", "พอแล้ว"]) if lang == "th" else \
-                  getattr(SystemConfig, "STOP_PHRASES_EN", ["that's all", "thats all", "nothing else", "no more", "done", "finished", "enough"])
-        return any(p in text for p in phrases)
+        """True only when the reply is essentially "that's all" (see ``intent.is_end_of_interview``)."""
+        return is_end_of_interview(utterance)
 
     # -------------------------------------------------------------------------
     # 2. MID-SESSION ACUTE PREEMPTION CHECK (EMERGENCY BRAKE)
@@ -71,6 +65,13 @@ class ReasoningEngine:
             return True, 2
 
         return False, 0
+
+    @staticmethod
+    def is_live_chest_emergency(utterance: str, dominant_gesture: str) -> bool:
+        """Patient is clutching the chest RIGHT NOW and describes the pain as severe."""
+        text = (utterance or "").lower()
+        return dominant_gesture == "CHEST_PAIN" and any(
+            k in text for k in ["เจ็บมาก", "แน่นมาก", "ปวดมาก", "severe", "crushing", "really bad", "very bad"])
 
     # -------------------------------------------------------------------------
     # 3. PROACTIVE VISUAL INITIATION PROMPT
@@ -100,7 +101,7 @@ class ReasoningEngine:
         dom_gesture = visual_telemetry.get("dominant_current_gesture", "NONE")
 
         # 1. Fast Rule Checks: Cancellation or Life Threat
-        if any(w in text for w in ["พอแค่นี้", "ไม่เอาแล้ว", "ยกเลิก", "enough", "stop", "cancel", "going out", "see the doctor"]):
+        if is_cancel_request(text):
             cancel_resp = "รับทราบค่ะ ขออภัยที่ทำให้เสียเวลา ดิฉันจะส่งเรื่องให้คุณพบแพทย์ทันทีนะคะ" if active_lang == "th" else \
                           "Understood. I apologize for the delay. Please proceed directly to see the doctor."
             return {
@@ -188,7 +189,7 @@ Output ONLY valid JSON:
 <|eot_id|><|start_header_id|>assistant<|end_header_id|>"""
 
         payload = {
-            "model": SystemConfig.OLLAMA_MODEL,
+            "model": SystemConfig.OLLAMA_TURN_MODEL,
             "prompt": prompt,
             "stream": False,
             "format": "json",
@@ -202,7 +203,7 @@ Output ONLY valid JSON:
 
         try:
             t0 = time.time()
-            res = requests.post(self.endpoint, json=payload, timeout=getattr(SystemConfig, "OLLAMA_TIMEOUT", 8.0))
+            res = requests.post(self.endpoint, json=payload, timeout=SystemConfig.OLLAMA_TURN_TIMEOUT)
             llm_duration = time.time() - t0
 
             if res.status_code == 200:
@@ -215,7 +216,22 @@ Output ONLY valid JSON:
                     raw_response += "}"
 
                 frame = json.loads(raw_response)
+                if not isinstance(frame, dict):
+                    raise ValueError("LLM turn output is not a JSON object")
                 frame["llm_latency_sec"] = round(llm_duration, 2)
+
+                # Guardrails: the LLM may only choose these actions, and may not end the
+                # case by itself (cancel) unless the patient actually asked to cancel.
+                if frame.get("action") not in self.LLM_TURN_ACTIONS:
+                    frame["action"] = "CONTINUE_TRIAGE"
+                if frame["action"] == "CANCEL_AND_EXIT":
+                    frame["action"] = "CONTINUE_TRIAGE"
+                if frame.get("target_language") not in ("th", "en"):
+                    frame["target_language"] = active_lang
+                if frame["action"] == "SWITCH_LANGUAGE" and frame["target_language"] == active_lang:
+                    frame["action"] = "CONTINUE_TRIAGE"
+                if not str(frame.get("spoken_response") or "").strip():
+                    raise ValueError("LLM turn output has no spoken_response")
 
                 if frame.get("target_language") == "th" or active_lang == "th":
                     frame["spoken_response"] = frame.get("spoken_response", "").replace("ครับ", "ค่ะ")
@@ -286,11 +302,15 @@ Output ONLY valid JSON:
     # -------------------------------------------------------------------------
     def evaluate_final_case(self, conversation_history: list, visual_signs: dict, skin_status: str, exit_reason: any,
                             language: str, temperature: float = 0.0, seed: int | None = None,
-                            timeout: float | None = None) -> dict:
+                            timeout: float | None = None, preempt_esi: int | None = None,
+                            use_llm: bool = True, intake: dict | None = None) -> dict:
         """Synthesizes the complete patient encounter into the final ESI Level + SOAP note.
 
         ``temperature``, ``seed`` and ``timeout`` exist for experiments (M3 replay); the kiosk
-        uses the defaults (temperature 0, no seed, SystemConfig.OLLAMA_TIMEOUT).
+        uses the defaults (temperature 0, no seed, SystemConfig.OLLAMA_FINAL_TIMEOUT).
+        ``preempt_esi`` is the level found by the mid-interview emergency check; ``use_llm=False``
+        skips the LLM (emergency fast path, so the nurse alert is not delayed). Every result
+        passes through ``apply_safety_floor``.
         """
         transcript = " ".join([t["text"] for t in conversation_history if t.get("role") == "patient"])
         scenario = self.evaluate_scenario(transcript, visual_signs)
@@ -308,6 +328,7 @@ CLINICAL BOUNDARY CRITERIA:
 - ESI Level 4: Requires 1 resource (e.g. simple x-ray or single medication).
 - ESI Level 5: No resources needed (refill, exam only).
 
+Write every text field in ENGLISH (translate Thai), at most 25 words per field.
 Return ONLY a valid JSON object matching this schema:
 {{
   "esi_level": <int 1-5>,
@@ -326,6 +347,7 @@ Return ONLY a valid JSON object matching this schema:
 - Abdominal Guarding: {visual_signs.get('abdominal_clutching', False)}
 - Cranial Distress (Headache): {visual_signs.get('head_clutching', False)}
 - Facial Skin Status (CNN): {skin_status}
+[STRUCTURED INTAKE]: {self._intake_line(intake)}
 [SCENARIO CROSS-VALIDATION]: {scenario['scenario_type']} ({scenario['clinical_flag']})
 [ENCOUNTER EXIT REASON]: {exit_val}
 <|eot_id|><|start_header_id|>assistant<|end_header_id|>"""
@@ -335,43 +357,134 @@ Return ONLY a valid JSON object matching this schema:
             "prompt": prompt,
             "stream": False,
             "format": "json",
-            "options": {"temperature": float(temperature), "num_predict": 256},
+            "options": {"temperature": float(temperature), "num_predict": 200},
             "keep_alive": -1
         }
         if seed is not None:
             payload["options"]["seed"] = int(seed)
-        request_timeout = timeout if timeout is not None else getattr(SystemConfig, "OLLAMA_TIMEOUT", 10.0)
+        request_timeout = timeout if timeout is not None else SystemConfig.OLLAMA_FINAL_TIMEOUT
 
+        verdict = None
+        fallback_reason = None
+        if not use_llm:
+            fallback_reason = "DETERMINISTIC_EMERGENCY_FAST_PATH"
+        else:
+            try:
+                start_t = time.time()
+                res = requests.post(self.endpoint, json=payload, timeout=request_timeout)
+                if res.status_code != 200:
+                    fallback_reason = f"DETERMINISTIC_FALLBACK_OLLAMA_HTTP_{res.status_code}"
+                else:
+                    out = json.loads(res.json().get("response", "{}"))
+                    problem = self.verdict_problem(out)
+                    if problem:
+                        fallback_reason = "DETERMINISTIC_FALLBACK_INVALID_LLM_VERDICT"
+                        logger.warning(f"LLM verdict rejected: {problem}")
+                    else:
+                        out["esi_level"] = int(float(out["esi_level"]))
+                        out["scenario_details"] = scenario
+                        out["inference_latency_sec"] = round(time.time() - start_t, 2)
+                        verdict = out
+            except requests.Timeout:
+                fallback_reason = "DETERMINISTIC_FALLBACK_LLM_TIMEOUT"
+            except requests.ConnectionError:
+                fallback_reason = "DETERMINISTIC_FALLBACK_OLLAMA_UNREACHABLE"
+            except (json.JSONDecodeError, ValueError):
+                fallback_reason = "DETERMINISTIC_FALLBACK_JSON_PARSE_ERROR"
+            except Exception as e:
+                fallback_reason = f"DETERMINISTIC_FALLBACK_UNEXPECTED_{type(e).__name__.upper()}"
+
+        rule_verdict = self._deterministic_verdict(transcript, visual_signs, skin_status, exit_val,
+                                                   scenario, fallback_reason or "")
+        if verdict is None:
+            if fallback_reason != "DETERMINISTIC_EMERGENCY_FAST_PATH":
+                logger.warning(f"Final synthesis fallback triggered: {fallback_reason}")
+            verdict = rule_verdict
+        else:
+            # Fill any SOAP field the LLM left empty with the rule-based text.
+            for key in ("urgency", "subjective", "objective", "assessment", "plan"):
+                if not str(verdict.get(key) or "").strip():
+                    verdict[key] = rule_verdict[key]
+            verdict.setdefault("scenario_type", scenario["scenario_type"])
+            verdict["audit_mode"] = "LLM_INFERENCE_VALIDATED"
+
+        if intake:
+            verdict["intake"] = intake
+        return self.apply_safety_floor(verdict, visual_signs, skin_status, exit_val, scenario, preempt_esi,
+                                       pain_score=(intake or {}).get("pain_score_0_10"))
+
+    @staticmethod
+    def _intake_line(intake: dict | None) -> str:
+        if not intake:
+            return "not collected"
+        score = intake.get("pain_score_0_10")
+        return (f"complaint='{intake.get('complaint') or 'not stated'}'; "
+                f"pain score={'%s/10' % score if score is not None else intake.get('severity') or 'not stated'}; "
+                f"onset='{intake.get('onset') or 'not stated'}'")
+
+    # -------------------------------------------------------------------------
+    # 7. VERDICT VALIDATION + SAFETY FLOOR
+    # -------------------------------------------------------------------------
+    REQUIRED_TEXT_FIELDS = ("urgency", "subjective", "objective", "assessment", "plan")
+    URGENCY_BY_ESI = {1: "Resuscitation", 2: "Emergent", 3: "Urgent", 4: "Less Urgent", 5: "Non-urgent"}
+
+    @staticmethod
+    def verdict_problem(out) -> str:
+        """Return why an LLM verdict is unusable, or "" when it is acceptable."""
+        if not isinstance(out, dict):
+            return "not a JSON object"
+        esi = out.get("esi_level")
+        if isinstance(esi, bool):
+            return "esi_level is not a number"
         try:
-            start_t = time.time()
-            res = requests.post(self.endpoint, json=payload, timeout=request_timeout)
-            if res.status_code == 200:
-                out = json.loads(res.json().get("response", "{}"))
-                out["scenario_details"] = scenario
-                out["inference_latency_sec"] = round(time.time() - start_t, 2)
-                return out
-        except requests.Timeout:
-            fallback_reason = "DETERMINISTIC_FALLBACK_LLM_TIMEOUT"
-        except requests.ConnectionError:
-            fallback_reason = "DETERMINISTIC_FALLBACK_OLLAMA_UNREACHABLE"
-        except json.JSONDecodeError:
-            fallback_reason = "DETERMINISTIC_FALLBACK_JSON_PARSE_ERROR"
-        except Exception as e:
-            fallback_reason = f"DETERMINISTIC_FALLBACK_UNEXPECTED_{type(e).__name__.upper()}"
+            esi_float = float(esi)
+        except (TypeError, ValueError):
+            return f"esi_level={esi!r} is not a number"
+        if esi_float != int(esi_float):
+            return f"esi_level={esi!r} is not a whole number"
+        esi_int = int(esi_float)
+        if not 1 <= esi_int <= 5:
+            return f"esi_level={esi_int} outside 1-5"
+        return ""
 
-        logger.warning(f"Final synthesis fallback triggered: {fallback_reason}")
+    @classmethod
+    def apply_safety_floor(cls, verdict: dict, visual_signs: dict, skin_status: str, exit_val: str,
+                           scenario: dict, preempt_esi=None, pain_score=None) -> dict:
+        """Never let a verdict be LESS urgent than the hard signals the kiosk observed.
 
-        # # Deterministic Fallback
-        # if exit_val == "AMS_3_STRIKES" or visual_signs.get("chest_clutching", False):
-        #     esi = 2
-        #     urgency = "Emergent / High Risk"
-        # elif visual_signs.get("abdominal_clutching", False) or visual_signs.get("head_clutching", False):
-        #     esi = 3
-        #     urgency = "Urgent (2+ Resources Anticipated)"
-        # else:
-        #     esi = 4
-        #     urgency = "Less Urgent"
+        A lower ESI number is more urgent. Each rule gives the highest ESI number allowed.
+        """
+        caps = []
+        if exit_val == "EMERGENCY_INTERRUPT":
+            caps.append((min(int(preempt_esi), 2) if preempt_esi in (1, 2) else 2,
+                         "emergency detected during the interview"))
+        if visual_signs.get("chest_clutching", False):
+            caps.append((2, "sustained chest clutching (Levine's sign)"))
+        if exit_val == "AMS_3_STRIKES":
+            caps.append((2, "possible altered mental status (3 off-topic replies)"))
+        skin = (skin_status or "").strip().upper().replace(" ", "_")
+        if skin in ("RED_FLUSHING", "FLUSHING_(RED)", "PALLOR_(PALE)"):
+            caps.append((3, f"abnormal skin ({skin_status})"))
+        if scenario.get("scenario_type") == "SCENARIO_C_CLINICAL_CONFLICT":
+            caps.append((3, "pain posture while the patient minimises symptoms"))
+        if isinstance(pain_score, (int, float)) and pain_score >= 7:
+            caps.append((3, f"patient-rated pain {pain_score}/10"))
+        if not caps:
+            return verdict
+        limit = min(c[0] for c in caps)
+        original = int(verdict["esi_level"])
+        if original > limit:
+            verdict["esi_before_safety_floor"] = original
+            verdict["esi_level"] = limit
+            reasons = "; ".join(r for c, r in caps if c == limit)
+            verdict["urgency"] = f"{cls.URGENCY_BY_ESI[limit]} [SAFETY FLOOR: {reasons}]"
+            verdict["safety_floor"] = reasons
+            logger.warning(f"Safety floor: ESI {original} -> {limit} ({reasons})")
+        return verdict
 
+    def _deterministic_verdict(self, transcript: str, visual_signs: dict, skin_status: str, exit_val: str,
+                               scenario: dict, fallback_reason: str) -> dict:
+        """Rule-based ESI + SOAP note used when the LLM is unavailable or rejected."""
         # Critical keywords → ESI 1
         ESI1_KEYWORDS = [
             "หมดสติ", "ไม่รู้สึกตัว", "หยุดหายใจ", "ชักเกร็ง",
@@ -397,7 +510,8 @@ Return ONLY a valid JSON object matching this schema:
         normalized_skin_status = skin_status.strip().upper().replace(" ", "_")
         normal_skin = normalized_skin_status == "NORMAL"
         no_conflict    = scenario["scenario_type"] != "SCENARIO_C_CLINICAL_CONFLICT"
-        normal_exit    = exit_val not in ("AMS_3_STRIKES", "EMERGENCY_ABORT")
+        normal_exit    = exit_val not in ("AMS_3_STRIKES", "EMERGENCY_INTERRUPT", "EMERGENCY_ABORT",
+                                           "HUMAN_NURSE_SUMMONED", "SYSTEM_FAULT")
 
         # --- Step 1: ESI 1 — check first, must never be missed ---
         is_esi1 = any(w in text_lower for w in ESI1_KEYWORDS)
@@ -425,7 +539,10 @@ Return ONLY a valid JSON object matching this schema:
 
         elif no_visual_signs and normal_skin and no_conflict and normal_exit:
             # All clear conditions met → safe to assign ESI 4 or 5
-            if any(w in text_lower for w in ESI5_KEYWORDS):
+            # English keywords on whole words, so "cold sweat" is not read as "cold".
+            minor = any(w in text_lower for w in ESI5_KEYWORDS if not w.isascii()) or any(
+                re.search(rf"\b{re.escape(w)}\b(?! sweat)", text_lower) for w in ESI5_KEYWORDS if w.isascii())
+            if minor:
                 esi    = 5
                 urgency = "Non-urgent (No Resources Anticipated)"
             else:

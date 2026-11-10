@@ -108,6 +108,8 @@ ollama pull llama3.2
 PYTHONPATH=src python -m triage_kiosk.main
 ```
 
+Before a live test, run `PYTHONPATH=src python scripts/checks/kiosk_preflight.py --full`. The full real-world test and demo procedure is in [docs/demo/REAL_WORLD_TEST.md](docs/demo/REAL_WORLD_TEST.md).
+
 The first run downloads the Faster-Whisper model. Cloud speech recognition is
 off by default; set `ALLOW_CLOUD_SPEECH_RECOGNITION=1` only if you accept
 sending audio to Google when local transcription fails.
