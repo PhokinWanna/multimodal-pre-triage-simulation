@@ -204,13 +204,18 @@ def _ingest_case(session: Session, payload: dict[str, Any], settings: Settings) 
 
         raw_evidence = payload.get("visual_evidence_path")
         case.evidence_path = safe_evidence_path(raw_evidence, settings.evidence_dir)
+        if case.evidence_path is None and isinstance(raw_evidence, str) and raw_evidence:
+            # Same photo folder mounted at another path (Docker: host folder -> /evidence).
+            same_name = os.path.join(settings.evidence_dir, os.path.basename(raw_evidence.replace("\\", "/")))
+            if os.path.isfile(same_name):
+                case.evidence_path = safe_evidence_path(same_name, settings.evidence_dir)
         if raw_evidence and case.evidence_path is None:
             notes.append("evidence image outside the allowed folder: not linked")
 
         verdict = payload.get("triage_verdict")
         if isinstance(verdict, dict):
             case.ai_esi = _esi(verdict.get("esi_level"))
-            case.ai_urgency = _str(verdict.get("urgency"), 32)
+            case.ai_urgency = _str(verdict.get("urgency"), 200)
             case.scenario_type = _str(verdict.get("scenario_type"), 64)
             case.subjective = _str(verdict.get("subjective"))
             case.objective = _str(verdict.get("objective"))

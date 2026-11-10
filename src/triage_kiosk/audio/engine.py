@@ -27,7 +27,10 @@ IS_MAC = (platform.system() == "Darwin")
 
 if not IS_MAC:
     import pygame
-    pygame.mixer.init()
+    try:
+        pygame.mixer.init()
+    except Exception as _e:  # noqa: BLE001  (no sound device, e.g. a headless Linux box)
+        logging.getLogger(__name__).warning(f"No audio output device ({_e}); voice prompts will be silent.")
 
 class AudioDeviceError(RuntimeError):
     """The microphone or the speech engine cannot be used (unplugged, no permission, not installed)."""

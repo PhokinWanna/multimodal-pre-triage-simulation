@@ -16,11 +16,15 @@ and suggest an Emergency Severity Index (ESI) level before a nurse sees them.
 
 - **Vision:** MediaPipe face and pose landmarks plus an on-device TFLite CNN
   that classifies facial skin patches as *Normal* or *Flushing*.
-- **Speech:** local Faster-Whisper speech-to-text and pre-recorded Thai/English
-  voice prompts.
-- **Reasoning:** Llama 3.2 running locally through Ollama conducts an
-  OPQRST-style symptom interview and proposes an ESI level, with a
-  deterministic rule-based fallback if the LLM times out.
+- **Speech:** local Faster-Whisper speech-to-text (Thai/English detected
+  automatically), pre-recorded voice prompts, and the offline macOS voices for the
+  interview questions.
+- **Interview:** a fixed, step-by-step intake (main complaint → pain score 0–10 →
+  onset → "anything else?"), so questions are never repeated.
+- **Reasoning:** Llama 3.2 running locally through Ollama writes the SOAP note and
+  proposes an ESI level, with a deterministic rule-based fallback if the LLM times
+  out and a safety floor that the LLM cannot override (emergency words, chest
+  clutching, pain ≥ 7/10).
 - **Privacy by design:** verbal PDPA consent before any data is collected; on
   refusal, only an anonymous nurse-assistance event is sent. Patient text is
   never sent to external text-to-speech.
@@ -73,7 +77,8 @@ the two Model-03 rows are a like-for-like comparison.
 
 **Limitations:** the evaluation is patch-level and grouped by filename prefix,
 not verified person-disjoint, so identity leakage is possible. The Model-03
-checkpoints are research artifacts and are not yet wired into the kiosk. Full
+α = 0.75 best checkpoint is the model the kiosk now uses
+(`models/skin_classifier.tflite`, see [`models/README.md`](models/README.md)). Full
 details are in
 [`FINAL_SUMMARY.md`](scripts/train/cnn/model03/results/FINAL_SUMMARY.md).
 
@@ -95,32 +100,54 @@ details are in
 
 ## Getting started
 
-Requires Python 3.11, a webcam, a microphone, and [Ollama](https://ollama.com)
-with the Llama 3.2 model.
+Tested on macOS (Apple Silicon, M1) with Python 3.11. Needs a webcam, a microphone,
+a speaker and [Ollama](https://ollama.com). On Linux, install `portaudio19-dev` and
+`libgl1` first; interview questions then use the generic recording, because the
+offline voices (`say`) are macOS-only.
 
 ```bash
+brew install portaudio            # macOS: needed BEFORE installing PyAudio
 python3.11 -m venv .venv-kiosk
 source .venv-kiosk/bin/activate
 python -m pip install -r requirements-kiosk.txt
-brew install portaudio        # macOS, needed by PyAudio
-ollama pull llama3.2
-
-PYTHONPATH=src python -m triage_kiosk.main
+ollama pull llama3.2              # with the Ollama app running
 ```
 
-Before a live test, run `PYTHONPATH=src python scripts/checks/kiosk_preflight.py --full`. The full real-world test and demo procedure is in [docs/demo/REAL_WORLD_TEST.md](docs/demo/REAL_WORLD_TEST.md).
+Optional but recommended: download the Thai voice **Kanya** (System Settings →
+Accessibility → Spoken Content → System voice → Manage Voices → Thai). The first kiosk
+run downloads the Faster-Whisper model (~500 MB) and asks for camera/microphone access.
 
-The first run downloads the Faster-Whisper model. Cloud speech recognition is
-off by default; set `ALLOW_CLOUD_SPEECH_RECOGNITION=1` only if you accept
-sending audio to Google when local transcription fails.
-Logs print at INFO level; run with `LOG_LEVEL=DEBUG` to also see
-transcribed speech while debugging.
+**Run the whole system** (three terminals, from the repository root):
+
+```bash
+# 1. dashboard (its own environment, see below)
+export DASHBOARD_KIOSK_KEY=pick-any-shared-secret
+PYTHONPATH=src python -m uvicorn nurse_dashboard.app:app --port 8000
+
+# 2. pre-flight check of camera, mic, voices, Ollama and dashboard (must end with 0 FAIL)
+export NURSE_DASHBOARD_KEY=pick-any-shared-secret      # same value as DASHBOARD_KIOSK_KEY
+PYTHONPATH=src python scripts/checks/kiosk_preflight.py --full
+
+# 3. kiosk (same terminal as step 2)
+PYTHONPATH=src python -m triage_kiosk.main             # press q in the camera window to quit
+```
+
+Cases go to `http://127.0.0.1:8000/api/triage/submit_case` (change with
+`NURSE_DASHBOARD_ENDPOINT`). If the dashboard is down, cases wait in
+`data/runtime/spool_outbox/` and are re-sent automatically. Test scenarios and a demo
+script: [docs/demo/REAL_WORLD_TEST.md](docs/demo/REAL_WORLD_TEST.md).
+
+Useful settings (environment variables): `KIOSK_LOG_TRANSCRIPTS=1` prints what Whisper
+heard; `MIC_ENERGY_THRESHOLD=600` for a noisy room; `WHISPER_MODEL=medium` for better
+Thai (slower); `INTERVIEW_MODE=llm` for the original free-form LLM questions.
+Cloud speech recognition is off by default (`ALLOW_CLOUD_SPEECH_RECOGNITION=1` sends
+audio to Google).
 
 Run the tests (no camera, microphone, or Ollama needed):
 
 ```bash
 python -m pip install -r requirements-test.txt
-PYTHONPATH=src python -m pytest
+python -m pytest                 # includes a simulated end-to-end kiosk run
 ```
 
 ### Nurse dashboard
@@ -130,9 +157,10 @@ Use a separate environment (Python 3.11 or newer):
 ```bash
 python -m venv .venv-dashboard && source .venv-dashboard/bin/activate
 python -m pip install -r requirements-dashboard.txt
-PYTHONPATH=src python -m nurse_dashboard create-admin
+PYTHONPATH=src python -m nurse_dashboard create-admin   # first time only
+PYTHONPATH=src python -m nurse_dashboard create-user    # e.g. a nurse account
 PYTHONPATH=src python -m uvicorn nurse_dashboard.app:app --port 8000
-python scripts/dashboard/send_demo_cases.py     # optional: fake kiosk cases
+NURSE_DASHBOARD_KEY=pick-any-shared-secret python scripts/dashboard/send_demo_cases.py  # optional: fake cases
 ```
 
 Open `http://127.0.0.1:8000`. Full guide for nurses, admins and setup:
@@ -158,7 +186,7 @@ More detail: [`scripts/train/cnn/SPLIT_README.md`](scripts/train/cnn/SPLIT_READM
   nurses; a System Usability Scale (SUS) session is planned.
 - The kiosk does not measure vital signs or collect identity; nurses add both
   at the dashboard.
-- Systematic LLM scenario testing is planned work.
+- Systematic LLM scenario testing (experiment M3) is in progress.
 
 ## License
 

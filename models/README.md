@@ -1,12 +1,14 @@
 # Model assets
 
-`skin_classifier.tflite` is the TFLite model loaded by the current vision
-engine. The engine expects a single float32 image tensor and reports the
-model's positive output as the Flushing class. Model-03 research checkpoints
-are stored separately with their experiment report and are not wired into the
-kiosk.
+`skin_classifier.tflite` is the skin CNN loaded by the kiosk's vision engine
+(`src/triage_kiosk/vision/skin.py`). It is the Model-03 focal-loss α = 0.75 best
+checkpoint, converted to TFLite. `skin_classifier.json` records its source checkpoint
+(SHA-256), the decision threshold chosen on the validation set, and the expected input:
+64x64 forehead/cheek patches, BGR → CIELAB, divided by 255, with the patch
+probabilities averaged.
 
-The packaged TFLite model is not accompanied by a source training manifest
-that proves parity with the latest CNN experiment. Do not treat the Model-03
-results as validation of this deployed artifact. Verify preprocessing,
-camera-region selection, and TFLite parity before relying on its predictions.
+`legacy/skin_classifier_original.tflite` is the original model, kept only for the
+original-vs-fixed comparison in the M3 experiment (`SKIN_PIPELINE=legacy_whole_face`).
+
+The evaluation is patch-level on a prefix-grouped split (not verified person-disjoint),
+so treat the predictions as research output, not a clinical measurement.

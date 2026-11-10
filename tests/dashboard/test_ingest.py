@@ -138,3 +138,22 @@ def test_every_delivery_is_audited(client, session, full_case):
 
     actions = [a.action for a in session.exec(select(AuditLog).order_by(AuditLog.id)).all()]
     assert actions == ["case_received", "duplicate_delivery"]
+
+
+def test_evidence_from_another_mount_path_is_linked_by_file_name(client, session, settings, full_case):
+    # Docker: the kiosk sends its host path, the dashboard sees the same folder at /evidence.
+    open(os.path.join(settings.evidence_dir, "CASE-77.jpg"), "wb").close()
+    full_case.update(case_id="CASE-77",
+                     visual_evidence_path="/Users/someone/project/data/runtime/evidence/CASE-77.jpg")
+    client.post(URL, json=full_case)
+
+    case = _case(session, "CASE-77")
+    assert case.evidence_path == os.path.realpath(os.path.join(settings.evidence_dir, "CASE-77.jpg"))
+    assert not any("outside the allowed folder" in n for n in case.check_notes)
+
+
+def test_long_urgency_text_is_kept(client, session, full_case):
+    full_case.update(case_id="CASE-78")
+    full_case["triage_verdict"]["urgency"] = "Urgent [SAFETY FLOOR: patient-rated pain 8/10]"
+    client.post(URL, json=full_case)
+    assert _case(session, "CASE-78").ai_urgency == "Urgent [SAFETY FLOOR: patient-rated pain 8/10]"

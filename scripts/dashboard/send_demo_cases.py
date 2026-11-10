@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import time
 import urllib.error
 import urllib.request
@@ -80,9 +81,12 @@ def demo_payloads() -> list[dict]:
     ]
 
 
-def post(url: str, payload: dict) -> tuple[int, str]:
+def post(url: str, payload: dict, key: str = "") -> tuple[int, str]:
+    headers = {"Content-Type": "application/json"}
+    if key:
+        headers["X-Kiosk-Key"] = key
     req = urllib.request.Request(url, data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
-                                 headers={"Content-Type": "application/json"}, method="POST")
+                                 headers=headers, method="POST")
     try:
         with urllib.request.urlopen(req, timeout=5) as res:
             return res.status, res.read().decode()
@@ -94,15 +98,19 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--url", default=DEFAULT_URL)
     parser.add_argument("--delay", type=float, default=1.0, help="seconds between cases (to watch them arrive)")
+    parser.add_argument("--key", default=os.getenv("NURSE_DASHBOARD_KEY") or os.getenv("DASHBOARD_KIOSK_KEY", ""),
+                        help="kiosk key (default: $NURSE_DASHBOARD_KEY or $DASHBOARD_KIOSK_KEY)")
     args = parser.parse_args()
 
     try:
         for payload in demo_payloads():
-            status, body = post(args.url, payload)
+            status, body = post(args.url, payload, args.key)
             print(f"{payload['case_id']}: {status} {body}")
+            if status == 401:
+                raise SystemExit("Rejected (401): set --key or NURSE_DASHBOARD_KEY to the dashboard's DASHBOARD_KIOSK_KEY.")
             time.sleep(args.delay)
         event = {"event_type": "nurse_assistance_requested", "reason": "consent_refused", "event_id": uuid.uuid4().hex}
-        status, body = post(args.url, event)
+        status, body = post(args.url, event, args.key)
         print(f"Consent-refusal alert: {status} {body}")
     except urllib.error.URLError as e:
         raise SystemExit(f"Could not reach the dashboard at {args.url} ({e.reason}). Is it running?")
