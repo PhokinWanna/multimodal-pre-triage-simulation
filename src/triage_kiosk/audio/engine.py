@@ -1,15 +1,14 @@
 """Audio engine: on-device speech-to-text and voice-prompt playback.
 
 Uses Faster-Whisper for local transcription, plays pre-recorded Thai/English
-prompts (afplay on macOS, pygame elsewhere), and limits external TTS to a fixed
-generic reply.
+prompts (afplay on macOS, pygame on Windows/Linux), speaks with the OFFLINE system
+voice (macOS `say`, Windows SAPI) and limits external TTS (gTTS) to fixed sentences.
 """
 
 import logging
 import os
 import re
 import time
-import platform
 import tempfile
 import threading
 import subprocess
@@ -17,18 +16,20 @@ import numpy as np
 import speech_recognition as sr
 from gtts import gTTS
 from ..config import SystemConfig
-from ..tts_privacy import is_safe_fixed_text, safe_off_topic_text
+from ..tts_privacy import fixed_audio_filename, is_safe_fixed_text, safe_off_topic_text
+from .. import platform_support as plat
 from ..intent import find_wake_word
 
 logger = logging.getLogger(__name__)
 
-# Detect operating system
-IS_MAC = (platform.system() == "Darwin")
+IS_MAC, IS_WINDOWS = plat.IS_MAC, plat.IS_WINDOWS
+_MIXER_READY = False
 
 if not IS_MAC:
     import pygame
     try:
         pygame.mixer.init()
+        _MIXER_READY = True
     except Exception as _e:  # noqa: BLE001  (no sound device, e.g. a headless Linux box)
         logging.getLogger(__name__).warning(f"No audio output device ({_e}); voice prompts will be silent.")
 
@@ -37,8 +38,12 @@ class AudioDeviceError(RuntimeError):
 
 
 def detect_local_voices() -> dict:
-    """Return {lang: voice} for the configured offline voices that are installed (macOS `say`)."""
-    if not (IS_MAC and SystemConfig.LOCAL_TTS_ENABLED):
+    """Return {lang: voice} for the offline voices that are installed (macOS `say`, Windows SAPI)."""
+    if not SystemConfig.LOCAL_TTS_ENABLED:
+        return {}
+    if IS_WINDOWS:
+        return detect_windows_voices()
+    if not IS_MAC:
         return {}
     try:
         listing = subprocess.run(["/usr/bin/say", "-v", "?"], capture_output=True, text=True,
@@ -47,6 +52,23 @@ def detect_local_voices() -> dict:
         logger.warning(f"Offline TTS unavailable: {e}")
         return {}
     return pick_voices(listing)
+
+
+def detect_windows_voices() -> dict:
+    try:
+        voices = plat.list_windows_voices()
+    except Exception as e:  # noqa: BLE001  (pywin32 missing / SAPI broken)
+        logger.warning(f"Windows offline voices unavailable ({e}); install pywin32 (requirements in 'Windows version').")
+        return {}
+    found = {}
+    for lang, wanted in SystemConfig.LOCAL_TTS_VOICES_WINDOWS.items():
+        choice = plat.pick_sapi_voice(voices, lang, wanted)
+        if choice:
+            found[lang] = choice
+            logger.info(f"Offline voice for '{lang}': {choice}")
+        else:
+            logger.warning(f"No Windows '{lang}' voice installed; fixed prompts use the pre-recorded audio.")
+    return found
 
 
 def pick_voices(say_listing: str) -> dict:
@@ -78,7 +100,7 @@ def pick_voices(say_listing: str) -> dict:
 
 class AudioEngine:
     def __init__(self):
-        logger.info(f"Initializing Audio Engine Subsystems (Platform: {'macOS' if IS_MAC else 'Windows/Linux'})...")
+        logger.info(f"Initializing Audio Engine Subsystems (Platform: {plat.PLATFORM_NAME})...")
         self._is_speaking = False
         self.audio_lock = threading.Lock()
         self._mic = self._source = None
@@ -110,7 +132,7 @@ class AudioEngine:
     # opened once and only closed at shutdown (or after a device error).
     def _open_source(self):
         if getattr(self, "_source", None) is None:
-            mic_idx = None if IS_MAC else getattr(SystemConfig, "MICROPHONE_DEVICE_INDEX", None)
+            mic_idx = SystemConfig.MICROPHONE_DEVICE_INDEX
             try:
                 mic = sr.Microphone(device_index=mic_idx)
                 source = mic.__enter__()
@@ -230,8 +252,10 @@ class AudioEngine:
                     if IS_MAC:
                         # Native macOS CoreAudio execution (Zero SDL2 collisions)
                         subprocess.run(["/usr/bin/afplay", filepath], check=True)
+                    elif not _MIXER_READY:
+                        logger.warning("No audio output device: prompt not played.")
                     else:
-                        # Windows fallback
+                        # Windows / Linux
                         pygame.mixer.music.load(filepath)
                         pygame.mixer.music.play()
                         while pygame.mixer.music.get_busy():
@@ -270,8 +294,9 @@ class AudioEngine:
     def speak_text(self, text: str, lang: str = "th", block: bool = True) -> bool:
         """Speak any text with the OFFLINE system voice. Returns False if no voice is available.
 
-        Nothing leaves the device: macOS `say` synthesises locally. Patient-specific or
-        LLM-generated text must only ever go through this method, never through gTTS.
+        Nothing leaves the device: macOS `say` / Windows SAPI synthesise locally.
+        Patient-specific or LLM-generated text must only ever go through this method,
+        never through gTTS.
         """
         text = (text or "").strip()
         if not text or not self.can_speak(lang):
@@ -282,8 +307,11 @@ class AudioEngine:
             with self.audio_lock:
                 self._is_speaking = True
                 try:
-                    subprocess.run(["/usr/bin/say", "-v", voice, "-r", str(SystemConfig.LOCAL_TTS_RATE), "--", text],
-                                   check=True, timeout=60)
+                    if IS_WINDOWS:
+                        plat.speak_windows(text, voice, SystemConfig.LOCAL_TTS_RATE)
+                    else:
+                        subprocess.run(["/usr/bin/say", "-v", voice, "-r", str(SystemConfig.LOCAL_TTS_RATE),
+                                        "--", text], check=True, timeout=60)
                 except Exception as e:  # noqa: BLE001
                     logger.error(f"Offline TTS failure: {e}")
                 finally:
@@ -303,10 +331,20 @@ class AudioEngine:
     def speak_fixed(self, text: str, lang: str = "th", block: bool = True) -> str:
         """Speak one of the kiosk's FIXED sentences (no patient data).
 
-        Order: offline voice -> gTTS (allowed only because the text is fixed and pre-approved)
-        -> the generic pre-recorded question. Returns "say", "gtts" or "template".
+        Order on macOS: offline voice -> pre-rendered file -> gTTS -> generic recording.
+        Order elsewhere: pre-rendered file -> offline voice -> gTTS -> generic recording
+        (the pre-rendered Thai sounds like the other recordings; a Windows Thai voice
+        needs an extra speech pack). gTTS is allowed only because the text is fixed and
+        pre-approved. Returns "say", "file", "gtts" or "template".
         """
-        if self.speak_text(text, lang=lang, block=block):
+        fixed_file = os.path.join(SystemConfig.FIXED_AUDIO_DIR, fixed_audio_filename(lang, text))
+        if IS_MAC and self.speak_text(text, lang=lang, block=block):
+            return "say"
+        if os.path.isfile(fixed_file):
+            logger.info(f"[Audio Cache fixed]: \"{text}\"")
+            self._play_audio_file(fixed_file, block=block)
+            return "file"
+        if not IS_MAC and self.speak_text(text, lang=lang, block=block):
             return "say"
         if not is_safe_fixed_text(text):
             logger.error("Refusing to send non-approved text to gTTS; playing the generic recording.")
@@ -430,5 +468,5 @@ class AudioEngine:
 
     def release(self):
         self._close_source()
-        if not IS_MAC:
+        if not IS_MAC and _MIXER_READY:
             pygame.mixer.quit()

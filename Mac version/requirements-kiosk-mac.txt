@@ -1,0 +1,2 @@
+# macOS kiosk runtime (Apple Silicon, macOS 12+, Python 3.11). Needs: brew install portaudio
+-r ../requirements-kiosk.txt

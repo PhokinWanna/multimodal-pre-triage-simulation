@@ -10,6 +10,7 @@ Run from the repository root:
 """
 
 import copy
+import tempfile
 import json
 import logging
 import sys
@@ -141,7 +142,7 @@ def run(replies, telemetry=None, ollama="ok", turn_reply=None, final_reply=None,
     r.endpoint = "http://fake-ollama/api/generate"
     k.reasoning = r
     k.conveyor_belt = FakeOutbox()
-    k.evidence_dir = "/tmp"
+    k.evidence_dir = tempfile.gettempdir()
     k.last_heartbeat = _time.time()
     k.current_state = KioskState.PREPARE_STANDBY
     k.active_language = "th"

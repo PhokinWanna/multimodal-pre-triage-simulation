@@ -28,7 +28,7 @@ class SystemConfig:
     PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
     # --- Video & Display Pipeline ---
-    CAMERA_INDEX = 0
+    CAMERA_INDEX = int(os.getenv("CAMERA_INDEX", "0"))
     FRAME_WIDTH = 1280
     FRAME_HEIGHT = 720
     TARGET_FPS = 30
@@ -68,7 +68,8 @@ class SystemConfig:
     WAKE_WORDS_EN = ["hello", "hi", "start", "help", "triage", "greeting", "hey"]
 
 # Set physical mic to Index 1 (Your USB Mic), but i use 0 for defult mac mic
-    MICROPHONE_DEVICE_INDEX = 0
+    # None = the system's default input device (set MIC_DEVICE_INDEX to pick another one)
+    MICROPHONE_DEVICE_INDEX = int(os.environ["MIC_DEVICE_INDEX"]) if os.getenv("MIC_DEVICE_INDEX") else None
 
 # Force CPU for Fast-Whisper (Zero CUDA DLL errors & frees VRAM for Llama) 
     FASTER_WHISPER_DEVICE = "cpu"
@@ -107,6 +108,8 @@ class SystemConfig:
     # --- Audio Template Cache Directory ---
     BASE_DIR = str(PROJECT_ROOT)
     AUDIO_TEMPLATE_DIR = str(PROJECT_ROOT / "assets" / "audio")
+    # Pre-rendered audio of every fixed sentence (scripts/audio/generate_templates.py)
+    FIXED_AUDIO_DIR = str(PROJECT_ROOT / "assets" / "audio" / "fixed")
 
     # Audio Template File Mapping
     TEMPLATES = {
@@ -212,6 +215,12 @@ class SystemConfig:
         "en": os.getenv("LOCAL_TTS_VOICE_EN", "Samantha"),
     }
     LOCAL_TTS_RATE = int(os.getenv("LOCAL_TTS_RATE", "175"))   # words per minute
+    # Windows (SAPI): Thai "Microsoft Pattara" needs the Thai speech pack:
+    # Settings > Time & language > Language & region > Thai > Language options > Speech.
+    LOCAL_TTS_VOICES_WINDOWS = {
+        "th": os.getenv("LOCAL_TTS_VOICE_TH_WIN", "Pattara"),
+        "en": os.getenv("LOCAL_TTS_VOICE_EN_WIN", "Zira"),
+    }
 
     # --- Fault handling ---
     FSM_MAX_CONSECUTIVE_ERRORS = 3            # then: tell staff (dashboard) and reset to standby

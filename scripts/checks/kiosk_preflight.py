@@ -19,6 +19,7 @@ import time
 from urllib.parse import urlsplit
 
 from triage_kiosk.config import SystemConfig
+from triage_kiosk import platform_support as plat
 
 RESULTS = []
 
@@ -29,13 +30,17 @@ def report(status, name, detail=""):
 
 
 def check_packages():
-    for mod in ["numpy", "cv2", "mediapipe", "requests", "speech_recognition", "pyaudio",
-                "faster_whisper", "gtts", "ai_edge_litert"]:
+    mods = ["numpy", "cv2", "mediapipe", "requests", "speech_recognition", "pyaudio",
+            "faster_whisper", "gtts", "ai_edge_litert"]
+    if plat.IS_WINDOWS:
+        mods += ["pygame", "win32com.client"]
+    for mod in mods:
         try:
             m = importlib.import_module(mod)
             report("OK", f"import {mod}", getattr(m, "__version__", ""))
         except Exception as e:  # noqa: BLE001
-            hint = " (macOS: brew install portaudio, then pip install PyAudio)" if mod == "pyaudio" else ""
+            hint = {"pyaudio": " (macOS: brew install portaudio, then pip install PyAudio)",
+                    "win32com.client": " (pip install pywin32 - needed for the Windows offline voices)"}.get(mod, "")
             report("FAIL", f"import {mod}", f"{e}{hint}")
 
 
@@ -46,6 +51,13 @@ def check_files():
             if not os.path.isfile(os.path.join(SystemConfig.AUDIO_TEMPLATE_DIR, name)):
                 missing.append(f"{lang}/{key}")
     report("OK" if not missing else "FAIL", "audio templates (th + en)", ", ".join(missing) or "all present")
+    from triage_kiosk.tts_privacy import fixed_audio_filename, fixed_kiosk_texts
+    texts = fixed_kiosk_texts()
+    absent = [t for lang, t in texts
+              if not os.path.isfile(os.path.join(SystemConfig.FIXED_AUDIO_DIR, fixed_audio_filename(lang, t)))]
+    report("OK" if not absent else "WARN", "pre-recorded interview questions",
+           f"{len(texts) - len(absent)}/{len(texts)} present"
+           + ("" if not absent else " -> run: python scripts/audio/generate_templates.py (internet once)"))
     model = SystemConfig.TFLITE_SKIN_MODEL_PATH
     meta = os.path.splitext(model)[0] + ".json"
     report("OK" if os.path.isfile(model) else "FAIL", "skin CNN model", model)
@@ -57,38 +69,42 @@ def check_files():
                f"{len(left)} undelivered record(s) waiting" if left else "empty")
     except OSError as e:
         report("FAIL", "outbox spool folder", str(e))
-    if platform.system() == "Darwin":
+    if plat.IS_MAC:
         report("OK" if shutil.which("afplay") else "FAIL", "afplay (speaker playback)")
 
 
 def check_camera():
-    import cv2
-    cap = cv2.VideoCapture(SystemConfig.CAMERA_INDEX)
-    ok, frame = (cap.read() if cap.isOpened() else (False, None))
-    cap.release()
+    cap = plat.open_camera(SystemConfig.CAMERA_INDEX)
+    ok, frame = (cap.read() if cap is not None else (False, None))
+    if cap is not None:
+        cap.release()
     if ok and frame is not None:
         report("OK", f"camera index {SystemConfig.CAMERA_INDEX}", f"frame {frame.shape[1]}x{frame.shape[0]}")
     else:
         report("FAIL", f"camera index {SystemConfig.CAMERA_INDEX}",
-               "cannot read a frame (macOS: System Settings > Privacy > Camera for Terminal/IDE)")
+               "cannot read a frame (macOS: System Settings > Privacy > Camera for Terminal/IDE; "
+               "Windows: Settings > Privacy & security > Camera > let desktop apps access; "
+               "close Zoom/Teams; try CAMERA_INDEX=1)")
 
 
 def check_microphone(record):
     try:
         import speech_recognition as sr
         names = sr.Microphone.list_microphone_names()
-        report("OK" if names else "FAIL", "microphones found", "; ".join(names[:4]))
+        report("OK" if names else "FAIL", "audio devices (MIC_DEVICE_INDEX = number)",
+               "; ".join(f"{i}: {n}" for i, n in enumerate(names[:12])))
         if not record:
             return None
         r = sr.Recognizer()
         print("        Speak a short sentence now (4 s)...")
-        with sr.Microphone() as src:
+        with sr.Microphone(device_index=SystemConfig.MICROPHONE_DEVICE_INDEX) as src:
             audio = r.record(src, duration=4)
         import numpy as np
         pcm = np.frombuffer(audio.get_raw_data(convert_rate=16000, convert_width=2), dtype=np.int16)
         rms = float(np.sqrt(np.mean(pcm.astype(np.float32) ** 2)))
         report("OK" if rms > 150 else "WARN", "microphone recording level",
-               f"RMS {rms:.0f} (very low = muted / no permission: Privacy > Microphone)")
+               f"RMS {rms:.0f} (very low = muted / no permission: Privacy > Microphone; "
+               "wrong input device: set MIC_DEVICE_INDEX to a number from the list above)")
         return pcm
     except Exception as e:  # noqa: BLE001
         report("FAIL", "microphone", str(e))
@@ -96,8 +112,10 @@ def check_microphone(record):
 
 
 def check_voices(speak):
-    if platform.system() != "Darwin":
-        report("WARN", "offline voices", "macOS only; elsewhere the generic recordings are used")
+    if plat.IS_WINDOWS:
+        return check_windows_voices(speak)
+    if not plat.IS_MAC:
+        report("WARN", "offline voices", "macOS/Windows only; elsewhere the pre-recorded audio is used")
         return
     from triage_kiosk.audio.engine import pick_voices
     listing = subprocess.run(["/usr/bin/say", "-v", "?"], capture_output=True, text=True).stdout
@@ -113,14 +131,41 @@ def check_voices(speak):
             subprocess.call(["/usr/bin/say", "-v", v, text])
 
 
+def check_windows_voices(speak):
+    try:
+        voices = plat.list_windows_voices()
+    except Exception as e:  # noqa: BLE001
+        report("WARN", "offline voices (SAPI)", f"{e} -> pip install pywin32")
+        return
+    report("OK" if voices else "WARN", "Windows voices found", "; ".join(d for d, _ in voices[:6]) or "none")
+    for lang in ("th", "en"):
+        v = plat.pick_sapi_voice(voices, lang, SystemConfig.LOCAL_TTS_VOICES_WINDOWS[lang])
+        hint = ("Settings > Time & language > Language & region > add Thai > Language options > Speech "
+                "(voice: Microsoft Pattara)" if lang == "th" else "Settings > Time & language > Speech")
+        report("OK" if v else "WARN", f"offline {lang} voice (only needed for INTERVIEW_MODE=llm)",
+               v or f"missing -> pre-recorded audio is used ({hint})")
+        if v and speak:
+            plat.speak_windows("เป็นมานานกี่ชั่วโมงแล้วคะ" if lang == "th" else "How long have you had this pain?", v)
+
+
 def check_speaker():
     path = os.path.join(SystemConfig.AUDIO_TEMPLATE_DIR, SystemConfig.TEMPLATES["th"]["greeting"])
-    player = ["afplay", path] if platform.system() == "Darwin" else None
-    if not player:
-        report("WARN", "speaker", "non-macOS: test pygame playback manually")
-        return
     t0 = time.time()
-    rc = subprocess.call(player)
+    if plat.IS_MAC:
+        rc = subprocess.call(["afplay", path])
+    else:
+        try:
+            import pygame
+            pygame.mixer.init()
+            pygame.mixer.music.load(path)
+            pygame.mixer.music.play()
+            while pygame.mixer.music.get_busy():
+                time.sleep(0.05)
+            pygame.mixer.quit()
+            rc = 0
+        except Exception as e:  # noqa: BLE001
+            report("FAIL", "speaker", f"{e} (check the default output device in the sound settings)")
+            return
     report("OK" if rc == 0 else "FAIL", "speaker plays Thai greeting", f"{time.time() - t0:.1f} s - did you hear it?")
 
 
@@ -193,10 +238,11 @@ def check_dashboard():
 
 
 def main():
+    plat.configure_console_utf8()
     ap = argparse.ArgumentParser()
     ap.add_argument("--full", action="store_true", help="record mic, play speaker, load Whisper, time the LLM")
     a = ap.parse_args()
-    print(f"Python {sys.version.split()[0]} on {platform.platform()}\n")
+    print(f"Python {sys.version.split()[0]} on {platform.platform()} ({plat.PLATFORM_NAME})\n")
     check_packages()
     check_files()
     check_camera()

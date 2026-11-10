@@ -16,6 +16,7 @@ import time
 import threading
 
 from .config import SystemConfig, KioskState, ExitReason
+from .platform_support import configure_console_utf8, open_camera
 from .consent import kiosk_fault_event, prepare_pdpa_refusal_handoff
 from .intent import (NO, UNCLEAR, YES, choose_language, classify_consent, is_cancel_request,
                      is_ready_to_finish, requested_language)
@@ -474,7 +475,7 @@ class SmartReceptionTriageKiosk:
         proactive_prompt = self.reasoning.get_proactive_visual_prompt(dom_gesture, lang=self.active_language)
         if proactive_prompt:
             logger.info(f"[Proactive Visual Cue]: Triggering inquiry for {dom_gesture}")
-            self._say(proactive_prompt, "inquiry", role="kiosk_proactive")
+            self._say_fixed(proactive_prompt, role="kiosk_proactive")
         else:
             self._play_logged("inquiry")
         intake.mark_asked("complaint")
@@ -686,15 +687,15 @@ class SmartReceptionTriageKiosk:
 
     def run(self):
         """Main-Thread GUI Capture Loop (macOS Cocoa Compliant)."""
-        cap = cv2.VideoCapture(SystemConfig.CAMERA_INDEX)
-        if not cap.isOpened():
-            cap.release()
+        cap = open_camera(SystemConfig.CAMERA_INDEX)
+        if cap is None:
             self.running = False
             self.conveyor_belt.running = False
             self.vision.release()
             self.audio.release()
             raise RuntimeError(
-                f"Could not open camera device {SystemConfig.CAMERA_INDEX}."
+                f"Could not open camera device {SystemConfig.CAMERA_INDEX}. Close other apps that use the camera, "
+                "allow camera access for this terminal in the OS privacy settings, or try CAMERA_INDEX=1."
             )
 
         cap.set(cv2.CAP_PROP_FRAME_WIDTH, SystemConfig.FRAME_WIDTH)
@@ -739,6 +740,7 @@ class SmartReceptionTriageKiosk:
 
 
 if __name__ == "__main__":
+    configure_console_utf8()
     logging.basicConfig(
         level=os.getenv("LOG_LEVEL", "INFO").upper(),
         format="%(asctime)s %(levelname)-7s %(name)s: %(message)s",

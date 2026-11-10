@@ -1,0 +1,4 @@
+# Windows 10/11 kiosk runtime (64-bit Python 3.11). All packages install as pre-built wheels.
+-r ../requirements-kiosk.txt
+# Offline Windows voices (SAPI) for spoken questions
+pywin32==312

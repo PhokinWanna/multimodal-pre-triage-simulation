@@ -100,10 +100,21 @@ details are in
 
 ## Getting started
 
-Tested on macOS (Apple Silicon, M1) with Python 3.11. Needs a webcam, a microphone,
-a speaker and [Ollama](https://ollama.com). On Linux, install `portaudio19-dev` and
-`libgl1` first; interview questions then use the generic recording, because the
-offline voices (`say`) are macOS-only.
+**Easiest way:** use the ready-made scripts for your computer — double-click them in order:
+
+| | Folder | Scripts |
+|---|---|---|
+| macOS | [`Mac version/`](Mac%20version/README.md) | `1_setup` → `2_start_dashboard` → `3_preflight_check` → `4_start_kiosk` (`.command`) |
+| Windows 10/11 | [`Windows version/`](Windows%20version/README.md) | `1_setup` → `2_start_dashboard` → `3_preflight_check` → `4_start_kiosk` (`.bat`) |
+
+Both use the same code in `src/`; the kiosk detects the operating system by itself.
+The manual steps below do the same thing by hand.
+
+
+Tested live on macOS (Apple Silicon, M1) with Python 3.11; Windows 10/11 support uses
+the same code (pygame playback, DirectShow camera, SAPI voices). Needs a webcam, a
+microphone, a speaker and [Ollama](https://ollama.com). On Linux, install
+`portaudio19-dev` and `libgl1` first.
 
 ```bash
 brew install portaudio            # macOS: needed BEFORE installing PyAudio
