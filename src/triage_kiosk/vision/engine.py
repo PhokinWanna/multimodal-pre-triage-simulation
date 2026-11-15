@@ -43,8 +43,8 @@ class VisionEngine:
                  skin_pipeline: Optional[str] = None, skin_model_path: Optional[str] = None,
                  require_skin_model: Optional[bool] = None, skin_model: Optional[skin_mod.SkinModel] = None):
         self.static_image_mode = static_image_mode
-        self.posture_version = posture_version or getattr(SystemConfig, "POSTURE_RULES_VERSION", "v2")
-        self.skin_pipeline = skin_pipeline or getattr(SystemConfig, "SKIN_PIPELINE", "patch")
+        self.posture_version = posture_version or getattr(SystemConfig, "POSTURE_RULES_VERSION", "v3")
+        self.skin_pipeline = skin_pipeline or getattr(SystemConfig, "SKIN_PIPELINE", "patch_qc")
         self.posture_cfg = posture_config_from_system()
 
         # 1. MediaPipe Pose
@@ -75,6 +75,7 @@ class VisionEngine:
         self.last_skin_inference_time = 0.0
         self.cached_skin_status = skin_mod.UNKNOWN
         self.cached_skin_probability: Optional[float] = None
+        self.last_skin_reason = ""
 
         # 5. Skin model
         if require_skin_model is None:
@@ -108,7 +109,9 @@ class VisionEngine:
             return skin_mod.SkinResult(status=skin_mod.color_fallback(roi), method="color_fallback")
         if self.skin_pipeline == "legacy_whole_face":
             return skin_mod.classify_whole_face_legacy(skin_mod.face_bbox_crop(frame, face_landmarks), self.skin_model)
-        return skin_mod.classify_patches(frame, face_landmarks, self.skin_model)
+        if self.skin_pipeline == "patch":                # round-A behaviour: no image-suitability check
+            return skin_mod.classify_patches(frame, face_landmarks, self.skin_model)
+        return skin_mod.classify_patches_qc(frame, face_landmarks, self.skin_model)
 
     # ------------------------------------------------------------------ experiments
     def analyze_image(self, image_bgr: np.ndarray) -> dict:
@@ -119,7 +122,8 @@ class VisionEngine:
         face_res = self.face_mesh.process(rgb)
         posture = self._posture(pose_res.pose_landmarks, w, h) if pose_res.pose_landmarks else None
         skin_res = (self._skin(image_bgr, face_res.multi_face_landmarks[0].landmark)
-                    if face_res.multi_face_landmarks else skin_mod.SkinResult(method="no_face"))
+                    if face_res.multi_face_landmarks
+                    else skin_mod.SkinResult(method="no_face", reason=skin_mod.REASON_NO_FACE))
         return {
             "person_found": bool(posture and posture.person_found),
             "face_found": bool(face_res.multi_face_landmarks),
@@ -150,6 +154,7 @@ class VisionEngine:
             "dominant_current_gesture": "NONE",
             "skin_status": self.cached_skin_status,
             "skin_probability": self.cached_skin_probability,
+            "skin_reason": "",
             "clean_view": clean_view,
             "skeleton_view": skeleton_view,
             "active_filters": [],
@@ -210,15 +215,18 @@ class VisionEngine:
             if result.status != skin_mod.UNKNOWN:          # keep the last good reading otherwise
                 self.cached_skin_status = result.status
                 self.cached_skin_probability = result.probability
+            self.last_skin_reason = result.reason
             telemetry["skin_status"] = self.cached_skin_status
             telemetry["skin_probability"] = self.cached_skin_probability
+        telemetry["skin_reason"] = self.last_skin_reason if telemetry["skin_status"] == skin_mod.UNKNOWN else ""
 
         # Diagnostics overlay
         self.mp_draw.draw_landmarks(skeleton_view, pose_res.pose_landmarks, self.mp_pose.POSE_CONNECTIONS)
         torso = float(posture.debug.get("torso_px", 100.0))
         if telemetry["chest_clutching"]:
             c = posture.debug.get("sternum") or posture.debug.get("chest_center")
-            cv2.circle(skeleton_view, tuple(int(v) for v in c), int(torso * 0.30), (0, 0, 255), 3)
+            radius = self.posture_cfg.v3_chest_radius if posture.debug.get("rules") == "v3" else 0.30
+            cv2.circle(skeleton_view, tuple(int(v) for v in c), int(torso * radius), (0, 0, 255), 3)
             cv2.putText(skeleton_view, "SIGN: CHEST PAIN", (30, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 255), 2)
         elif telemetry["abdominal_clutching"]:
             c = posture.debug.get("navel") or posture.debug.get("navel_center")
@@ -228,6 +236,9 @@ class VisionEngine:
             cv2.putText(skeleton_view, "SIGN: HEAD DISTRESS", (30, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 0, 255), 2)
         if telemetry["skin_status"] == skin_mod.FLUSHING:
             cv2.putText(skeleton_view, "CNN SKIN: ERYTHEMA / FLUSHING", (30, 100), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+        elif telemetry["skin_status"] == skin_mod.UNKNOWN and telemetry.get("skin_reason"):
+            cv2.putText(skeleton_view, f"SKIN: not assessed ({telemetry['skin_reason']})", (30, 100),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.6, (200, 200, 200), 2)
         if telemetry["active_filters"]:
             cv2.putText(skeleton_view, "FILTER ACTIVE: " + ", ".join(telemetry["active_filters"]), (30, h - 30),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 0), 2)

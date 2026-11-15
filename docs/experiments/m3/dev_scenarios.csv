@@ -1,0 +1,16 @@
+id,esi_reference,language,patient_text,camera_posture,camera_skin_status,camera_skin_probability,decision_point
+D01,1,th,กินยานอนหลับไปทั้งกระปุกเมื่อชั่วโมงก่อน ตอนนี้ง่วงมาก ลืมตาแทบไม่ขึ้น หายใจช้าลงเรื่อยๆ ค่ะ,none,NORMAL,0.2,A: overdose with falling consciousness and slow breathing
+D02,1,en,I cut my arm on broken glass. Blood is spurting out and I can't stop it. I feel dizzy and cold.,none,UNKNOWN,,A: uncontrolled arterial bleeding with shock signs
+D03,1,th,ถูกงูกัดที่ขาเมื่อยี่สิบนาทีก่อน ตอนนี้หนังตาตก กลืนลำบาก หายใจไม่สะดวกครับ,none,NORMAL,0.3,A: snake bite with paralysis signs and airway/breathing compromise
+D04,2,th,ท้องได้สามสิบสี่สัปดาห์ ปวดหัวมาก ตาพร่ามัว เท้าบวมมาสองวันค่ะ,head,UNKNOWN,,B: high-risk pregnancy problem (possible pre-eclampsia)
+D05,2,en,"It's probably just indigestion. I feel a bit sweaty and tired, that's all. I don't want to make a fuss.",chest,NORMAL,0.15,B: patient minimises; sweating + hand on chest = possible cardiac (camera should raise it)
+D06,2,en,I'm on dialysis and I missed my last two sessions. I get short of breath when I lie down and my heart is fluttering.,none,RED_FLUSHING,0.82,B: high-risk (missed dialysis with breathlessness and palpitations)
+D07,3,en,I have had diarrhea more than ten times since last night and I keep vomiting. I feel weak and my mouth is very dry.,abdomen,NORMAL,0.2,C: lab tests + IV fluids (two or more resources)
+D08,3,th,หกล้มสะโพกกระแทกพื้นเมื่อเช้า ปวดสะโพก ลุกเดินไม่ได้ อายุเจ็ดสิบปีค่ะ,none,UNKNOWN,,C: X-ray + blood tests / injected pain relief (two or more)
+D09,3,en,"My lower leg has been red, swollen and warm for three days, and since last night I have a fever.",none,RED_FLUSHING,0.75,C: blood tests + IV antibiotics (two or more)
+D10,4,en,"I twisted my knee playing football yesterday. It is swollen, but I can walk on it.",none,NORMAL,0.1,C: X-ray only (one resource)
+D11,4,th,ก้างปลาติดคอตอนกินข้าวเย็น รู้สึกเจ็บตอนกลืน แต่กลืนน้ำลายได้ หายใจปกติครับ,none,UNKNOWN,,C: removal procedure only (one resource)
+D12,4,en,"I have a painful red lump under my arm, about two centimetres. No fever. I think it needs to be drained.",none,RED_FLUSHING,0.7,C: incision and drainage only (one resource); flushed face must not raise it
+D13,5,th,มาล้างแผลตามนัดค่ะ แผลแห้งดี ไม่ปวด ไม่มีไข้,none,NORMAL,0.2,C: simple dressing (no resource)
+D14,5,en,My eyes have been red and itchy for two days. No pain and I can see normally. I would like some eye drops.,none,RED_FLUSHING,0.8,C: examination + prescription (no resource); flushed face must not raise it
+D15,5,th,ท้องผูกมาสามวัน ไม่ปวดท้อง ผายลมได้ปกติ อยากได้ยาระบายครับ,abdomen,UNKNOWN,,C: prescription only (no resource); hand on abdomen must not raise it

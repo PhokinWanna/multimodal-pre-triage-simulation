@@ -83,6 +83,8 @@ class SmartReceptionTriageKiosk:
                 "head_clutching": False
             },
             "facial_skin_status": "UNKNOWN",
+            "facial_skin_probability": None,
+            "facial_skin_reason": "",
             "visual_evidence_path": None,
             "intake": None,
             "triage_verdict": None
@@ -100,6 +102,8 @@ class SmartReceptionTriageKiosk:
                     self.case_container["cumulative_visual_signs"][key] = True
 
             self.case_container["facial_skin_status"] = t.get("skin_status", "UNKNOWN")
+            self.case_container["facial_skin_probability"] = t.get("skin_probability")
+            self.case_container["facial_skin_reason"] = t.get("skin_reason", "")
 
             # Save clean JPEG to disk
             if "clean_view" in t and self.case_container["visual_evidence_path"] is None:
@@ -358,6 +362,8 @@ class SmartReceptionTriageKiosk:
                     conversation_history=self.case_container["conversation"],
                     visual_signs=self.case_container["cumulative_visual_signs"],
                     skin_status=self.case_container["facial_skin_status"],
+                    skin_probability=self.case_container.get("facial_skin_probability"),
+                    skin_reason=self.case_container.get("facial_skin_reason", ""),
                     exit_reason=exit_str,
                     language=self.active_language,
                     preempt_esi=self.case_container.get("preempt_esi"),
@@ -717,7 +723,7 @@ class SmartReceptionTriageKiosk:
                     self.latest_telemetry = telemetry
 
                 if SystemConfig.SHOW_DUAL_WINDOWS:
-                    # Clean camera window hidden for now (kept for later use):
+                    # Clean camera window hidden
                     # cv2.imshow("Kiosk - Clean Patient View", telemetry["clean_view"])
                     cv2.imshow("Kiosk - Diagnostic Skeleton View", telemetry["skeleton_view"])
                 else:

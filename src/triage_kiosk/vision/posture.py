@@ -31,6 +31,7 @@ import numpy as np
 
 # MediaPipe Pose landmark indices used here.
 NOSE, L_EYE, R_EYE, MOUTH_L, MOUTH_R = 0, 2, 5, 9, 10
+L_EAR, R_EAR = 7, 8
 L_SHOULDER, R_SHOULDER, L_ELBOW, R_ELBOW, L_WRIST, R_WRIST = 11, 12, 13, 14, 15, 16
 L_PINKY, R_PINKY, L_INDEX, R_INDEX = 17, 18, 19, 20
 L_HIP, R_HIP = 23, 24
@@ -59,6 +60,14 @@ class PostureConfig:
     head_max_below_eyes: float = 0.05  # head pose: hand centre no lower than this below eye level
     chin_radius: float = 0.20        # thinking pose: hand-centre distance to chin point
     head_to_torso: float = 2.2       # torso ≈ 2.2 x (shoulder line - nose) when the hips are not visible
+    # --- v3 (round B) values: fitted on the posture development pool, see docs/experiments/m3/PROTOCOL.md ---
+    v3_sternum_pos: float = 0.42     # chest-zone centre, fraction of the way down the torso (hand centre incl. wrist sits low)
+    v3_chest_radius: float = 0.28    # hand-centre distance to the chest-zone centre, in torso lengths
+    v3_chest_band: float = 0.62      # chest hand no lower than this fraction of the torso
+    v3_extrapolated_hips: bool = True   # hips below the frame: use MediaPipe's extrapolated hip points (clamped)
+    v3_torso_min_sw: float = 1.2     # clamp for the extrapolated torso, in shoulder widths
+    v3_torso_max_sw: float = 1.9
+    v3_temple_radius: float = 0.22   # head pose: fingertip/hand distance to a temple (ear) point, torso lengths
 
 
 @dataclass
@@ -291,14 +300,149 @@ def classify_posture_v2(lm: Landmarks, frame_h: int, frame_w: int,
     return res
 
 
+# ---------------------------------------------------------------- v3: round-B rules
+def classify_posture_v3(lm: Landmarks, frame_h: int, frame_w: int,
+                        cfg: PostureConfig = PostureConfig()) -> PostureResult:
+    """Round-B rules. Same structure as v2, with four changes (all fitted on development data only):
+
+    1. Chest zone re-fitted on ~1,950 labelled development images: v2's zone (30% down the torso,
+       radius 0.24) missed hands on the left/lower chest; it found only 65% of chest-clutching poses.
+    2. One hand is never both "chest" and "abdomen": it goes to the nearer zone centre.
+    3. Hips below the frame (seated close-ups): the torso length uses MediaPipe's extrapolated hip
+       points, clamped to a plausible range, instead of a fixed 1.3 x shoulder width.
+    4. Head pose also accepts hands on the TEMPLES (beside the eyes), not only at the forehead.
+    """
+    res = PostureResult()
+    vm = cfg.visibility_min
+    if any(i not in lm or _vis(lm, i) < vm for i in (L_SHOULDER, R_SHOULDER)):
+        return res
+    res.person_found = True
+
+    l_sh, r_sh = _pt(lm, L_SHOULDER), _pt(lm, R_SHOULDER)
+    sh_mid = (l_sh + r_sh) / 2.0
+    shoulder_width = _dist(l_sh, r_sh) + 1e-6
+
+    hips_ok = all(i in lm and _vis(lm, i) >= vm and lm[i][1] < frame_h - 5 for i in (L_HIP, R_HIP))
+    if hips_ok:
+        hip_mid = (_pt(lm, L_HIP) + _pt(lm, R_HIP)) / 2.0
+        torso = _dist(sh_mid, hip_mid)
+        if torso < shoulder_width * 0.8:
+            hips_ok = False
+    torso_source = "hips"
+    if not hips_ok:
+        torso = shoulder_width * 1.3
+        if NOSE in lm and _vis(lm, NOSE) >= vm and lm[NOSE][1] < sh_mid[1]:
+            torso = max(torso, cfg.head_to_torso * (sh_mid[1] - lm[NOSE][1]))
+        torso_source = "body proportions"
+        if cfg.v3_extrapolated_hips and L_HIP in lm and R_HIP in lm:
+            raw = _dist(sh_mid, (_pt(lm, L_HIP) + _pt(lm, R_HIP)) / 2.0)
+            if raw >= shoulder_width * 0.8:
+                torso = float(np.clip(raw, cfg.v3_torso_min_sw * shoulder_width, cfg.v3_torso_max_sw * shoulder_width))
+                torso_source = "extrapolated hips"
+        hip_mid = sh_mid + np.array([0.0, torso])
+    down = (hip_mid - sh_mid) / (np.linalg.norm(hip_mid - sh_mid) + 1e-6)
+
+    sternum = sh_mid + down * torso * cfg.v3_sternum_pos
+    navel = sh_mid + down * torso * cfg.navel_pos
+    hip_y = hip_mid[1]
+
+    face_ok = NOSE in lm and _vis(lm, NOSE) >= vm
+    temples = []
+    if face_ok:
+        nose = _pt(lm, NOSE)
+        eyes = [_pt(lm, i) for i in (L_EYE, R_EYE) if i in lm and _vis(lm, i) >= vm]
+        eye_mid = np.mean(eyes, axis=0) if eyes else nose - np.array([0.0, 0.06 * torso])
+        forehead = eye_mid - np.array([0.0, 0.08 * torso])
+        mouth = [_pt(lm, i) for i in (MOUTH_L, MOUTH_R) if i in lm and _vis(lm, i) >= vm]
+        mouth_mid = np.mean(mouth, axis=0) if mouth else nose + np.array([0.0, 0.06 * torso])
+        chin = mouth_mid + np.array([0.0, 0.07 * torso])
+        # Temple ≈ ear landmark lifted to eye level.
+        temples = [np.array([_pt(lm, i)[0], eye_mid[1]]) for i in (L_EAR, R_EAR) if i in lm and _vis(lm, i) >= vm]
+
+    l_el, r_el = _pt(lm, L_ELBOW), _pt(lm, R_ELBOW)
+    hands = {
+        "left": (_hand_centre(lm, L_WRIST, L_INDEX, L_PINKY, vm), l_el, _vis(lm, L_ELBOW) >= vm, L_WRIST, L_INDEX),
+        "right": (_hand_centre(lm, R_WRIST, R_INDEX, R_PINKY, vm), r_el, _vis(lm, R_ELBOW) >= vm, R_WRIST, R_INDEX),
+    }
+
+    crossed = False
+    if hands["left"][0] is not None and hands["right"][0] is not None and r_el is not None and l_el is not None:
+        crossed = (_dist(_pt(lm, L_WRIST), r_el) / torso < cfg.crossed_ratio and
+                   _dist(_pt(lm, R_WRIST), l_el) / torso < cfg.crossed_ratio)
+        lw, rw = _pt(lm, L_WRIST), _pt(lm, R_WRIST)
+        left_side = 1.0 if l_sh[0] > r_sh[0] else -1.0
+        lw_cross = (lw[0] - sh_mid[0]) * left_side < -0.05 * shoulder_width
+        rw_cross = (rw[0] - sh_mid[0]) * left_side > 0.05 * shoulder_width
+        at_torso = all(sh_mid[1] < w[1] < sh_mid[1] + 0.9 * torso for w in (lw, rw))
+        crossed = crossed or (lw_cross and rw_cross and at_torso)
+    if crossed:
+        res.filters.append("CROSSED_ARMS_FILTER")
+
+    debug = {"rules": "v3", "torso_px": round(torso, 1), "torso_source": torso_source, "hips_reliable": hips_ok,
+             "sternum": sternum.round(1).tolist(), "navel": navel.round(1).tolist()}
+    thinking = False
+    for side, (hand, elbow, elbow_vis, wrist_id, index_id) in hands.items():
+        if hand is None:
+            debug[side] = "hand not visible"
+            continue
+        d = {}
+        d["chest_dist"] = round(_dist(hand, sternum) / torso, 3)
+        d["navel_dist"] = round(_dist(hand, navel) / torso, 3)
+        along = float(np.dot(hand - sh_mid, down)) / torso      # 0 = shoulder line, 1 = hip line
+        d["along_torso"] = round(along, 3)
+        shoulder = l_sh if side == "left" else r_sh
+        elbow_ang = _angle(shoulder, elbow, _pt(lm, wrist_id)) if (elbow is not None and elbow_vis) else None
+        d["elbow_deg"] = None if elbow_ang is None else round(elbow_ang, 1)
+
+        bent = elbow_ang is None or elbow_ang <= cfg.elbow_max_deg
+        in_chest = 0.0 <= along <= cfg.v3_chest_band and d["chest_dist"] <= cfg.v3_chest_radius and bent
+        resting = hand[1] >= hip_y - cfg.lap_margin * torso
+        in_abdo = d["navel_dist"] <= cfg.abdomen_radius and not resting and along >= 0.45
+        d["resting_at_hips"] = bool(resting)
+        if in_chest and in_abdo:                                 # one hand, one zone: the nearer centre
+            in_chest = d["chest_dist"] <= d["navel_dist"]
+            in_abdo = not in_chest
+
+        side_head = side_think = False
+        if face_ok:
+            tip = _pt(lm, index_id) if index_id in lm and _vis(lm, index_id) >= vm else hand
+            d["forehead_dist"] = round(min(_dist(hand, forehead), _dist(tip, forehead)) / torso, 3)
+            d["chin_dist"] = round(_dist(hand, chin) / torso, 3)
+            d["temple_dist"] = round(min((min(_dist(tip, t), _dist(hand, t)) for t in temples), default=9e9) / torso, 3) \
+                if temples else None
+            high_enough = min(hand[1], tip[1]) <= eye_mid[1] + cfg.head_max_below_eyes * torso
+            at_forehead = hand[1] <= eye_mid[1] + cfg.head_max_below_eyes * torso and \
+                _dist(hand, forehead) / torso <= cfg.head_radius
+            at_temple = high_enough and d["temple_dist"] is not None and d["temple_dist"] <= cfg.v3_temple_radius
+            side_head = bool(at_forehead or at_temple)
+            side_think = (not side_head) and hand[1] > nose[1] and d["chin_dist"] <= cfg.chin_radius
+
+        res.chest |= bool(in_chest)
+        res.abdomen |= bool(in_abdo)
+        res.head |= side_head
+        thinking |= side_think
+        debug[side] = d
+
+    if thinking:
+        res.filters.append("THINKING_POSE_FILTER")
+    if crossed:
+        res.chest = res.abdomen = False
+    if thinking:
+        res.chest = False
+    res.debug = debug
+    return res
+
+
 def landmarks_from_mediapipe(pose_landmarks, frame_w: int, frame_h: int) -> dict[int, tuple[float, float, float]]:
     """Convert a MediaPipe NormalizedLandmarkList to {index: (x_px, y_px, visibility)}."""
     return {i: (lm.x * frame_w, lm.y * frame_h, float(getattr(lm, "visibility", 1.0)))
             for i, lm in enumerate(pose_landmarks.landmark)}
 
 
-def classify_posture(lm: Landmarks, frame_h: int, frame_w: int, version: str = "v2",
+def classify_posture(lm: Landmarks, frame_h: int, frame_w: int, version: str = "v3",
                      cfg: PostureConfig = PostureConfig()) -> PostureResult:
     if version == "v1":
         return classify_posture_v1(lm, frame_h, frame_w, cfg)
-    return classify_posture_v2(lm, frame_h, frame_w, cfg)
+    if version == "v2":
+        return classify_posture_v2(lm, frame_h, frame_w, cfg)
+    return classify_posture_v3(lm, frame_h, frame_w, cfg)

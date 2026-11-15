@@ -1,0 +1,120 @@
+{
+  "pool": "Roboflow Medical Emergency Detection v2 (one image per source photo)",
+  "sources_total": 1992,
+  "excluded_test_sources": [
+    "infarction_836",
+    "normal_184",
+    "normal_318",
+    "normal_355",
+    "normal_359",
+    "normal_390",
+    "normal_432",
+    "normal_447",
+    "normal_454"
+  ],
+  "test_photos_matched": {
+    "Posture/S01_body.jpg": "infarction_836",
+    "Posture/S05_body.jpg": "normal_184",
+    "Posture/S09_body.jpg": "normal_318",
+    "Posture/S17_body.jpg": "normal_355",
+    "Posture/S19_body.jpg": "normal_359",
+    "Posture/S22_body.jpg": "normal_454",
+    "Posture/S24_body.jpg": "normal_390",
+    "Posture/S25_body.jpg": "normal_432",
+    "Posture/S28_body.jpg": "normal_447"
+  },
+  "n_tuning": 1358,
+  "n_holdout": 610,
+  "rules": {
+    "v1 original": {
+      "tuning": {
+        "n": 1358,
+        "n_chest": 782,
+        "sensitivity": 0.0818,
+        "sensitivity_ci": [
+          0.0626,
+          0.102
+        ],
+        "specificity": 0.9358,
+        "specificity_ci": [
+          0.9162,
+          0.9551
+        ]
+      },
+      "hold-out": {
+        "n": 610,
+        "n_chest": 355,
+        "sensitivity": 0.0845,
+        "sensitivity_ci": [
+          0.0568,
+          0.113
+        ],
+        "specificity": 0.9098,
+        "specificity_ci": [
+          0.8732,
+          0.944
+        ]
+      }
+    },
+    "v2 round A": {
+      "tuning": {
+        "n": 1358,
+        "n_chest": 782,
+        "sensitivity": 0.6381,
+        "sensitivity_ci": [
+          0.6046,
+          0.6704
+        ],
+        "specificity": 0.8976,
+        "specificity_ci": [
+          0.8726,
+          0.9214
+        ]
+      },
+      "hold-out": {
+        "n": 610,
+        "n_chest": 355,
+        "sensitivity": 0.6704,
+        "sensitivity_ci": [
+          0.6212,
+          0.7186
+        ],
+        "specificity": 0.8745,
+        "specificity_ci": [
+          0.8333,
+          0.9142
+        ]
+      }
+    },
+    "v3 round B": {
+      "tuning": {
+        "n": 1358,
+        "n_chest": 782,
+        "sensitivity": 0.7647,
+        "sensitivity_ci": [
+          0.7349,
+          0.7923
+        ],
+        "specificity": 0.8802,
+        "specificity_ci": [
+          0.8534,
+          0.9056
+        ]
+      },
+      "hold-out": {
+        "n": 610,
+        "n_chest": 355,
+        "sensitivity": 0.7465,
+        "sensitivity_ci": [
+          0.7012,
+          0.7898
+        ],
+        "specificity": 0.8706,
+        "specificity_ci": [
+          0.8267,
+          0.9094
+        ]
+      }
+    }
+  }
+}

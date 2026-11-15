@@ -49,8 +49,8 @@ class SystemConfig:
     CROSSED_ARMS_WRIST_RATIO = 0.45          # Crossed Arms Filter ratio
     THINKING_FOREARM_MIN_ANGLE = 65.0        # Thinking Pose vertical forearm angle
 
-    # Posture rules: "v2" = corrected rules (default), "v1" = original rules (kept for comparison).
-    POSTURE_RULES_VERSION = os.getenv("POSTURE_RULES_VERSION", "v2")
+    # Posture rules: "v3" = round-B rules (default), "v2" = round-A rules, "v1" = original rules.
+    POSTURE_RULES_VERSION = os.getenv("POSTURE_RULES_VERSION", "v3")
     # Optional overrides of the v2 values in vision/posture.py (PostureConfig); tuned on dev images only.
     POSTURE_V2_PARAMS: dict = {}
 
@@ -58,8 +58,9 @@ class SystemConfig:
     TFLITE_SKIN_MODEL_PATH = str(PROJECT_ROOT / "models" / "skin_classifier.tflite")
     SKIN_CONFIDENCE_THRESHOLD = 0.65         # Used ONLY for a model without metadata (the original model).
                                              # Converted models carry their validation threshold in models/skin_classifier.json
-    # "patch" = forehead/cheek patches as in CNN training (default); "legacy_whole_face" = original behaviour.
-    SKIN_PIPELINE = os.getenv("SKIN_PIPELINE", "patch")
+    # "patch_qc" = patches + image-suitability check (round B, default); "patch" = round-A patches without
+    # the check; "legacy_whole_face" = original behaviour.
+    SKIN_PIPELINE = os.getenv("SKIN_PIPELINE", "patch_qc")
     # 1 = stop with an error if the skin model cannot be loaded (use in experiments).
     SKIN_REQUIRE_MODEL = os.getenv("SKIN_REQUIRE_MODEL", "0").strip().lower() in {"1", "true", "yes"}
 
@@ -204,6 +205,20 @@ class SystemConfig:
     # Final ESI + SOAP note. The patient hears the wrap-up message first, so this wait is hidden.
     OLLAMA_FINAL_TIMEOUT = float(os.getenv("OLLAMA_FINAL_TIMEOUT", "45"))
     OLLAMA_TIMEOUT = OLLAMA_TURN_TIMEOUT                                   # kept for older scripts
+
+    # --- Final verdict (round B) ---
+    # Prompt: "v1" = prompt used up to round A; "v2" = ESI decision steps; "v3" = v2 + worked examples.
+    # Chosen on development scenarios by scripts/experiments/m3/prompt_dev_eval.py.
+    TRIAGE_PROMPT_VERSION = os.getenv("TRIAGE_PROMPT_VERSION", "v1")
+    # v2/v3 only: take the level implied by the model's own step answers instead of its "esi_level" field.
+    TRIAGE_ESI_FROM_STEPS = os.getenv("TRIAGE_ESI_FROM_STEPS", "0").strip().lower() in {"1", "true", "yes"}
+    # Camera fusion: "independent" = posture and skin are two separate findings (up to round A);
+    # "weighted" = one visual risk score = w_posture x posture + w_skin x skin (triage/fusion.py).
+    FUSION_MODE = os.getenv("FUSION_MODE", "independent").strip().lower()
+    FUSION_W_POSTURE = float(os.getenv("FUSION_W_POSTURE", "0.5"))
+    FUSION_W_SKIN = float(os.getenv("FUSION_W_SKIN", "0.5"))
+    FUSION_CAP_POLICY = os.getenv("FUSION_CAP_POLICY", "high_only")   # none | high_only | high_and_moderate
+    FUSION_MISSING = os.getenv("FUSION_MISSING", "zero")              # zero | renormalise
 
     # --- Offline text-to-speech for the LLM's follow-up questions ---
     # macOS `say` runs on the device (no audio or text leaves the kiosk). The Thai voice

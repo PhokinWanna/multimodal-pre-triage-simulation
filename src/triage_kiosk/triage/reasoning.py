@@ -12,6 +12,7 @@ import time
 import requests
 from ..config import SystemConfig
 from ..intent import is_cancel_request, is_end_of_interview
+from . import fusion, prompts
 
 logger = logging.getLogger(__name__)
 
@@ -300,102 +301,83 @@ Output ONLY valid JSON:
     # -------------------------------------------------------------------------
     # 6. FINAL CLINICAL SYNTHESIS
     # -------------------------------------------------------------------------
-    def evaluate_final_case(self, conversation_history: list, visual_signs: dict, skin_status: str, exit_reason: any,
-                            language: str, temperature: float = 0.0, seed: int | None = None,
+    def evaluate_final_case(self, conversation_history: list, visual_signs: dict | None, skin_status: str,
+                            exit_reason: any, language: str, temperature: float = 0.0, seed: int | None = None,
                             timeout: float | None = None, preempt_esi: int | None = None,
-                            use_llm: bool = True, intake: dict | None = None) -> dict:
+                            use_llm: bool = True, intake: dict | None = None,
+                            skin_probability: float | None = None, skin_reason: str = "",
+                            prompt_version: str | None = None, fusion_mode: str | None = None,
+                            weights: tuple | None = None, cap_policy: str | None = None,
+                            esi_from_steps: bool | None = None) -> dict:
         """Synthesizes the complete patient encounter into the final ESI Level + SOAP note.
 
         ``temperature``, ``seed`` and ``timeout`` exist for experiments (M3 replay); the kiosk
         uses the defaults (temperature 0, no seed, SystemConfig.OLLAMA_FINAL_TIMEOUT).
         ``preempt_esi`` is the level found by the mid-interview emergency check; ``use_llm=False``
-        skips the LLM (emergency fast path, so the nurse alert is not delayed). Every result
-        passes through ``apply_safety_floor``.
+        skips the LLM (emergency fast path / rules-only experiment).
+
+        Round B: ``fusion_mode="weighted"`` combines posture and skin into one visual risk score
+        (``weights`` = (posture, skin), see ``fusion.py``); ``"independent"`` keeps them as two
+        separate findings (the behaviour up to round A). ``visual_signs=None`` means posture was
+        not assessed. ``prompt_version`` / ``esi_from_steps`` select the prompt (``prompts.py``).
+        Unset arguments come from SystemConfig. Every result passes through ``apply_safety_floor``
+        and carries a ``decision`` record (what the LLM said, what the rules said, which floor applied).
         """
         transcript = " ".join([t["text"] for t in conversation_history if t.get("role") == "patient"])
-        scenario = self.evaluate_scenario(transcript, visual_signs)
-
+        posture_assessed = visual_signs is not None
+        signs = visual_signs or {}
+        skin_status = skin_status or "UNKNOWN"
+        scenario = self.evaluate_scenario(transcript, signs)
         exit_val = exit_reason.value if hasattr(exit_reason, "value") else str(exit_reason)
 
-        prompt = f"""<|begin_of_text|><|start_header_id|>system<|end_header_id|>
-You are an Emergency Department Triage Officer operating under official ESI v4 standards.
-Classify the patient into an ESI Level: 1 (Resuscitation), 2 (Emergent), 3 (Urgent), 4 (Less Urgent), or 5 (Non-urgent).
+        prompt_version = prompt_version or SystemConfig.TRIAGE_PROMPT_VERSION
+        fusion_mode = fusion_mode or SystemConfig.FUSION_MODE
+        weights = weights or (SystemConfig.FUSION_W_POSTURE, SystemConfig.FUSION_W_SKIN)
+        cap_policy = cap_policy or SystemConfig.FUSION_CAP_POLICY
+        if esi_from_steps is None:
+            esi_from_steps = SystemConfig.TRIAGE_ESI_FROM_STEPS
+        if fusion_mode not in ("weighted", "independent"):
+            raise ValueError(f"unknown fusion mode: {fusion_mode}")
+        visual = (fusion.visual_score(visual_signs, skin_status, skin_probability, weights[0], weights[1],
+                                      missing=SystemConfig.FUSION_MISSING)
+                  if fusion_mode == "weighted" else None)
 
-CLINICAL BOUNDARY CRITERIA:
-- ESI Level 1: Immediate life-saving intervention required (cardiac arrest, airway compromise).
-- ESI Level 2: High risk situation, acute chest pain with Levine's sign, severe pain rated 8-10/10 with acute distress, Altered Mental Status.
-- ESI Level 3: Urgent condition needing 2 or more resources (e.g. lab test, IV meds, CT scan), moderate pain 4-7/10, but patient is stable, lucid, no acute danger.
-- ESI Level 4: Requires 1 resource (e.g. simple x-ray or single medication).
-- ESI Level 5: No resources needed (refill, exam only).
+        if prompt_version == "v1":
+            camera = prompts.camera_block_v1(signs, skin_status)
+        else:
+            camera = prompts.camera_block_v2(fusion.describe_posture(visual_signs),
+                                             fusion.describe_skin(skin_status, skin_probability, skin_reason), visual)
+        prompt = prompts.build_final_prompt(prompt_version, transcript, camera, self._intake_line(intake),
+                                            scenario, exit_val)
 
-Write every text field in ENGLISH (translate Thai), at most 25 words per field.
-Return ONLY a valid JSON object matching this schema:
-{{
-  "esi_level": <int 1-5>,
-  "urgency": "<Resuscitation|Emergent|Urgent|Less Urgent|Non-urgent>",
-  "scenario_type": "{scenario['scenario_type']}",
-  "subjective": "<patient stated symptoms>",
-  "objective": "<observed visual postures and skin assessment>",
-  "assessment": "<clinical nursing impression>",
-  "plan": "<immediate triage action plan>",
-  "audit_mode": "LLM_INFERENCE_VALIDATED"
-}}
-<|eot_id|><|start_header_id|>user<|end_header_id|>
-[CUMULATIVE PATIENT TRANSCRIPT]: "{transcript}"
-[SUSTAINED PERCEPTION TELEMETRY]:
-- Chest Pain (Levine's sign): {visual_signs.get('chest_clutching', False)}
-- Abdominal Guarding: {visual_signs.get('abdominal_clutching', False)}
-- Cranial Distress (Headache): {visual_signs.get('head_clutching', False)}
-- Facial Skin Status (CNN): {skin_status}
-[STRUCTURED INTAKE]: {self._intake_line(intake)}
-[SCENARIO CROSS-VALIDATION]: {scenario['scenario_type']} ({scenario['clinical_flag']})
-[ENCOUNTER EXIT REASON]: {exit_val}
-<|eot_id|><|start_header_id|>assistant<|end_header_id|>"""
-
-        payload = {
-            "model": SystemConfig.OLLAMA_MODEL,
-            "prompt": prompt,
-            "stream": False,
-            "format": "json",
-            "options": {"temperature": float(temperature), "num_predict": 200},
-            "keep_alive": -1
-        }
-        if seed is not None:
-            payload["options"]["seed"] = int(seed)
-        request_timeout = timeout if timeout is not None else SystemConfig.OLLAMA_FINAL_TIMEOUT
-
-        verdict = None
-        fallback_reason = None
+        verdict, fallback_reason, latency = None, None, None
+        level_field = steps_level = None
         if not use_llm:
             fallback_reason = "DETERMINISTIC_EMERGENCY_FAST_PATH"
         else:
-            try:
-                start_t = time.time()
-                res = requests.post(self.endpoint, json=payload, timeout=request_timeout)
-                if res.status_code != 200:
-                    fallback_reason = f"DETERMINISTIC_FALLBACK_OLLAMA_HTTP_{res.status_code}"
+            out, fallback_reason, latency = self._call_llm(
+                prompt, temperature, seed,
+                timeout if timeout is not None else SystemConfig.OLLAMA_FINAL_TIMEOUT,
+                prompts.NUM_PREDICT[prompt_version])
+            if fallback_reason is None:
+                level_field = None if self.verdict_problem(out) else int(float(out["esi_level"]))
+                steps_level = prompts.esi_from_steps(out) if (prompt_version != "v1" and isinstance(out, dict)) else None
+                llm_esi = steps_level if (esi_from_steps and steps_level is not None) else level_field
+                if llm_esi is None:
+                    llm_esi = steps_level
+                if llm_esi is None:
+                    fallback_reason = "DETERMINISTIC_FALLBACK_INVALID_LLM_VERDICT"
+                    logger.warning(f"LLM verdict rejected: {self.verdict_problem(out) or 'no usable level'}")
                 else:
-                    out = json.loads(res.json().get("response", "{}"))
-                    problem = self.verdict_problem(out)
-                    if problem:
-                        fallback_reason = "DETERMINISTIC_FALLBACK_INVALID_LLM_VERDICT"
-                        logger.warning(f"LLM verdict rejected: {problem}")
-                    else:
-                        out["esi_level"] = int(float(out["esi_level"]))
-                        out["scenario_details"] = scenario
-                        out["inference_latency_sec"] = round(time.time() - start_t, 2)
-                        verdict = out
-            except requests.Timeout:
-                fallback_reason = "DETERMINISTIC_FALLBACK_LLM_TIMEOUT"
-            except requests.ConnectionError:
-                fallback_reason = "DETERMINISTIC_FALLBACK_OLLAMA_UNREACHABLE"
-            except (json.JSONDecodeError, ValueError):
-                fallback_reason = "DETERMINISTIC_FALLBACK_JSON_PARSE_ERROR"
-            except Exception as e:
-                fallback_reason = f"DETERMINISTIC_FALLBACK_UNEXPECTED_{type(e).__name__.upper()}"
+                    out["esi_level"] = llm_esi
+                    out["scenario_details"] = scenario
+                    out["inference_latency_sec"] = latency
+                    verdict = out
 
-        rule_verdict = self._deterministic_verdict(transcript, visual_signs, skin_status, exit_val,
-                                                   scenario, fallback_reason or "")
+        rule_verdict = self._deterministic_verdict(transcript, signs, skin_status, exit_val,
+                                                   scenario, fallback_reason or "", visual=visual)
+        llm_valid = verdict is not None
+        esi_llm = verdict["esi_level"] if llm_valid else None
         if verdict is None:
             if fallback_reason != "DETERMINISTIC_EMERGENCY_FAST_PATH":
                 logger.warning(f"Final synthesis fallback triggered: {fallback_reason}")
@@ -405,13 +387,57 @@ Return ONLY a valid JSON object matching this schema:
             for key in ("urgency", "subjective", "objective", "assessment", "plan"):
                 if not str(verdict.get(key) or "").strip():
                     verdict[key] = rule_verdict[key]
-            verdict.setdefault("scenario_type", scenario["scenario_type"])
+            verdict["urgency"] = self.URGENCY_BY_ESI[esi_llm] if prompt_version != "v1" else verdict["urgency"]
+            verdict["scenario_type"] = verdict.get("scenario_type") or scenario["scenario_type"]
             verdict["audit_mode"] = "LLM_INFERENCE_VALIDATED"
 
         if intake:
             verdict["intake"] = intake
-        return self.apply_safety_floor(verdict, visual_signs, skin_status, exit_val, scenario, preempt_esi,
-                                       pain_score=(intake or {}).get("pain_score_0_10"))
+        before_floor = int(verdict["esi_level"])
+        verdict = self.apply_safety_floor(verdict, signs, skin_status, exit_val, scenario, preempt_esi,
+                                          pain_score=(intake or {}).get("pain_score_0_10"),
+                                          visual=visual, cap_policy=cap_policy)
+        final = int(verdict["esi_level"])
+        verdict["scope"] = "OUT_OF_SCOPE_IMMEDIATE_STAFF" if final == 1 else "IN_SCOPE"
+        if final == 1 and "OUT OF KIOSK SCOPE" not in str(verdict.get("urgency")):
+            verdict["urgency"] = f"{verdict.get('urgency') or self.URGENCY_BY_ESI[1]} [OUT OF KIOSK SCOPE: staff must attend now]"
+        verdict["decision"] = {
+            "prompt_version": prompt_version, "fusion_mode": fusion_mode, "cap_policy": cap_policy,
+            "posture_assessed": posture_assessed, "visual": visual,
+            "llm_used": bool(use_llm), "llm_valid": llm_valid, "fallback_reason": fallback_reason,
+            "esi_llm": esi_llm, "esi_llm_level_field": level_field, "esi_llm_from_steps": steps_level,
+            "esi_rules": int(rule_verdict["esi_level"]), "esi_before_floor": before_floor,
+            "caps": verdict.pop("_caps", []), "esi_final": final,
+        }
+        return verdict
+
+    def _call_llm(self, prompt: str, temperature: float, seed: int | None, timeout: float, num_predict: int):
+        """One Ollama call. Returns (parsed JSON or None, fallback reason or None, latency in s or None)."""
+        payload = {
+            "model": SystemConfig.OLLAMA_MODEL,
+            "prompt": prompt,
+            "stream": False,
+            "format": "json",
+            "options": {"temperature": float(temperature), "num_predict": int(num_predict)},
+            "keep_alive": -1
+        }
+        if seed is not None:
+            payload["options"]["seed"] = int(seed)
+        try:
+            start_t = time.time()
+            res = requests.post(self.endpoint, json=payload, timeout=timeout)
+            if res.status_code != 200:
+                return None, f"DETERMINISTIC_FALLBACK_OLLAMA_HTTP_{res.status_code}", None
+            out = json.loads(res.json().get("response", "{}"))
+            return out, None, round(time.time() - start_t, 2)
+        except requests.Timeout:
+            return None, "DETERMINISTIC_FALLBACK_LLM_TIMEOUT", None
+        except requests.ConnectionError:
+            return None, "DETERMINISTIC_FALLBACK_OLLAMA_UNREACHABLE", None
+        except (json.JSONDecodeError, ValueError):
+            return None, "DETERMINISTIC_FALLBACK_JSON_PARSE_ERROR", None
+        except Exception as e:  # noqa: BLE001
+            return None, f"DETERMINISTIC_FALLBACK_UNEXPECTED_{type(e).__name__.upper()}", None
 
     @staticmethod
     def _intake_line(intake: dict | None) -> str:
@@ -449,26 +475,37 @@ Return ONLY a valid JSON object matching this schema:
 
     @classmethod
     def apply_safety_floor(cls, verdict: dict, visual_signs: dict, skin_status: str, exit_val: str,
-                           scenario: dict, preempt_esi=None, pain_score=None) -> dict:
+                           scenario: dict, preempt_esi=None, pain_score=None,
+                           visual: dict | None = None, cap_policy: str = "high_only") -> dict:
         """Never let a verdict be LESS urgent than the hard signals the kiosk observed.
 
         A lower ESI number is more urgent. Each rule gives the highest ESI number allowed.
+        ``visual`` (weighted fusion) replaces the two separate camera rules (chest -> 2, abnormal
+        skin -> 3) by one rule on the combined visual band (``fusion.esi_cap``).
         """
-        caps = []
+        caps = []        # (cap, source, reason)
         if exit_val == "EMERGENCY_INTERRUPT":
-            caps.append((min(int(preempt_esi), 2) if preempt_esi in (1, 2) else 2,
+            caps.append((min(int(preempt_esi), 2) if preempt_esi in (1, 2) else 2, "interview",
                          "emergency detected during the interview"))
-        if visual_signs.get("chest_clutching", False):
-            caps.append((2, "sustained chest clutching (Levine's sign)"))
         if exit_val == "AMS_3_STRIKES":
-            caps.append((2, "possible altered mental status (3 off-topic replies)"))
-        skin = (skin_status or "").strip().upper().replace(" ", "_")
-        if skin in ("RED_FLUSHING", "FLUSHING_(RED)", "PALLOR_(PALE)"):
-            caps.append((3, f"abnormal skin ({skin_status})"))
+            caps.append((2, "interview", "possible altered mental status (3 off-topic replies)"))
+        if visual is not None:
+            cap = fusion.esi_cap(visual["band"], cap_policy)
+            if cap is not None:
+                w = visual["weights"]
+                caps.append((cap, "visual_band",
+                             f"combined visual risk {visual['band']} (score {visual['score']:.2f}; "
+                             f"posture {round(w['posture'] * 100)}% / skin {round(w['skin'] * 100)}%)"))
+        else:
+            if visual_signs.get("chest_clutching", False):
+                caps.append((2, "posture", "sustained chest clutching (Levine's sign)"))
+            if fusion.normalise_status(skin_status) in fusion.FLUSHING_NAMES:
+                caps.append((3, "skin", f"abnormal skin ({skin_status})"))
         if scenario.get("scenario_type") == "SCENARIO_C_CLINICAL_CONFLICT":
-            caps.append((3, "pain posture while the patient minimises symptoms"))
-        if isinstance(pain_score, (int, float)) and pain_score >= 7:
-            caps.append((3, f"patient-rated pain {pain_score}/10"))
+            caps.append((3, "conflict", "pain posture while the patient minimises symptoms"))
+        if isinstance(pain_score, (int, float)) and not isinstance(pain_score, bool) and pain_score >= 7:
+            caps.append((3, "pain", f"patient-rated pain {pain_score}/10"))
+        verdict["_caps"] = [{"cap": c, "source": src, "reason": r} for c, src, r in caps]
         if not caps:
             return verdict
         limit = min(c[0] for c in caps)
@@ -476,15 +513,19 @@ Return ONLY a valid JSON object matching this schema:
         if original > limit:
             verdict["esi_before_safety_floor"] = original
             verdict["esi_level"] = limit
-            reasons = "; ".join(r for c, r in caps if c == limit)
+            reasons = "; ".join(r for c, _, r in caps if c == limit)
             verdict["urgency"] = f"{cls.URGENCY_BY_ESI[limit]} [SAFETY FLOOR: {reasons}]"
             verdict["safety_floor"] = reasons
             logger.warning(f"Safety floor: ESI {original} -> {limit} ({reasons})")
         return verdict
 
     def _deterministic_verdict(self, transcript: str, visual_signs: dict, skin_status: str, exit_val: str,
-                               scenario: dict, fallback_reason: str) -> dict:
-        """Rule-based ESI + SOAP note used when the LLM is unavailable or rejected."""
+                               scenario: dict, fallback_reason: str, visual: dict | None = None) -> dict:
+        """Rule-based ESI + SOAP note used when the LLM is unavailable or rejected.
+
+        With ``visual`` (weighted fusion) the camera enters through the combined visual band:
+        HIGH -> at most ESI 2, MODERATE -> at most ESI 3 (stricter than the floor used after an
+        LLM answer, because no reasoning step judged the words)."""
         # Critical keywords → ESI 1
         ESI1_KEYWORDS = [
             "หมดสติ", "ไม่รู้สึกตัว", "หยุดหายใจ", "ชักเกร็ง",
@@ -524,6 +565,15 @@ Return ONLY a valid JSON object matching this schema:
             esi    = 1
             urgency = "Resuscitation — Immediate Life-Saving Intervention Required"
 
+        elif visual is not None:
+            # Weighted fusion: words give the base level, the visual band can only raise the urgency.
+            minor = any(w in text_lower for w in ESI5_KEYWORDS if not w.isascii()) or any(
+                re.search(rf"\b{re.escape(w)}\b(?! sweat)", text_lower) for w in ESI5_KEYWORDS if w.isascii())
+            base = 3 if not normal_exit else 5 if minor else 4
+            cap = fusion.esi_cap(visual["band"], "high_and_moderate")
+            esi = min(base, cap) if cap is not None else base
+            urgency = self.URGENCY_BY_ESI[esi] + f" (rules; visual risk {visual['band']})"
+
         elif visual_signs.get("chest_clutching", False):
             esi    = 2
             urgency = "Emergent / High Risk"
@@ -561,7 +611,7 @@ Return ONLY a valid JSON object matching this schema:
                 urgency += " [ESCALATED: Stoic Patient Conflict]"
 
         # --- Step 4: Escalate if skin abnormal ---
-        if normalized_skin_status in ("PALLOR_(PALE)", "FLUSHING_(RED)", "RED_FLUSHING"):
+        if visual is None and normalized_skin_status in ("PALLOR_(PALE)", "FLUSHING_(RED)", "RED_FLUSHING"):
             if esi > 2:
                 esi    -= 1
                 urgency += f" [ESCALATED: Skin={skin_status}]"

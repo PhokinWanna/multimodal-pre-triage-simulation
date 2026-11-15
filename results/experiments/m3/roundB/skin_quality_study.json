@@ -1,0 +1,472 @@
+{
+  "model": "SkinCNN-FL-\u03b10.75 (best checkpoint)",
+  "threshold": 0.5489389300346375,
+  "limits": {
+    "min_face_width_px": 200.0,
+    "max_native_face_width_px": 300.0,
+    "target_face_width_px": 276.0,
+    "min_patch_sharpness": 30.0,
+    "min_patch_lightness": 55.0,
+    "max_patch_lightness": 228.0
+  },
+  "training": {
+    "Normal": {
+      "images_with_face": 250,
+      "face_width_px": {
+        "p1": 223.9,
+        "p5": 241.7,
+        "p25": 265.4,
+        "p50": 276.4,
+        "p75": 284.8,
+        "p95": 298.3,
+        "p99": 313.4
+      },
+      "patch_lightness": {
+        "p1": 55.9,
+        "p5": 78.2,
+        "p25": 124.1,
+        "p50": 151.1,
+        "p75": 178.2,
+        "p95": 212.8,
+        "p99": 226.1
+      }
+    },
+    "Flushing": {
+      "images_with_face": 250,
+      "face_width_px": {
+        "p1": 144.6,
+        "p5": 180.2,
+        "p25": 288.3,
+        "p50": 371.2,
+        "p75": 454.1,
+        "p95": 590.4,
+        "p99": 659.0
+      },
+      "patch_lightness": {
+        "p1": 64.3,
+        "p5": 86.2,
+        "p25": 120.4,
+        "p50": 150.6,
+        "p75": 180.2,
+        "p95": 210.0,
+        "p99": 220.9
+      }
+    }
+  },
+  "blur": {
+    "Normal": {
+      "by_sigma": {
+        "0": {
+          "median_sharpness": 151.0,
+          "called_flushing_pct": 1.2
+        },
+        "0.5": {
+          "median_sharpness": 70.0,
+          "called_flushing_pct": 2.3
+        },
+        "0.8": {
+          "median_sharpness": 19.5,
+          "called_flushing_pct": 34.8
+        },
+        "1.0": {
+          "median_sharpness": 11.3,
+          "called_flushing_pct": 65.7
+        },
+        "1.5": {
+          "median_sharpness": 5.0,
+          "called_flushing_pct": 80.0
+        },
+        "2.0": {
+          "median_sharpness": 3.3,
+          "called_flushing_pct": 86.3
+        }
+      },
+      "by_sharpness": {
+        "0-15": {
+          "n": 1763,
+          "called_flushing_pct": 74.9
+        },
+        "15-30": {
+          "n": 452,
+          "called_flushing_pct": 40.7
+        },
+        "30-50": {
+          "n": 294,
+          "called_flushing_pct": 20.7
+        },
+        "50-100": {
+          "n": 402,
+          "called_flushing_pct": 9.0
+        },
+        "100-inf": {
+          "n": 689,
+          "called_flushing_pct": 2.9
+        }
+      }
+    },
+    "Flushing": {
+      "by_sigma": {
+        "0": {
+          "median_sharpness": 220.4,
+          "called_flushing_pct": 91.0
+        },
+        "0.5": {
+          "median_sharpness": 102.6,
+          "called_flushing_pct": 95.0
+        },
+        "0.8": {
+          "median_sharpness": 27.4,
+          "called_flushing_pct": 97.5
+        },
+        "1.0": {
+          "median_sharpness": 14.2,
+          "called_flushing_pct": 98.0
+        },
+        "1.5": {
+          "median_sharpness": 4.4,
+          "called_flushing_pct": 99.3
+        },
+        "2.0": {
+          "median_sharpness": 2.7,
+          "called_flushing_pct": 98.6
+        }
+      },
+      "by_sharpness": {
+        "0-15": {
+          "n": 1706,
+          "called_flushing_pct": 99.0
+        },
+        "15-30": {
+          "n": 382,
+          "called_flushing_pct": 97.9
+        },
+        "30-50": {
+          "n": 261,
+          "called_flushing_pct": 93.5
+        },
+        "50-100": {
+          "n": 274,
+          "called_flushing_pct": 92.7
+        },
+        "100-inf": {
+          "n": 713,
+          "called_flushing_pct": 92.6
+        }
+      }
+    }
+  },
+  "pipelines": {
+    "training Normal": {
+      "n": 250,
+      "old_called_flushing_pct": 0.4,
+      "new_answered_pct": 98.4,
+      "new_called_flushing_pct_of_answered": 0.8,
+      "new_unknown_reasons": {
+        "face too dark": 1,
+        "image too blurry": 3
+      },
+      "gate_only_answered_pct": 98.4,
+      "gate_only_called_flushing_pct_of_answered": 0.8
+    },
+    "training Flushing": {
+      "n": 250,
+      "old_called_flushing_pct": 94.8,
+      "new_answered_pct": 42.8,
+      "new_called_flushing_pct_of_answered": 88.8,
+      "new_unknown_reasons": {
+        "image too blurry": 22,
+        "result changes with image size": 90,
+        "face too small in the image": 21,
+        "no usable skin area": 8,
+        "face over-exposed": 2
+      },
+      "gate_only_answered_pct": 82.0,
+      "gate_only_called_flushing_pct_of_answered": 93.7
+    },
+    "development photos (true: all normal)": {
+      "n_faces": 20,
+      "old_answered": 19,
+      "old_false_flushing": 9,
+      "new_answered": 4,
+      "new_false_flushing": 0,
+      "rows": [
+        {
+          "file": "crossarm01.jpg",
+          "face": true,
+          "face_width_px": 101,
+          "old": "RED_FLUSHING",
+          "old_prob": 0.722,
+          "new": "UNKNOWN",
+          "new_prob": null,
+          "new_reason": "face too small in the image"
+        },
+        {
+          "file": "crossarm02.jpg",
+          "face": true,
+          "face_width_px": 118,
+          "old": "RED_FLUSHING",
+          "old_prob": 0.566,
+          "new": "UNKNOWN",
+          "new_prob": null,
+          "new_reason": "face too small in the image"
+        },
+        {
+          "file": "crossarm03.jpg",
+          "face": true,
+          "face_width_px": 158,
+          "old": "RED_FLUSHING",
+          "old_prob": 0.612,
+          "new": "UNKNOWN",
+          "new_prob": null,
+          "new_reason": "face too small in the image"
+        },
+        {
+          "file": "crossarm04.jpg",
+          "face": true,
+          "face_width_px": 116,
+          "old": "UNKNOWN",
+          "old_prob": null,
+          "new": "UNKNOWN",
+          "new_prob": null,
+          "new_reason": "face too small in the image"
+        },
+        {
+          "file": "head-scratch01.jpg",
+          "face": true,
+          "face_width_px": 115,
+          "old": "RED_FLUSHING",
+          "old_prob": 0.634,
+          "new": "UNKNOWN",
+          "new_prob": null,
+          "new_reason": "face too small in the image"
+        },
+        {
+          "file": "think01.jpg",
+          "face": true,
+          "face_width_px": 112,
+          "old": "NORMAL",
+          "old_prob": 0.375,
+          "new": "UNKNOWN",
+          "new_prob": null,
+          "new_reason": "face too small in the image"
+        },
+        {
+          "file": "dev_chest_01.jpg",
+          "face": true,
+          "face_width_px": 107,
+          "old": "RED_FLUSHING",
+          "old_prob": 0.69,
+          "new": "UNKNOWN",
+          "new_prob": null,
+          "new_reason": "face too small in the image"
+        },
+        {
+          "file": "dev_chest_02.jpg",
+          "face": true,
+          "face_width_px": 92,
+          "old": "NORMAL",
+          "old_prob": 0.371,
+          "new": "UNKNOWN",
+          "new_prob": null,
+          "new_reason": "face too small in the image"
+        },
+        {
+          "file": "dev_chest_03.jpg",
+          "face": true,
+          "face_width_px": 75,
+          "old": "NORMAL",
+          "old_prob": 0.312,
+          "new": "UNKNOWN",
+          "new_prob": null,
+          "new_reason": "face too small in the image"
+        },
+        {
+          "file": "dev_chest_04.jpg",
+          "face": true,
+          "face_width_px": 117,
+          "old": "RED_FLUSHING",
+          "old_prob": 0.647,
+          "new": "UNKNOWN",
+          "new_prob": null,
+          "new_reason": "face too small in the image"
+        },
+        {
+          "file": "dev_lap_01.jpg",
+          "face": true,
+          "face_width_px": 52,
+          "old": "RED_FLUSHING",
+          "old_prob": 0.734,
+          "new": "UNKNOWN",
+          "new_prob": null,
+          "new_reason": "face too small in the image"
+        },
+        {
+          "file": "dev_gesture_01.jpg",
+          "face": true,
+          "face_width_px": 141,
+          "old": "RED_FLUSHING",
+          "old_prob": 0.804,
+          "new": "UNKNOWN",
+          "new_prob": null,
+          "new_reason": "face too small in the image"
+        },
+        {
+          "file": "dev_holding_01.jpg",
+          "face": true,
+          "face_width_px": 144,
+          "old": "NORMAL",
+          "old_prob": 0.067,
+          "new": "UNKNOWN",
+          "new_prob": null,
+          "new_reason": "face too small in the image"
+        },
+        {
+          "file": "dev_running_01.jpg",
+          "face": true,
+          "face_width_px": 109,
+          "old": "RED_FLUSHING",
+          "old_prob": 0.658,
+          "new": "UNKNOWN",
+          "new_prob": null,
+          "new_reason": "face too small in the image"
+        },
+        {
+          "file": "devB_chest_01.jpg",
+          "face": true,
+          "face_width_px": 262,
+          "old": "NORMAL",
+          "old_prob": 0.245,
+          "new": "NORMAL",
+          "new_prob": 0.245,
+          "new_reason": ""
+        },
+        {
+          "file": "devB_chest_02.jpg",
+          "face": true,
+          "face_width_px": 168,
+          "old": "NORMAL",
+          "old_prob": 0.263,
+          "new": "UNKNOWN",
+          "new_prob": null,
+          "new_reason": "face too small in the image"
+        },
+        {
+          "file": "devB_abdomen_01.jpg",
+          "face": true,
+          "face_width_px": 196,
+          "old": "NORMAL",
+          "old_prob": 0.104,
+          "new": "UNKNOWN",
+          "new_prob": null,
+          "new_reason": "face too small in the image"
+        },
+        {
+          "file": "devB_abdomen_02.jpg",
+          "face": true,
+          "face_width_px": 247,
+          "old": "NORMAL",
+          "old_prob": 0.185,
+          "new": "NORMAL",
+          "new_prob": 0.185,
+          "new_reason": ""
+        },
+        {
+          "file": "devB_head_01.jpg",
+          "face": true,
+          "face_width_px": 219,
+          "old": "NORMAL",
+          "old_prob": 0.273,
+          "new": "NORMAL",
+          "new_prob": 0.273,
+          "new_reason": ""
+        },
+        {
+          "file": "devB_head_02.jpg",
+          "face": true,
+          "face_width_px": 205,
+          "old": "NORMAL",
+          "old_prob": 0.154,
+          "new": "NORMAL",
+          "new_prob": 0.154,
+          "new_reason": ""
+        }
+      ]
+    }
+  },
+  "face_size": {
+    "Normal x2.0": {
+      "n": 1949,
+      "round_a_flushing": "1376/1892",
+      "round_b_answered": "320/1949",
+      "round_b_flushing": "29/320",
+      "native_vs_reduced": {
+        "no answer: image too blurry | NORMAL": 968,
+        "RED_FLUSHING | NORMAL": 465,
+        "NORMAL | NORMAL": 291,
+        "no answer: image too blurry | no answer: image too blurry": 91,
+        "no answer: no usable skin area | no answer: no usable skin area": 52,
+        "RED_FLUSHING | RED_FLUSHING": 29,
+        "no answer: image too blurry | RED_FLUSHING": 18,
+        "no answer: image too blurry | no answer: no usable skin area": 16,
+        "RED_FLUSHING | no answer: image too blurry": 4,
+        "no answer: no usable skin area | NORMAL": 4,
+        "RED_FLUSHING | no answer: no usable skin area": 3,
+        "NORMAL | RED_FLUSHING": 2,
+        "no answer: image too blurry | no answer: face too dark": 2,
+        "no answer: no usable skin area | no answer: image too blurry": 1,
+        "NORMAL | no answer: no usable skin area": 1,
+        "NORMAL | no answer: image too blurry": 1,
+        "no answer: face too dark | no answer: no usable skin area": 1
+      }
+    },
+    "Normal x1.5": {
+      "n": 1291,
+      "round_a_flushing": "317/1256",
+      "round_b_answered": "659/1291",
+      "round_b_flushing": "31/659",
+      "native_vs_reduced": {
+        "NORMAL | NORMAL": 628,
+        "no answer: image too blurry | NORMAL": 268,
+        "RED_FLUSHING | NORMAL": 250,
+        "no answer: image too blurry | no answer: image too blurry": 56,
+        "no answer: no usable skin area | no answer: no usable skin area": 33,
+        "RED_FLUSHING | RED_FLUSHING": 31,
+        "no answer: image too blurry | no answer: no usable skin area": 5,
+        "NORMAL | no answer: image too blurry": 4,
+        "NORMAL | RED_FLUSHING": 3,
+        "no answer: no usable skin area | no answer: image too blurry": 2,
+        "no answer: image too blurry | RED_FLUSHING": 2,
+        "no answer: image too blurry | no answer: face too dark": 2,
+        "RED_FLUSHING | no answer: no usable skin area": 2,
+        "NORMAL | no answer: no usable skin area": 2,
+        "RED_FLUSHING | no answer: image too blurry": 1,
+        "no answer: face too dark | NORMAL": 1,
+        "no answer: image too blurry | no answer: face over-exposed": 1
+      }
+    },
+    "Flushing wide": {
+      "n": 798,
+      "round_a_flushing": "700/724",
+      "round_b_answered": "205/798",
+      "round_b_flushing": "180/205",
+      "native_vs_reduced": {
+        "RED_FLUSHING | NORMAL": 413,
+        "RED_FLUSHING | RED_FLUSHING": 180,
+        "no answer: no usable skin area | no answer: no usable skin area": 72,
+        "no answer: image too blurry | no answer: image too blurry": 40,
+        "NORMAL | NORMAL": 25,
+        "RED_FLUSHING | no answer: no usable skin area": 22,
+        "no answer: image too blurry | NORMAL": 20,
+        "no answer: image too blurry | RED_FLUSHING": 13,
+        "RED_FLUSHING | no answer: image too blurry": 4,
+        "no answer: image too blurry | no answer: face over-exposed": 2,
+        "no answer: no usable skin area | NORMAL": 2,
+        "no answer: image too blurry | no answer: no usable skin area": 1,
+        "NORMAL | RED_FLUSHING": 1,
+        "no answer: face too dark | RED_FLUSHING": 1,
+        "no answer: face over-exposed | RED_FLUSHING": 1,
+        "no answer: face over-exposed | no answer: face over-exposed": 1
+      }
+    }
+  }
+}
