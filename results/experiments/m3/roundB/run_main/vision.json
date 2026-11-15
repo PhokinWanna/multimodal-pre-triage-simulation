@@ -1,0 +1,1495 @@
+{
+  "created": "2026-11-15T15:07:42",
+  "posture_rules": "v3",
+  "skin_pipeline": "patch_qc",
+  "skin_model": {
+    "name": "SkinCNN-FL-α0.75 (best checkpoint)",
+    "threshold": 0.5489389300346375
+  },
+  "photo_sha256": {
+    "Posture/S01_body.jpg": "7852a06ea91808e9fb25b7352d391bade567bb38bf4a92171b8f57833174e6e0",
+    "skin/S01_skin.jpg": "b2de3e1bf0971bf507ec4b75b772b89b279ba8c3b4366ff5627bcd9737eb5a90",
+    "skin/S02_skin.jpg": "94308d345700b02add24c4de2dc1ac067446005a9bef528306b6d45be80b0756",
+    "Posture/S03_body.jpg": "6f246621f5f179d3e1122742c2d14731c8f284205c7a937c1822ba327ea004f1",
+    "skin/S03_skin.jpg": "a72d297bf48f0da84528492850aea6d3c2bf2753d93502532a5dd1f16b2181c6",
+    "Posture/S04_body.jpg": "f582337f1c285ca656173cb19e9ed9e07779f1fcb7cd6c4ed2cadc9396dc2644",
+    "Posture/S05_body.jpg": "c4687a74f350d34a93f45da95d14f5ccfb62b8e56eb212602705af6b046e8bc6",
+    "skin/S06_skin.jpg": "358d6cf07b0528842816e16a90c424e001c856060e3121c09c23be3258df13b9",
+    "Posture/S07_body.jpg": "662a3691425d41fd58aec7a6e5f2621d30c58719c9ac9b53566fce2de988284c",
+    "Posture/S08_body.jpg": "19855ec54e8b70c9d24c2b42917f2e5a2aaa8b1d5ffe5016bf06aac2239b7f2d",
+    "skin/S08_skin.jpg": "9ce22d6bccfa8d5b6606f224df2ec1aa7726775f07100e7dc3ba7a36afce4505",
+    "Posture/S09_body.jpg": "00e1ebe919519c37ec4b1baadde11e0cc16c25ce7c56f1da0a276afebc9b9556",
+    "Posture/S10_body.jpg": "e019beb6fb674f9b01568860a5b0f6f38023459a8366ad3b591d8a2c0cfbe53c",
+    "Posture/S11_body.jpg": "f6562033455b34c1a9d873d95440335d8f5122d7223f1cf71e62dbee219df808",
+    "Posture/S12_body.jpg": "312cf2d23d1c9a48d760c8c4b412c3ec648e3625d0ab67f83aaeabb090f2028f",
+    "Posture/S13_body.jpg": "cff88703c663f62891aa26c2cb83d6593670c8fef3e4def9e29fba4d14868f78",
+    "Posture/S14_body.jpg": "e4ed71738ef01c3fbd96454a65570de6ff8009c0b38e3fc65ad2a6780a48ba13",
+    "skin/S14_skin.jpg": "dc3b8dc95cd8b88bf7ef1c4319c8a18a0d56ce118c01936557900fb3783c917c",
+    "skin/S15_skin.jpg": "c68cbc1dad3ef4e6acfc83f450e3cdfd4eb5ac8de572ba31825e3ea405ecb728",
+    "Posture/S16_body.jpg": "c412ce98d4dc5acbf9d827b90b6a60fdc55e653191d7b9fae80d866ff73cf51a",
+    "skin/S16_skin.jpg": "6c041e51a2c062b95c84d12a56dc5e1823318b60ba1d9b1800756861ec71fbea",
+    "Posture/S17_body.jpg": "1cf0096cc9ec9f964b73c6ab57f66fc402bf19eb6ee570fe3296bfc8b0f7bbbd",
+    "Posture/S18_body.jpg": "6561a653c5085352239b56391d2a12ac5eaf6b4ceac676e66c420854d07e145c",
+    "skin/S18_skin.jpg": "feb9ce73fa057eddf430405dda66e0784cba24436b844109d514eb5e14a3d625",
+    "Posture/S19_body.jpg": "3225ee4a4c916a982abcdfb9999e4eab84e32f684553db248af69c00c0cc5384",
+    "skin/S20_skin.jpg": "a8d472318c4b91b70660b1f294c57cfa2447330cee3244a2feddcdd3d62a1f5e",
+    "Posture/S21_body.jpg": "9c51abc02b46f75fc5c0a994485de897450c893ddae797cd2180fadde3f305ac",
+    "Posture/S22_body.jpg": "06739056851757a0547ada54d8340ff7e564037863d625f2831893b054cbda3d",
+    "skin/S23_skin.jpg": "36f91c43fcecbec171d1f15081f6d3bbdd4a2029528bba2af76edcc27e522403",
+    "Posture/S24_body.jpg": "7a030a190e1f8ad3e02e8369f3637ddfdc6834409dc200cb346b3e6b8220b4f6",
+    "Posture/S25_body.jpg": "1e832f534f981fb72e76d43e15334f264485b4c1efd437f6f04cc8ca6a8d1733",
+    "Posture/S26_body.jpg": "dd5ac6dfe483696744ee2d77f837b5721120022c606a5da2eca99b5f0b5c6075",
+    "skin/S27_skin.jpg": "eae6b08ead5f2a954cc439cbf26cd0dbe628b8abc0dd041e01e8ff9dbd46dca4",
+    "Posture/S28_body.jpg": "a026082b3da0818a206f54f9a502b0f3e61283b9e6bfd0460946d3f04ae68170",
+    "skin/S29_skin.jpg": "9b38b9aa2bc2c28e22d5bb875aca660c335fc9a3509651abc5ce605defdb9422",
+    "Posture/S30_body.jpg": "cbca177e1570634fbff57cb66a5c1757aa3cb535d3521fa25c7da456374fe297",
+    "skin/S30_skin.jpg": "b2cd5cf8bf1ddd01c0fe74cf60e38378f662b0f56ab1936d3032dc7c7fe8bf89"
+  },
+  "cases": {
+    "S01": {
+      "person_found": true,
+      "face_found": true,
+      "visual_signs": {
+        "chest_clutching": true,
+        "abdominal_clutching": false,
+        "head_clutching": false
+      },
+      "posture_label": "chest",
+      "posture_filters": [],
+      "skin_status": "UNKNOWN",
+      "skin_probability": null,
+      "skin_reason": "image too blurry",
+      "skin_patches": {},
+      "skin_quality": {
+        "face_width_px": 776.4,
+        "original_size": {
+          "status": "UNKNOWN",
+          "probability": null,
+          "reason": "image too blurry",
+          "scale": 1.0,
+          "patches": {
+            "Forehead": {
+              "sharpness": 5.5,
+              "lightness": 171.5
+            },
+            "Zone_L": {
+              "sharpness": 17.5,
+              "lightness": 75.9
+            },
+            "Zone_R": {
+              "sharpness": 4.9,
+              "lightness": 149.6
+            }
+          },
+          "dropped": {
+            "Forehead": "image too blurry",
+            "Zone_L": "image too blurry",
+            "Zone_R": "image too blurry"
+          },
+          "face_width_px": 776.4
+        },
+        "training_size": {
+          "status": "UNKNOWN",
+          "probability": null,
+          "reason": "image too blurry",
+          "scale": 0.355,
+          "patches": {
+            "Forehead": {
+              "sharpness": 14.6,
+              "lightness": 166.4
+            },
+            "Zone_R": {
+              "sharpness": 19.2,
+              "lightness": 155.7
+            }
+          },
+          "dropped": {
+            "Forehead": "image too blurry",
+            "Zone_L": "no usable skin area",
+            "Zone_R": "image too blurry"
+          }
+        }
+      },
+      "skin_method": "patch_cnn_qc",
+      "image_file": "Posture/S01_body.jpg",
+      "image_file_skin": "skin/S01_skin.jpg",
+      "sharpness_posture_photo": 47.5,
+      "sharpness_skin_photo": 62.0
+    },
+    "S02": {
+      "person_found": false,
+      "face_found": true,
+      "visual_signs": {
+        "chest_clutching": false,
+        "abdominal_clutching": false,
+        "head_clutching": false
+      },
+      "posture_label": "none",
+      "posture_filters": [],
+      "skin_status": "NORMAL",
+      "skin_probability": 0.2144361799582839,
+      "skin_reason": "",
+      "skin_patches": {
+        "Zone_L": 0.1022,
+        "Zone_R": 0.0339
+      },
+      "skin_quality": {
+        "face_width_px": 372.4,
+        "original_size": {
+          "status": "NORMAL",
+          "probability": 0.3608148992061615,
+          "reason": "",
+          "scale": 1.0,
+          "patches": {
+            "Zone_R": {
+              "sharpness": 509.2,
+              "lightness": 148.4
+            }
+          },
+          "dropped": {
+            "Forehead": "no usable skin area",
+            "Zone_L": "no usable skin area"
+          },
+          "face_width_px": 372.4
+        },
+        "training_size": {
+          "status": "NORMAL",
+          "probability": 0.0680574607104063,
+          "reason": "",
+          "scale": 0.741,
+          "patches": {
+            "Zone_L": {
+              "sharpness": 725.6,
+              "lightness": 135.7
+            },
+            "Zone_R": {
+              "sharpness": 424.3,
+              "lightness": 137.9
+            }
+          },
+          "dropped": {
+            "Forehead": "no usable skin area"
+          }
+        }
+      },
+      "skin_method": "patch_cnn_qc",
+      "image_file": "skin/S02_skin.jpg",
+      "image_file_skin": "",
+      "sharpness_posture_photo": 421.3,
+      "sharpness_skin_photo": 421.3
+    },
+    "S03": {
+      "person_found": false,
+      "face_found": true,
+      "visual_signs": {
+        "chest_clutching": false,
+        "abdominal_clutching": false,
+        "head_clutching": false
+      },
+      "posture_label": "none",
+      "posture_filters": [],
+      "skin_status": "UNKNOWN",
+      "skin_probability": null,
+      "skin_reason": "result changes with image size",
+      "skin_patches": {},
+      "skin_quality": {
+        "face_width_px": 391.5,
+        "original_size": {
+          "status": "RED_FLUSHING",
+          "probability": 0.837796151638031,
+          "reason": "",
+          "scale": 1.0,
+          "patches": {
+            "Forehead": {
+              "sharpness": 12.1,
+              "lightness": 157.5
+            },
+            "Zone_L": {
+              "sharpness": 44.2,
+              "lightness": 166.6
+            },
+            "Zone_R": {
+              "sharpness": 23.3,
+              "lightness": 140.2
+            }
+          },
+          "dropped": {
+            "Forehead": "image too blurry",
+            "Zone_R": "image too blurry"
+          },
+          "face_width_px": 391.5
+        },
+        "training_size": {
+          "status": "NORMAL",
+          "probability": 0.1711907982826233,
+          "reason": "",
+          "scale": 0.705,
+          "patches": {
+            "Forehead": {
+              "sharpness": 14.7,
+              "lightness": 156.8
+            },
+            "Zone_L": {
+              "sharpness": 67.9,
+              "lightness": 163.8
+            },
+            "Zone_R": {
+              "sharpness": 36.6,
+              "lightness": 139.0
+            }
+          },
+          "dropped": {
+            "Forehead": "image too blurry"
+          }
+        }
+      },
+      "skin_method": "patch_cnn_qc",
+      "image_file": "Posture/S03_body.jpg",
+      "image_file_skin": "skin/S03_skin.jpg",
+      "sharpness_posture_photo": 1740.9,
+      "sharpness_skin_photo": 22.2
+    },
+    "S04": {
+      "person_found": true,
+      "face_found": true,
+      "visual_signs": {
+        "chest_clutching": true,
+        "abdominal_clutching": true,
+        "head_clutching": false
+      },
+      "posture_label": "chest",
+      "posture_filters": [],
+      "skin_status": "UNKNOWN",
+      "skin_probability": null,
+      "skin_reason": "face too small in the image",
+      "skin_patches": {},
+      "skin_quality": {
+        "face_width_px": 101.2
+      },
+      "skin_method": "patch_cnn_qc",
+      "image_file": "Posture/S04_body.jpg",
+      "image_file_skin": "",
+      "sharpness_posture_photo": 446.2,
+      "sharpness_skin_photo": 446.2
+    },
+    "S05": {
+      "person_found": true,
+      "face_found": true,
+      "visual_signs": {
+        "chest_clutching": false,
+        "abdominal_clutching": false,
+        "head_clutching": false
+      },
+      "posture_label": "none",
+      "posture_filters": [],
+      "skin_status": "UNKNOWN",
+      "skin_probability": null,
+      "skin_reason": "face too small in the image",
+      "skin_patches": {},
+      "skin_quality": {
+        "face_width_px": 91.1
+      },
+      "skin_method": "patch_cnn_qc",
+      "image_file": "Posture/S05_body.jpg",
+      "image_file_skin": "",
+      "sharpness_posture_photo": 248.6,
+      "sharpness_skin_photo": 248.6
+    },
+    "S06": {
+      "person_found": true,
+      "face_found": true,
+      "visual_signs": {
+        "chest_clutching": false,
+        "abdominal_clutching": false,
+        "head_clutching": false
+      },
+      "posture_label": "none",
+      "posture_filters": [],
+      "skin_status": "UNKNOWN",
+      "skin_probability": null,
+      "skin_reason": "image too blurry",
+      "skin_patches": {},
+      "skin_quality": {
+        "face_width_px": 873.5,
+        "original_size": {
+          "status": "UNKNOWN",
+          "probability": null,
+          "reason": "image too blurry",
+          "scale": 1.0,
+          "patches": {
+            "Zone_L": {
+              "sharpness": 19.9,
+              "lightness": 152.9
+            },
+            "Zone_R": {
+              "sharpness": 20.9,
+              "lightness": 139.0
+            }
+          },
+          "dropped": {
+            "Forehead": "no usable skin area",
+            "Zone_L": "image too blurry",
+            "Zone_R": "image too blurry"
+          },
+          "face_width_px": 873.5
+        },
+        "training_size": {
+          "status": "NORMAL",
+          "probability": 0.36962562799453735,
+          "reason": "",
+          "scale": 0.316,
+          "patches": {
+            "Zone_R": {
+              "sharpness": 82.3,
+              "lightness": 115.9
+            }
+          },
+          "dropped": {
+            "Forehead": "no usable skin area",
+            "Zone_L": "no usable skin area"
+          }
+        }
+      },
+      "skin_method": "patch_cnn_qc",
+      "image_file": "skin/S06_skin.jpg",
+      "image_file_skin": "",
+      "sharpness_posture_photo": 82.0,
+      "sharpness_skin_photo": 82.0
+    },
+    "S07": {
+      "person_found": true,
+      "face_found": true,
+      "visual_signs": {
+        "chest_clutching": true,
+        "abdominal_clutching": false,
+        "head_clutching": false
+      },
+      "posture_label": "chest",
+      "posture_filters": [],
+      "skin_status": "UNKNOWN",
+      "skin_probability": null,
+      "skin_reason": "face too small in the image",
+      "skin_patches": {},
+      "skin_quality": {
+        "face_width_px": 72.0
+      },
+      "skin_method": "patch_cnn_qc",
+      "image_file": "Posture/S07_body.jpg",
+      "image_file_skin": "",
+      "sharpness_posture_photo": 129.0,
+      "sharpness_skin_photo": 129.0
+    },
+    "S08": {
+      "person_found": true,
+      "face_found": true,
+      "visual_signs": {
+        "chest_clutching": true,
+        "abdominal_clutching": false,
+        "head_clutching": false
+      },
+      "posture_label": "chest",
+      "posture_filters": [],
+      "skin_status": "UNKNOWN",
+      "skin_probability": null,
+      "skin_reason": "result changes with image size",
+      "skin_patches": {},
+      "skin_quality": {
+        "face_width_px": 582.0,
+        "original_size": {
+          "status": "RED_FLUSHING",
+          "probability": 0.8951252102851868,
+          "reason": "",
+          "scale": 1.0,
+          "patches": {
+            "Forehead": {
+              "sharpness": 7.3,
+              "lightness": 172.2
+            },
+            "Zone_L": {
+              "sharpness": 3.9,
+              "lightness": 117.1
+            },
+            "Zone_R": {
+              "sharpness": 45.9,
+              "lightness": 191.7
+            }
+          },
+          "dropped": {
+            "Forehead": "image too blurry",
+            "Zone_L": "image too blurry"
+          },
+          "face_width_px": 582.0
+        },
+        "training_size": {
+          "status": "NORMAL",
+          "probability": 0.2226932868361473,
+          "reason": "",
+          "scale": 0.474,
+          "patches": {
+            "Forehead": {
+              "sharpness": 38.2,
+              "lightness": 169.7
+            },
+            "Zone_L": {
+              "sharpness": 47.3,
+              "lightness": 95.0
+            },
+            "Zone_R": {
+              "sharpness": 144.6,
+              "lightness": 187.1
+            }
+          },
+          "dropped": {}
+        }
+      },
+      "skin_method": "patch_cnn_qc",
+      "image_file": "Posture/S08_body.jpg",
+      "image_file_skin": "skin/S08_skin.jpg",
+      "sharpness_posture_photo": 319.3,
+      "sharpness_skin_photo": 114.9
+    },
+    "S09": {
+      "person_found": true,
+      "face_found": true,
+      "visual_signs": {
+        "chest_clutching": false,
+        "abdominal_clutching": false,
+        "head_clutching": false
+      },
+      "posture_label": "none",
+      "posture_filters": [],
+      "skin_status": "UNKNOWN",
+      "skin_probability": null,
+      "skin_reason": "face too small in the image",
+      "skin_patches": {},
+      "skin_quality": {
+        "face_width_px": 82.2
+      },
+      "skin_method": "patch_cnn_qc",
+      "image_file": "Posture/S09_body.jpg",
+      "image_file_skin": "",
+      "sharpness_posture_photo": 16.3,
+      "sharpness_skin_photo": 16.3
+    },
+    "S10": {
+      "person_found": true,
+      "face_found": true,
+      "visual_signs": {
+        "chest_clutching": false,
+        "abdominal_clutching": false,
+        "head_clutching": true
+      },
+      "posture_label": "head",
+      "posture_filters": [],
+      "skin_status": "UNKNOWN",
+      "skin_probability": null,
+      "skin_reason": "result changes with image size",
+      "skin_patches": {},
+      "skin_quality": {
+        "face_width_px": 623.1,
+        "original_size": {
+          "status": "RED_FLUSHING",
+          "probability": 0.6319770316282908,
+          "reason": "",
+          "scale": 1.0,
+          "patches": {
+            "Forehead": {
+              "sharpness": 118.4,
+              "lightness": 167.5
+            },
+            "Zone_L": {
+              "sharpness": 945.2,
+              "lightness": 92.0
+            },
+            "Zone_R": {
+              "sharpness": 71.4,
+              "lightness": 190.6
+            }
+          },
+          "dropped": {},
+          "face_width_px": 623.1
+        },
+        "training_size": {
+          "status": "NORMAL",
+          "probability": 0.0757783322284619,
+          "reason": "",
+          "scale": 0.443,
+          "patches": {
+            "Forehead": {
+              "sharpness": 189.2,
+              "lightness": 162.2
+            },
+            "Zone_L": {
+              "sharpness": 904.5,
+              "lightness": 106.5
+            },
+            "Zone_R": {
+              "sharpness": 168.6,
+              "lightness": 201.3
+            }
+          },
+          "dropped": {}
+        }
+      },
+      "skin_method": "patch_cnn_qc",
+      "image_file": "Posture/S10_body.jpg",
+      "image_file_skin": "",
+      "sharpness_posture_photo": 1002.9,
+      "sharpness_skin_photo": 1002.9
+    },
+    "S11": {
+      "person_found": true,
+      "face_found": true,
+      "visual_signs": {
+        "chest_clutching": false,
+        "abdominal_clutching": true,
+        "head_clutching": false
+      },
+      "posture_label": "abdomen",
+      "posture_filters": [],
+      "skin_status": "NORMAL",
+      "skin_probability": 0.29465444370483357,
+      "skin_reason": "",
+      "skin_patches": {
+        "Forehead": 0.012,
+        "Zone_L": 0.0977,
+        "Zone_R": 0.0242
+      },
+      "skin_quality": {
+        "face_width_px": 611.3,
+        "original_size": {
+          "status": "NORMAL",
+          "probability": 0.5446873903274536,
+          "reason": "",
+          "scale": 1.0,
+          "patches": {
+            "Forehead": {
+              "sharpness": 21.4,
+              "lightness": 212.1
+            },
+            "Zone_L": {
+              "sharpness": 13.0,
+              "lightness": 210.5
+            },
+            "Zone_R": {
+              "sharpness": 57.4,
+              "lightness": 146.7
+            }
+          },
+          "dropped": {
+            "Forehead": "image too blurry",
+            "Zone_L": "image too blurry"
+          },
+          "face_width_px": 611.3
+        },
+        "training_size": {
+          "status": "NORMAL",
+          "probability": 0.04462149708221356,
+          "reason": "",
+          "scale": 0.451,
+          "patches": {
+            "Forehead": {
+              "sharpness": 55.6,
+              "lightness": 210.6
+            },
+            "Zone_L": {
+              "sharpness": 144.3,
+              "lightness": 199.1
+            },
+            "Zone_R": {
+              "sharpness": 92.9,
+              "lightness": 123.6
+            }
+          },
+          "dropped": {}
+        }
+      },
+      "skin_method": "patch_cnn_qc",
+      "image_file": "Posture/S11_body.jpg",
+      "image_file_skin": "",
+      "sharpness_posture_photo": 337.1,
+      "sharpness_skin_photo": 337.1
+    },
+    "S12": {
+      "person_found": true,
+      "face_found": true,
+      "visual_signs": {
+        "chest_clutching": true,
+        "abdominal_clutching": false,
+        "head_clutching": false
+      },
+      "posture_label": "chest",
+      "posture_filters": [],
+      "skin_status": "UNKNOWN",
+      "skin_probability": null,
+      "skin_reason": "face too small in the image",
+      "skin_patches": {},
+      "skin_quality": {
+        "face_width_px": 55.9
+      },
+      "skin_method": "patch_cnn_qc",
+      "image_file": "Posture/S12_body.jpg",
+      "image_file_skin": "",
+      "sharpness_posture_photo": 110.9,
+      "sharpness_skin_photo": 110.9
+    },
+    "S13": {
+      "person_found": true,
+      "face_found": true,
+      "visual_signs": {
+        "chest_clutching": false,
+        "abdominal_clutching": true,
+        "head_clutching": false
+      },
+      "posture_label": "abdomen",
+      "posture_filters": [],
+      "skin_status": "NORMAL",
+      "skin_probability": 0.02243242831900716,
+      "skin_reason": "",
+      "skin_patches": {
+        "Zone_L": 0.0163,
+        "Zone_R": 0.039
+      },
+      "skin_quality": {
+        "face_width_px": 664.8,
+        "original_size": {
+          "status": "NORMAL",
+          "probability": 0.017169898375868797,
+          "reason": "",
+          "scale": 1.0,
+          "patches": {
+            "Forehead": {
+              "sharpness": 197.3,
+              "lightness": 44.3
+            },
+            "Zone_L": {
+              "sharpness": 118.7,
+              "lightness": 187.3
+            },
+            "Zone_R": {
+              "sharpness": 190.1,
+              "lightness": 185.3
+            }
+          },
+          "dropped": {
+            "Forehead": "face too dark"
+          },
+          "face_width_px": 664.8
+        },
+        "training_size": {
+          "status": "NORMAL",
+          "probability": 0.02769495826214552,
+          "reason": "",
+          "scale": 0.415,
+          "patches": {
+            "Zone_L": {
+              "sharpness": 104.0,
+              "lightness": 185.0
+            },
+            "Zone_R": {
+              "sharpness": 255.2,
+              "lightness": 191.2
+            }
+          },
+          "dropped": {
+            "Forehead": "no usable skin area"
+          }
+        }
+      },
+      "skin_method": "patch_cnn_qc",
+      "image_file": "Posture/S13_body.jpg",
+      "image_file_skin": "",
+      "sharpness_posture_photo": 161.4,
+      "sharpness_skin_photo": 161.4
+    },
+    "S14": {
+      "person_found": true,
+      "face_found": true,
+      "visual_signs": {
+        "chest_clutching": false,
+        "abdominal_clutching": true,
+        "head_clutching": false
+      },
+      "posture_label": "abdomen",
+      "posture_filters": [],
+      "skin_status": "UNKNOWN",
+      "skin_probability": null,
+      "skin_reason": "image too blurry",
+      "skin_patches": {},
+      "skin_quality": {
+        "face_width_px": 509.6,
+        "original_size": {
+          "status": "UNKNOWN",
+          "probability": null,
+          "reason": "image too blurry",
+          "scale": 1.0,
+          "patches": {
+            "Zone_L": {
+              "sharpness": 7.2,
+              "lightness": 186.4
+            }
+          },
+          "dropped": {
+            "Forehead": "no usable skin area",
+            "Zone_L": "image too blurry"
+          },
+          "face_width_px": 509.6
+        },
+        "training_size": {
+          "status": "NORMAL",
+          "probability": 0.38640499114990234,
+          "reason": "",
+          "scale": 0.542,
+          "patches": {
+            "Zone_L": {
+              "sharpness": 135.2,
+              "lightness": 177.8
+            }
+          },
+          "dropped": {
+            "Forehead": "no usable skin area"
+          }
+        }
+      },
+      "skin_method": "patch_cnn_qc",
+      "image_file": "Posture/S14_body.jpg",
+      "image_file_skin": "skin/S14_skin.jpg",
+      "sharpness_posture_photo": 343.4,
+      "sharpness_skin_photo": 683.1
+    },
+    "S15": {
+      "person_found": false,
+      "face_found": true,
+      "visual_signs": {
+        "chest_clutching": false,
+        "abdominal_clutching": false,
+        "head_clutching": false
+      },
+      "posture_label": "none",
+      "posture_filters": [],
+      "skin_status": "NORMAL",
+      "skin_probability": 0.2917504720389843,
+      "skin_reason": "",
+      "skin_patches": {
+        "Zone_L": 0.0367
+      },
+      "skin_quality": {
+        "face_width_px": 769.5,
+        "original_size": {
+          "status": "NORMAL",
+          "probability": 0.5468342304229736,
+          "reason": "",
+          "scale": 1.0,
+          "patches": {
+            "Zone_L": {
+              "sharpness": 96.9,
+              "lightness": 189.6
+            },
+            "Zone_R": {
+              "sharpness": 12.2,
+              "lightness": 161.5
+            }
+          },
+          "dropped": {
+            "Forehead": "no usable skin area",
+            "Zone_R": "image too blurry"
+          },
+          "face_width_px": 769.5
+        },
+        "training_size": {
+          "status": "NORMAL",
+          "probability": 0.036666713654994965,
+          "reason": "",
+          "scale": 0.359,
+          "patches": {
+            "Zone_L": {
+              "sharpness": 152.7,
+              "lightness": 178.6
+            }
+          },
+          "dropped": {
+            "Forehead": "no usable skin area",
+            "Zone_R": "no usable skin area"
+          }
+        }
+      },
+      "skin_method": "patch_cnn_qc",
+      "image_file": "skin/S15_skin.jpg",
+      "image_file_skin": "",
+      "sharpness_posture_photo": 122.1,
+      "sharpness_skin_photo": 122.1
+    },
+    "S16": {
+      "person_found": true,
+      "face_found": true,
+      "visual_signs": {
+        "chest_clutching": false,
+        "abdominal_clutching": false,
+        "head_clutching": true
+      },
+      "posture_label": "head",
+      "posture_filters": [],
+      "skin_status": "NORMAL",
+      "skin_probability": 0.3457322269678116,
+      "skin_reason": "",
+      "skin_patches": {
+        "Zone_L": 0.2989
+      },
+      "skin_quality": {
+        "face_width_px": 585.9,
+        "original_size": {
+          "status": "NORMAL",
+          "probability": 0.392602801322937,
+          "reason": "",
+          "scale": 1.0,
+          "patches": {
+            "Zone_L": {
+              "sharpness": 188.0,
+              "lightness": 157.8
+            }
+          },
+          "dropped": {
+            "Forehead": "no usable skin area",
+            "Zone_R": "no usable skin area"
+          },
+          "face_width_px": 585.9
+        },
+        "training_size": {
+          "status": "NORMAL",
+          "probability": 0.29886165261268616,
+          "reason": "",
+          "scale": 0.471,
+          "patches": {
+            "Zone_L": {
+              "sharpness": 232.9,
+              "lightness": 134.5
+            }
+          },
+          "dropped": {
+            "Forehead": "no usable skin area",
+            "Zone_R": "no usable skin area"
+          }
+        }
+      },
+      "skin_method": "patch_cnn_qc",
+      "image_file": "Posture/S16_body.jpg",
+      "image_file_skin": "skin/S16_skin.jpg",
+      "sharpness_posture_photo": 515.9,
+      "sharpness_skin_photo": 297.8
+    },
+    "S17": {
+      "person_found": true,
+      "face_found": true,
+      "visual_signs": {
+        "chest_clutching": false,
+        "abdominal_clutching": false,
+        "head_clutching": false
+      },
+      "posture_label": "none",
+      "posture_filters": [],
+      "skin_status": "UNKNOWN",
+      "skin_probability": null,
+      "skin_reason": "face too small in the image",
+      "skin_patches": {},
+      "skin_quality": {
+        "face_width_px": 70.4
+      },
+      "skin_method": "patch_cnn_qc",
+      "image_file": "Posture/S17_body.jpg",
+      "image_file_skin": "",
+      "sharpness_posture_photo": 11.3,
+      "sharpness_skin_photo": 11.3
+    },
+    "S18": {
+      "person_found": true,
+      "face_found": true,
+      "visual_signs": {
+        "chest_clutching": false,
+        "abdominal_clutching": true,
+        "head_clutching": false
+      },
+      "posture_label": "abdomen",
+      "posture_filters": [],
+      "skin_status": "UNKNOWN",
+      "skin_probability": null,
+      "skin_reason": "image too blurry",
+      "skin_patches": {},
+      "skin_quality": {
+        "face_width_px": 448.8,
+        "original_size": {
+          "status": "UNKNOWN",
+          "probability": null,
+          "reason": "image too blurry",
+          "scale": 1.0,
+          "patches": {
+            "Forehead": {
+              "sharpness": 16.3,
+              "lightness": 152.7
+            },
+            "Zone_L": {
+              "sharpness": 11.2,
+              "lightness": 130.4
+            },
+            "Zone_R": {
+              "sharpness": 28.2,
+              "lightness": 155.8
+            }
+          },
+          "dropped": {
+            "Forehead": "image too blurry",
+            "Zone_L": "image too blurry",
+            "Zone_R": "image too blurry"
+          },
+          "face_width_px": 448.8
+        },
+        "training_size": {
+          "status": "NORMAL",
+          "probability": 0.41449621319770813,
+          "reason": "",
+          "scale": 0.615,
+          "patches": {
+            "Forehead": {
+              "sharpness": 15.1,
+              "lightness": 151.1
+            },
+            "Zone_L": {
+              "sharpness": 120.6,
+              "lightness": 123.4
+            },
+            "Zone_R": {
+              "sharpness": 194.7,
+              "lightness": 150.0
+            }
+          },
+          "dropped": {
+            "Forehead": "image too blurry"
+          }
+        }
+      },
+      "skin_method": "patch_cnn_qc",
+      "image_file": "Posture/S18_body.jpg",
+      "image_file_skin": "skin/S18_skin.jpg",
+      "sharpness_posture_photo": 179.6,
+      "sharpness_skin_photo": 186.5
+    },
+    "S19": {
+      "person_found": true,
+      "face_found": true,
+      "visual_signs": {
+        "chest_clutching": false,
+        "abdominal_clutching": false,
+        "head_clutching": false
+      },
+      "posture_label": "none",
+      "posture_filters": [],
+      "skin_status": "UNKNOWN",
+      "skin_probability": null,
+      "skin_reason": "face too small in the image",
+      "skin_patches": {},
+      "skin_quality": {
+        "face_width_px": 70.4
+      },
+      "skin_method": "patch_cnn_qc",
+      "image_file": "Posture/S19_body.jpg",
+      "image_file_skin": "",
+      "sharpness_posture_photo": 198.6,
+      "sharpness_skin_photo": 198.6
+    },
+    "S20": {
+      "person_found": true,
+      "face_found": true,
+      "visual_signs": {
+        "chest_clutching": true,
+        "abdominal_clutching": false,
+        "head_clutching": false
+      },
+      "posture_label": "chest",
+      "posture_filters": [],
+      "skin_status": "RED_FLUSHING",
+      "skin_probability": 0.6414566040039062,
+      "skin_reason": "",
+      "skin_patches": {
+        "Zone_L": 0.7466,
+        "Zone_R": 0.6984
+      },
+      "skin_quality": {
+        "face_width_px": 363.8,
+        "original_size": {
+          "status": "RED_FLUSHING",
+          "probability": 0.5604124069213867,
+          "reason": "",
+          "scale": 1.0,
+          "patches": {
+            "Forehead": {
+              "sharpness": 5.3,
+              "lightness": 155.4
+            },
+            "Zone_L": {
+              "sharpness": 9.7,
+              "lightness": 152.3
+            },
+            "Zone_R": {
+              "sharpness": 47.9,
+              "lightness": 185.6
+            }
+          },
+          "dropped": {
+            "Forehead": "image too blurry",
+            "Zone_L": "image too blurry"
+          },
+          "face_width_px": 363.8
+        },
+        "training_size": {
+          "status": "RED_FLUSHING",
+          "probability": 0.7225008010864258,
+          "reason": "",
+          "scale": 0.759,
+          "patches": {
+            "Forehead": {
+              "sharpness": 6.5,
+              "lightness": 153.7
+            },
+            "Zone_L": {
+              "sharpness": 31.2,
+              "lightness": 150.2
+            },
+            "Zone_R": {
+              "sharpness": 69.2,
+              "lightness": 177.6
+            }
+          },
+          "dropped": {
+            "Forehead": "image too blurry"
+          }
+        }
+      },
+      "skin_method": "patch_cnn_qc",
+      "image_file": "skin/S20_skin.jpg",
+      "image_file_skin": "",
+      "sharpness_posture_photo": 39.3,
+      "sharpness_skin_photo": 39.3
+    },
+    "S21": {
+      "person_found": true,
+      "face_found": true,
+      "visual_signs": {
+        "chest_clutching": false,
+        "abdominal_clutching": false,
+        "head_clutching": false
+      },
+      "posture_label": "none",
+      "posture_filters": [],
+      "skin_status": "NORMAL",
+      "skin_probability": 0.26448946588789113,
+      "skin_reason": "",
+      "skin_patches": {
+        "Forehead": 0.0499,
+        "Zone_R": 0.0017
+      },
+      "skin_quality": {
+        "face_width_px": 599.1,
+        "original_size": {
+          "status": "NORMAL",
+          "probability": 0.5031582117080688,
+          "reason": "",
+          "scale": 1.0,
+          "patches": {
+            "Forehead": {
+              "sharpness": 1528.5,
+              "lightness": 72.7
+            },
+            "Zone_R": {
+              "sharpness": 291.1,
+              "lightness": 193.9
+            }
+          },
+          "dropped": {},
+          "face_width_px": 599.1
+        },
+        "training_size": {
+          "status": "NORMAL",
+          "probability": 0.02582072006771341,
+          "reason": "",
+          "scale": 0.461,
+          "patches": {
+            "Forehead": {
+              "sharpness": 1700.3,
+              "lightness": 78.6
+            },
+            "Zone_R": {
+              "sharpness": 172.4,
+              "lightness": 183.4
+            }
+          },
+          "dropped": {}
+        }
+      },
+      "skin_method": "patch_cnn_qc",
+      "image_file": "Posture/S21_body.jpg",
+      "image_file_skin": "",
+      "sharpness_posture_photo": 308.9,
+      "sharpness_skin_photo": 308.9
+    },
+    "S22": {
+      "person_found": true,
+      "face_found": true,
+      "visual_signs": {
+        "chest_clutching": false,
+        "abdominal_clutching": false,
+        "head_clutching": false
+      },
+      "posture_label": "none",
+      "posture_filters": [],
+      "skin_status": "UNKNOWN",
+      "skin_probability": null,
+      "skin_reason": "face too small in the image",
+      "skin_patches": {},
+      "skin_quality": {
+        "face_width_px": 95.8
+      },
+      "skin_method": "patch_cnn_qc",
+      "image_file": "Posture/S22_body.jpg",
+      "image_file_skin": "",
+      "sharpness_posture_photo": 39.4,
+      "sharpness_skin_photo": 39.4
+    },
+    "S23": {
+      "person_found": true,
+      "face_found": true,
+      "visual_signs": {
+        "chest_clutching": false,
+        "abdominal_clutching": false,
+        "head_clutching": false
+      },
+      "posture_label": "none",
+      "posture_filters": [],
+      "skin_status": "UNKNOWN",
+      "skin_probability": null,
+      "skin_reason": "image too blurry",
+      "skin_patches": {},
+      "skin_quality": {
+        "face_width_px": 536.3,
+        "original_size": {
+          "status": "UNKNOWN",
+          "probability": null,
+          "reason": "image too blurry",
+          "scale": 1.0,
+          "patches": {
+            "Forehead": {
+              "sharpness": 9.1,
+              "lightness": 177.2
+            },
+            "Zone_L": {
+              "sharpness": 10.5,
+              "lightness": 162.1
+            },
+            "Zone_R": {
+              "sharpness": 10.9,
+              "lightness": 189.3
+            }
+          },
+          "dropped": {
+            "Forehead": "image too blurry",
+            "Zone_L": "image too blurry",
+            "Zone_R": "image too blurry"
+          },
+          "face_width_px": 536.3
+        },
+        "training_size": {
+          "status": "NORMAL",
+          "probability": 0.37500013411045074,
+          "reason": "",
+          "scale": 0.515,
+          "patches": {
+            "Forehead": {
+              "sharpness": 25.7,
+              "lightness": 175.2
+            },
+            "Zone_L": {
+              "sharpness": 63.8,
+              "lightness": 156.2
+            },
+            "Zone_R": {
+              "sharpness": 90.8,
+              "lightness": 181.4
+            }
+          },
+          "dropped": {
+            "Forehead": "image too blurry"
+          }
+        }
+      },
+      "skin_method": "patch_cnn_qc",
+      "image_file": "skin/S23_skin.jpg",
+      "image_file_skin": "",
+      "sharpness_posture_photo": 149.3,
+      "sharpness_skin_photo": 149.3
+    },
+    "S24": {
+      "person_found": true,
+      "face_found": true,
+      "visual_signs": {
+        "chest_clutching": false,
+        "abdominal_clutching": false,
+        "head_clutching": false
+      },
+      "posture_label": "none",
+      "posture_filters": [
+        "CROSSED_ARMS_FILTER"
+      ],
+      "skin_status": "UNKNOWN",
+      "skin_probability": null,
+      "skin_reason": "face too small in the image",
+      "skin_patches": {},
+      "skin_quality": {
+        "face_width_px": 129.6
+      },
+      "skin_method": "patch_cnn_qc",
+      "image_file": "Posture/S24_body.jpg",
+      "image_file_skin": "",
+      "sharpness_posture_photo": 23.6,
+      "sharpness_skin_photo": 23.6
+    },
+    "S25": {
+      "person_found": true,
+      "face_found": true,
+      "visual_signs": {
+        "chest_clutching": false,
+        "abdominal_clutching": false,
+        "head_clutching": false
+      },
+      "posture_label": "none",
+      "posture_filters": [],
+      "skin_status": "UNKNOWN",
+      "skin_probability": null,
+      "skin_reason": "face too small in the image",
+      "skin_patches": {},
+      "skin_quality": {
+        "face_width_px": 95.5
+      },
+      "skin_method": "patch_cnn_qc",
+      "image_file": "Posture/S25_body.jpg",
+      "image_file_skin": "",
+      "sharpness_posture_photo": 21.0,
+      "sharpness_skin_photo": 21.0
+    },
+    "S26": {
+      "person_found": true,
+      "face_found": true,
+      "visual_signs": {
+        "chest_clutching": false,
+        "abdominal_clutching": false,
+        "head_clutching": false
+      },
+      "posture_label": "none",
+      "posture_filters": [],
+      "skin_status": "UNKNOWN",
+      "skin_probability": null,
+      "skin_reason": "face too small in the image",
+      "skin_patches": {},
+      "skin_quality": {
+        "face_width_px": 128.2
+      },
+      "skin_method": "patch_cnn_qc",
+      "image_file": "Posture/S26_body.jpg",
+      "image_file_skin": "",
+      "sharpness_posture_photo": 127.3,
+      "sharpness_skin_photo": 127.3
+    },
+    "S27": {
+      "person_found": true,
+      "face_found": true,
+      "visual_signs": {
+        "chest_clutching": false,
+        "abdominal_clutching": false,
+        "head_clutching": false
+      },
+      "posture_label": "none",
+      "posture_filters": [],
+      "skin_status": "UNKNOWN",
+      "skin_probability": null,
+      "skin_reason": "result changes with image size",
+      "skin_patches": {},
+      "skin_quality": {
+        "face_width_px": 560.1,
+        "original_size": {
+          "status": "RED_FLUSHING",
+          "probability": 0.7343934774398804,
+          "reason": "",
+          "scale": 1.0,
+          "patches": {
+            "Forehead": {
+              "sharpness": 27.5,
+              "lightness": 183.0
+            },
+            "Zone_L": {
+              "sharpness": 112.7,
+              "lightness": 106.4
+            },
+            "Zone_R": {
+              "sharpness": 21.7,
+              "lightness": 178.4
+            }
+          },
+          "dropped": {
+            "Forehead": "image too blurry",
+            "Zone_R": "image too blurry"
+          },
+          "face_width_px": 560.1
+        },
+        "training_size": {
+          "status": "NORMAL",
+          "probability": 0.16530903428792953,
+          "reason": "",
+          "scale": 0.493,
+          "patches": {
+            "Forehead": {
+              "sharpness": 69.3,
+              "lightness": 181.5
+            },
+            "Zone_L": {
+              "sharpness": 234.8,
+              "lightness": 96.0
+            },
+            "Zone_R": {
+              "sharpness": 356.8,
+              "lightness": 153.1
+            }
+          },
+          "dropped": {}
+        }
+      },
+      "skin_method": "patch_cnn_qc",
+      "image_file": "skin/S27_skin.jpg",
+      "image_file_skin": "",
+      "sharpness_posture_photo": 262.8,
+      "sharpness_skin_photo": 262.8
+    },
+    "S28": {
+      "person_found": true,
+      "face_found": true,
+      "visual_signs": {
+        "chest_clutching": false,
+        "abdominal_clutching": false,
+        "head_clutching": false
+      },
+      "posture_label": "none",
+      "posture_filters": [],
+      "skin_status": "UNKNOWN",
+      "skin_probability": null,
+      "skin_reason": "face too small in the image",
+      "skin_patches": {},
+      "skin_quality": {
+        "face_width_px": 64.8
+      },
+      "skin_method": "patch_cnn_qc",
+      "image_file": "Posture/S28_body.jpg",
+      "image_file_skin": "",
+      "sharpness_posture_photo": 22.4,
+      "sharpness_skin_photo": 22.4
+    },
+    "S29": {
+      "person_found": false,
+      "face_found": true,
+      "visual_signs": {
+        "chest_clutching": false,
+        "abdominal_clutching": false,
+        "head_clutching": false
+      },
+      "posture_label": "none",
+      "posture_filters": [],
+      "skin_status": "UNKNOWN",
+      "skin_probability": null,
+      "skin_reason": "result changes with image size",
+      "skin_patches": {},
+      "skin_quality": {
+        "face_width_px": 680.1,
+        "original_size": {
+          "status": "RED_FLUSHING",
+          "probability": 0.666567474603653,
+          "reason": "",
+          "scale": 1.0,
+          "patches": {
+            "Forehead": {
+              "sharpness": 58.1,
+              "lightness": 160.5
+            },
+            "Zone_L": {
+              "sharpness": 38.4,
+              "lightness": 124.7
+            }
+          },
+          "dropped": {},
+          "face_width_px": 680.1
+        },
+        "training_size": {
+          "status": "NORMAL",
+          "probability": 0.39522866904735565,
+          "reason": "",
+          "scale": 0.406,
+          "patches": {
+            "Forehead": {
+              "sharpness": 503.3,
+              "lightness": 145.4
+            },
+            "Zone_L": {
+              "sharpness": 87.5,
+              "lightness": 132.0
+            }
+          },
+          "dropped": {}
+        }
+      },
+      "skin_method": "patch_cnn_qc",
+      "image_file": "skin/S29_skin.jpg",
+      "image_file_skin": "",
+      "sharpness_posture_photo": 1143.3,
+      "sharpness_skin_photo": 1143.3
+    },
+    "S30": {
+      "person_found": true,
+      "face_found": true,
+      "visual_signs": {
+        "chest_clutching": false,
+        "abdominal_clutching": false,
+        "head_clutching": false
+      },
+      "posture_label": "none",
+      "posture_filters": [
+        "THINKING_POSE_FILTER"
+      ],
+      "skin_status": "RED_FLUSHING",
+      "skin_probability": 0.6749840577443441,
+      "skin_reason": "",
+      "skin_patches": {
+        "Forehead": 0.5394,
+        "Zone_L": 0.5456,
+        "Zone_R": 0.9399
+      },
+      "skin_quality": {
+        "scale": 1.0,
+        "patches": {
+          "Forehead": {
+            "sharpness": 40.1,
+            "lightness": 200.0
+          },
+          "Zone_L": {
+            "sharpness": 152.4,
+            "lightness": 196.8
+          },
+          "Zone_R": {
+            "sharpness": 197.8,
+            "lightness": 205.7
+          }
+        },
+        "dropped": {},
+        "face_width_px": 234.3
+      },
+      "skin_method": "patch_cnn_qc",
+      "image_file": "Posture/S30_body.jpg",
+      "image_file_skin": "skin/S30_skin.jpg",
+      "sharpness_posture_photo": 166.8,
+      "sharpness_skin_photo": 177.9
+    }
+  }
+}

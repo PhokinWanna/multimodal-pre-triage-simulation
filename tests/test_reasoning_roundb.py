@@ -157,3 +157,27 @@ class RulesOnlyTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class RetryTests(unittest.TestCase):
+    def test_cut_off_json_is_retried_once_with_a_larger_budget(self):
+        eng = ReasoningEngine.__new__(ReasoningEngine)
+        eng.endpoint = "http://x"
+        budgets = []
+
+        def once(prompt, temperature, seed, timeout, num_predict):
+            budgets.append(num_predict)
+            if len(budgets) == 1:
+                return None, "DETERMINISTIC_FALLBACK_JSON_PARSE_ERROR", None
+            return {"esi_level": 3, **SOAP}, None, 2.0
+        eng._call_llm_once = once
+        v = case(eng, prompt_version="v1", fusion_mode="weighted")
+        self.assertEqual((budgets, v["esi_level"], v["decision"]["llm_valid"]), ([200, 400], 3, True))
+
+    def test_no_second_retry(self):
+        eng = ReasoningEngine.__new__(ReasoningEngine)
+        eng.endpoint = "http://x"
+        calls = []
+        eng._call_llm_once = lambda *a: calls.append(a) or (None, "DETERMINISTIC_FALLBACK_JSON_PARSE_ERROR", None)
+        v = case(eng, prompt_version="v1", fusion_mode="weighted")
+        self.assertEqual((len(calls), v["decision"]["llm_valid"]), (2, False))

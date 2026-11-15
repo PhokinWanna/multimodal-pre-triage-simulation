@@ -5,6 +5,7 @@ Kiosk environment, Ollama running, after prompt_dev_eval.py:
     python scripts/experiments/m3/run_roundB.py --limit 2      # 1-minute smoke test (separate folder)
     python scripts/experiments/m3/run_roundB.py                # the real run (about 1-1.5 h on an M1)
     python scripts/experiments/m3/run_roundB.py --consistency  # optional: + 10 sampled runs of the main system
+    python scripts/experiments/m3/run_roundB.py --no-qc        # + skin without the image check (sensitivity)
 
 The run can be stopped (Ctrl+C) and started again with the same command: every LLM answer is
 cached, so it continues where it stopped.
@@ -53,6 +54,12 @@ LLM_CONFIGS = [
     ("PS", False, True, True, "weighted", (0.5, 0.5)),
 ]
 RULES_CONFIGS = [(f"{n}_rules", t, p, s, m, w) for n, t, p, s, m, w in LLM_CONFIGS if n in ("W50", "IND", "W60", "W40")]
+# Exploratory sensitivity analysis (amendment 2, added after the first round-B run): the same weights
+# when the skin result comes from the round-A patch pipeline WITHOUT the image check, i.e. the skin
+# part always answers. Only configurations that use the skin result are repeated.
+NOQC = "_noQC"
+NOQC_CONFIGS = [(n + NOQC, t, p, s, m, w) for n, t, p, s, m, w in LLM_CONFIGS if s and n in ("W50", "IND", "W60", "W40", "TS", "S", "PS")]
+NOQC_RULES = [(n + NOQC, t, p, s, m, w) for n, t, p, s, m, w in RULES_CONFIGS if n != "IND_rules"]
 CONSISTENCY = {"temperature": 0.8, "seeds": list(range(1, 11))}
 
 
@@ -70,7 +77,7 @@ def analyse_photo(vision, path: Path) -> dict:
             "skin_patches": s.patch_probabilities, "skin_quality": s.quality, "skin_method": s.method}
 
 
-def camera_results(scenarios: list[dict], out: Path, vision=None) -> dict:
+def camera_results(scenarios: list[dict], out: Path, vision=None, skin_pipeline: str = "patch_qc") -> dict:
     """Round-B camera analysis of every test photo, computed once and stored (photos are hashed)."""
     files = {}
     for sc in scenarios:
@@ -79,11 +86,11 @@ def camera_results(scenarios: list[dict], out: Path, vision=None) -> dict:
                 files[f] = sha256_file(IMAGES_DIR / "test" / f)
     if out.is_file():
         stored = json.loads(out.read_text(encoding="utf-8"))
-        if stored.get("photo_sha256") == files:
+        if stored.get("photo_sha256") == files and stored.get("skin_pipeline") == skin_pipeline:
             return stored
     if vision is None:
         from triage_kiosk.vision.engine import VisionEngine
-        vision = VisionEngine(static_image_mode=True, posture_version="v3", skin_pipeline="patch_qc",
+        vision = VisionEngine(static_image_mode=True, posture_version="v3", skin_pipeline=skin_pipeline,
                               skin_model_path=str(NEW_MODEL), require_skin_model=True)
     cases = {}
     for sc in scenarios:
@@ -171,6 +178,7 @@ def run(args, llm=None, vision=None, out_dir: Path | None = None, selection: dic
             return 1
     from triage_kiosk.config import SystemConfig
     cam_all = camera_results(scenarios, out / "vision.json", vision)
+    cam_noqc = camera_results(scenarios, out / "vision_noQC.json", vision, skin_pipeline="patch") if args.no_qc else None
     config = {**key, "created": dt.datetime.now().isoformat(timespec="seconds"), "git_commit": git_commit(),
               "llm": model_info, "llm_model": SystemConfig.OLLAMA_MODEL, "llm_timeout_s": args.timeout,
               "primary_config": PRIMARY, "temperature": 0.0, "seed": 0,
@@ -178,7 +186,8 @@ def run(args, llm=None, vision=None, out_dir: Path | None = None, selection: dic
               "rules_configs": [c[0] for c in RULES_CONFIGS], "cap_policy": "high_only",
               "missing_policy": SystemConfig.FUSION_MISSING,
               "posture_rules": cam_all["posture_rules"], "skin_pipeline": cam_all["skin_pipeline"],
-              "skin_model": cam_all["skin_model"], "consistency": CONSISTENCY if args.consistency else None}
+              "skin_model": cam_all["skin_model"], "consistency": CONSISTENCY if args.consistency else None,
+              "noqc_sensitivity": bool(args.no_qc)}
     cfg_path.write_text(json.dumps(config, indent=2, ensure_ascii=False), encoding="utf-8")
 
     engine, cache = make_engine(out / "llm_cache.jsonl", llm=llm)
@@ -191,12 +200,15 @@ def run(args, llm=None, vision=None, out_dir: Path | None = None, selection: dic
         jobs += [((f"{PRIMARY}_sampled",) + primary[1:], True, CONSISTENCY["temperature"], s, i + 1)
                  for i, s in enumerate(CONSISTENCY["seeds"])]
     jobs += [(cfg, False, 0.0, 0, 0) for cfg in RULES_CONFIGS]
+    if args.no_qc:
+        jobs += [(cfg, True, 0.0, 0, 0) for cfg in NOQC_CONFIGS] + [(cfg, False, 0.0, 0, 0) for cfg in NOQC_RULES]
     total = len(jobs) * len(scenarios)
     try:
         for j, (cfg, use_llm, temp, seed, run_no) in enumerate(jobs):
             line = []
             for sc in scenarios:
-                rec = one_call(engine, sc, cam_all["cases"][sc["id"]], cfg, selection, args.timeout, use_llm, temp, seed, run_no)
+                cams = cam_noqc if cfg[0].endswith(NOQC) else cam_all
+                rec = one_call(engine, sc, cams["cases"][sc["id"]], cfg, selection, args.timeout, use_llm, temp, seed, run_no)
                 records.append(rec)
                 if rec["fallback_reason"] and any(x in rec["fallback_reason"] for x in ("TIMEOUT", "UNREACHABLE", "HTTP")):
                     failures += 1
@@ -228,6 +240,8 @@ def parse_args(argv=None):
     ap.add_argument("--scenarios", type=Path, default=SCENARIOS_CSV)
     ap.add_argument("--limit", type=int, default=0, help="only the first N scenarios, into run_smoke/ (smoke test)")
     ap.add_argument("--consistency", action="store_true", help="also 10 sampled runs (temperature 0.8) of the main system")
+    ap.add_argument("--no-qc", action="store_true",
+                    help="also repeat the skin configurations with the round-A skin pipeline (no image check)")
     return ap.parse_args(argv)
 
 

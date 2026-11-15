@@ -119,3 +119,10 @@ Unchanged: the 30 scenarios, the 37 photos, `labels_final.csv`, the LLM (`llama3
 **Analysis** (`analyze_roundB.py`): the tables above with 95 % bootstrap intervals; per-input Shapley contribution (average absolute change in ESI levels and share) for the LLM alone and for the whole system; sensitivity to the floor policy (none / HIGH only / HIGH and MODERATE); camera accuracy per round.
 
 **Known limits added in round B.** The same 30 scenarios were seen in round A, so round B is not an unseen test: the improvements were made on development data, but the decision of *what* to improve came from round-A errors. The ESI 1 out-of-scope rule was introduced after round A (Ajarn's advice). The weights 60:40 / 40:60 are compared descriptively; with 24 in-scope scenarios small differences are not meaningful.
+
+### Amendment 2 (2026-11-15, after the first round-B run)
+
+Two things were found in the first round-B run (results kept in git history; the run folder is re-used, finished answers are read from the cache):
+
+1. **Cut-off LLM answers (engineering bug).** 15 of 330 LLM answers (2 of 30 in the main system) were not valid JSON. Round A used a 256-token budget; the kiosk had since been changed to 200 tokens for speed, which can cut off a long Thai note. Fix, in the kiosk itself: when the JSON is broken, ask once more with twice the budget. Only those calls are repeated. The prompt, the scenarios and the selection are unchanged.
+2. **The skin image check refused most test photos** (answered 8 of 30; found 2 of 14 truly flushed faces). The main system stays as registered. Because this leaves the posture : skin weighting with almost no skin input, an **exploratory** sensitivity analysis is added: the weighted configurations, and the configurations needed for the input-share analysis, are repeated with the round-A skin pipeline (patches without the image check, which answers for almost every photo but called 8 of 16 normal faces flushed in round A). Reported separately and labelled exploratory; it does not replace the main result.

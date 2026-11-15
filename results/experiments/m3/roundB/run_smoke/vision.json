@@ -1,0 +1,148 @@
+{
+  "created": "2026-11-15T15:05:36",
+  "posture_rules": "v3",
+  "skin_pipeline": "patch_qc",
+  "skin_model": {
+    "name": "SkinCNN-FL-α0.75 (best checkpoint)",
+    "threshold": 0.5489389300346375
+  },
+  "photo_sha256": {
+    "Posture/S01_body.jpg": "7852a06ea91808e9fb25b7352d391bade567bb38bf4a92171b8f57833174e6e0",
+    "skin/S01_skin.jpg": "b2de3e1bf0971bf507ec4b75b772b89b279ba8c3b4366ff5627bcd9737eb5a90",
+    "skin/S02_skin.jpg": "94308d345700b02add24c4de2dc1ac067446005a9bef528306b6d45be80b0756"
+  },
+  "cases": {
+    "S01": {
+      "person_found": true,
+      "face_found": true,
+      "visual_signs": {
+        "chest_clutching": true,
+        "abdominal_clutching": false,
+        "head_clutching": false
+      },
+      "posture_label": "chest",
+      "posture_filters": [],
+      "skin_status": "UNKNOWN",
+      "skin_probability": null,
+      "skin_reason": "image too blurry",
+      "skin_patches": {},
+      "skin_quality": {
+        "face_width_px": 776.4,
+        "original_size": {
+          "status": "UNKNOWN",
+          "probability": null,
+          "reason": "image too blurry",
+          "scale": 1.0,
+          "patches": {
+            "Forehead": {
+              "sharpness": 5.5,
+              "lightness": 171.5
+            },
+            "Zone_L": {
+              "sharpness": 17.5,
+              "lightness": 75.9
+            },
+            "Zone_R": {
+              "sharpness": 4.9,
+              "lightness": 149.6
+            }
+          },
+          "dropped": {
+            "Forehead": "image too blurry",
+            "Zone_L": "image too blurry",
+            "Zone_R": "image too blurry"
+          },
+          "face_width_px": 776.4
+        },
+        "training_size": {
+          "status": "UNKNOWN",
+          "probability": null,
+          "reason": "image too blurry",
+          "scale": 0.355,
+          "patches": {
+            "Forehead": {
+              "sharpness": 14.6,
+              "lightness": 166.4
+            },
+            "Zone_R": {
+              "sharpness": 19.2,
+              "lightness": 155.7
+            }
+          },
+          "dropped": {
+            "Forehead": "image too blurry",
+            "Zone_L": "no usable skin area",
+            "Zone_R": "image too blurry"
+          }
+        }
+      },
+      "skin_method": "patch_cnn_qc",
+      "image_file": "Posture/S01_body.jpg",
+      "image_file_skin": "skin/S01_skin.jpg",
+      "sharpness_posture_photo": 47.5,
+      "sharpness_skin_photo": 62.0
+    },
+    "S02": {
+      "person_found": false,
+      "face_found": true,
+      "visual_signs": {
+        "chest_clutching": false,
+        "abdominal_clutching": false,
+        "head_clutching": false
+      },
+      "posture_label": "none",
+      "posture_filters": [],
+      "skin_status": "NORMAL",
+      "skin_probability": 0.2144361799582839,
+      "skin_reason": "",
+      "skin_patches": {
+        "Zone_L": 0.1022,
+        "Zone_R": 0.0339
+      },
+      "skin_quality": {
+        "face_width_px": 372.4,
+        "original_size": {
+          "status": "NORMAL",
+          "probability": 0.3608148992061615,
+          "reason": "",
+          "scale": 1.0,
+          "patches": {
+            "Zone_R": {
+              "sharpness": 509.2,
+              "lightness": 148.4
+            }
+          },
+          "dropped": {
+            "Forehead": "no usable skin area",
+            "Zone_L": "no usable skin area"
+          },
+          "face_width_px": 372.4
+        },
+        "training_size": {
+          "status": "NORMAL",
+          "probability": 0.0680574607104063,
+          "reason": "",
+          "scale": 0.741,
+          "patches": {
+            "Zone_L": {
+              "sharpness": 725.6,
+              "lightness": 135.7
+            },
+            "Zone_R": {
+              "sharpness": 424.3,
+              "lightness": 137.9
+            }
+          },
+          "dropped": {
+            "Forehead": "no usable skin area"
+          }
+        }
+      },
+      "skin_method": "patch_cnn_qc",
+      "image_file": "skin/S02_skin.jpg",
+      "image_file_skin": "",
+      "sharpness_posture_photo": 421.3,
+      "sharpness_skin_photo": 421.3
+    }
+  }
+}

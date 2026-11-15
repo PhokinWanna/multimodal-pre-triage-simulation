@@ -1,0 +1,155 @@
+{
+  "selection": {
+    "candidate": "v1",
+    "prompt_version": "v1",
+    "esi_from_steps": false
+  },
+  "scenarios_sha256": "a4a912f38816c01497ff9899f35403af3b46ae602f8597dda5070e058ca6216d",
+  "n_scenarios": 30,
+  "created": "2026-11-15T15:07:42",
+  "git_commit": "c989265fbb14de096359d5604ef71becde7ad54c",
+  "llm": "{\"name\": \"llama3.2:latest\", \"digest\": \"a80c4f17acd55265feec403c7aef86be0c25983ab279d83f3bcd3abbcb5b8b72\", \"details\": {\"parent_model\": \"\", \"format\": \"gguf\", \"family\": \"llama\", \"families\": [\"llama\"], \"parameter_size\": \"3.2B\", \"quantization_level\": \"Q4_K_M\", \"context_length\": 131072, \"embedding_length\": 3072, \"runner\": \"ggml\"}}",
+  "llm_model": "llama3.2:latest",
+  "llm_timeout_s": 90.0,
+  "primary_config": "W50",
+  "temperature": 0.0,
+  "seed": 0,
+  "configs": [
+    {
+      "name": "W50",
+      "text": true,
+      "posture": true,
+      "skin": true,
+      "fusion_mode": "weighted",
+      "weights": [
+        0.5,
+        0.5
+      ]
+    },
+    {
+      "name": "IND",
+      "text": true,
+      "posture": true,
+      "skin": true,
+      "fusion_mode": "independent",
+      "weights": [
+        0.5,
+        0.5
+      ]
+    },
+    {
+      "name": "W60",
+      "text": true,
+      "posture": true,
+      "skin": true,
+      "fusion_mode": "weighted",
+      "weights": [
+        0.6,
+        0.4
+      ]
+    },
+    {
+      "name": "W40",
+      "text": true,
+      "posture": true,
+      "skin": true,
+      "fusion_mode": "weighted",
+      "weights": [
+        0.4,
+        0.6
+      ]
+    },
+    {
+      "name": "T",
+      "text": true,
+      "posture": false,
+      "skin": false,
+      "fusion_mode": "weighted",
+      "weights": [
+        0.5,
+        0.5
+      ]
+    },
+    {
+      "name": "TP",
+      "text": true,
+      "posture": true,
+      "skin": false,
+      "fusion_mode": "weighted",
+      "weights": [
+        0.5,
+        0.5
+      ]
+    },
+    {
+      "name": "TS",
+      "text": true,
+      "posture": false,
+      "skin": true,
+      "fusion_mode": "weighted",
+      "weights": [
+        0.5,
+        0.5
+      ]
+    },
+    {
+      "name": "NONE",
+      "text": false,
+      "posture": false,
+      "skin": false,
+      "fusion_mode": "weighted",
+      "weights": [
+        0.5,
+        0.5
+      ]
+    },
+    {
+      "name": "P",
+      "text": false,
+      "posture": true,
+      "skin": false,
+      "fusion_mode": "weighted",
+      "weights": [
+        0.5,
+        0.5
+      ]
+    },
+    {
+      "name": "S",
+      "text": false,
+      "posture": false,
+      "skin": true,
+      "fusion_mode": "weighted",
+      "weights": [
+        0.5,
+        0.5
+      ]
+    },
+    {
+      "name": "PS",
+      "text": false,
+      "posture": true,
+      "skin": true,
+      "fusion_mode": "weighted",
+      "weights": [
+        0.5,
+        0.5
+      ]
+    }
+  ],
+  "rules_configs": [
+    "W50_rules",
+    "IND_rules",
+    "W60_rules",
+    "W40_rules"
+  ],
+  "cap_policy": "high_only",
+  "missing_policy": "zero",
+  "posture_rules": "v3",
+  "skin_pipeline": "patch_qc",
+  "skin_model": {
+    "name": "SkinCNN-FL-α0.75 (best checkpoint)",
+    "threshold": 0.5489389300346375
+  },
+  "consistency": null
+}

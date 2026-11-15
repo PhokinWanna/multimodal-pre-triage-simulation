@@ -1,0 +1,31 @@
+id,esi_reference,scope,esi_A_original,esi_A_fixed,esi_B_llm_only,esi_B_independent,esi_B_main,esi_B_W60,esi_B_W40,esi_B_text_only,esi_B_rules_W50,direction_B_main,camera_posture_B,camera_skin_B,skin_reason_B,visual_score_50_50,visual_band_50_50,floor,step_a,step_b,resources,llm_latency_s
+S01,1,out (ESI 1),3,2,2,2,2,2,2,3,2,under,chest,UNKNOWN,image too blurry,0.5,HIGH,combined visual risk HIGH (score 0.50; posture 50% / skin 50%),,,,12.16
+S02,1,out (ESI 1),2,2,2,2,2,2,2,2,4,under,none,NORMAL,,0.107,LOW,,,,,8.65
+S03,1,out (ESI 1),3,2,4,3,4,4,4,4,4,under,none,UNKNOWN,result changes with image size,0.0,LOW,,,,,
+S04,1,out (ESI 1),2,2,2,2,2,2,2,2,2,under,chest,UNKNOWN,face too small in the image,0.5,HIGH,combined visual risk HIGH (score 0.50; posture 50% / skin 50%),,,,8.07
+S05,1,out (ESI 1),2,2,2,2,2,2,2,2,4,under,none,UNKNOWN,face too small in the image,0.0,LOW,,,,,10.55
+S06,1,out (ESI 1),3,3,3,3,3,3,3,3,4,under,none,UNKNOWN,image too blurry,0.0,LOW,,,,,8.29
+S07,2,in,3,2,3,2,2,2,2,3,2,,chest,UNKNOWN,face too small in the image,0.5,HIGH,combined visual risk HIGH (score 0.50; posture 50% / skin 50%),,,,10.49
+S08,2,in,3,2,2,2,2,2,2,2,2,,chest,UNKNOWN,result changes with image size,0.5,HIGH,combined visual risk HIGH (score 0.50; posture 50% / skin 50%),,,,6.76
+S09,2,in,3,3,4,3,4,4,4,3,4,under,none,UNKNOWN,face too small in the image,0.0,LOW,,,,,
+S10,2,in,4,4,4,4,4,4,4,4,3,under,head,UNKNOWN,result changes with image size,0.3,MODERATE,,,,,9.72
+S11,2,in,4,2,2,2,2,2,2,3,3,,abdomen,NORMAL,,0.497,MODERATE,patient-rated pain 9/10,,,,11.17
+S12,2,in,4,3,3,2,2,2,2,4,2,,chest,UNKNOWN,face too small in the image,0.5,HIGH,combined visual risk HIGH (score 0.50; posture 50% / skin 50%); pain posture while the patient minimises symptoms,,,,10.5
+S13,3,in,4,3,3,3,3,3,3,3,3,,abdomen,NORMAL,,0.361,MODERATE,,,,,9.91
+S14,3,in,4,3,3,3,3,3,3,4,3,,abdomen,UNKNOWN,image too blurry,0.35,MODERATE,,,,,12.95
+S15,3,in,4,4,3,3,3,3,3,3,4,,none,NORMAL,,0.146,LOW,,,,,15.04
+S16,3,in,3,3,3,3,3,3,3,4,3,,head,NORMAL,,0.473,MODERATE,,,,,12.07
+S17,3,in,4,4,3,3,3,3,3,3,4,,none,UNKNOWN,face too small in the image,0.0,LOW,,,,,9.55
+S18,3,in,4,4,3,3,3,3,3,4,3,,abdomen,UNKNOWN,image too blurry,0.35,MODERATE,,,,,11.1
+S19,4,in,4,4,4,4,4,4,4,4,4,,none,UNKNOWN,face too small in the image,0.0,LOW,,,,,13.13
+S20,4,in,4,2,2,2,2,2,2,4,2,over,chest,RED_FLUSHING,,0.821,HIGH,combined visual risk HIGH (score 0.82; posture 50% / skin 50%); pain posture while the patient minimises symptoms,,,,12.69
+S21,4,in,4,4,4,4,4,4,4,4,4,,none,NORMAL,,0.132,LOW,,,,,12.35
+S22,4,in,4,4,3,3,3,3,3,3,4,over,none,UNKNOWN,face too small in the image,0.0,LOW,,,,,11.7
+S23,4,in,4,4,4,4,4,4,4,4,4,,none,UNKNOWN,image too blurry,0.0,LOW,,,,,15.36
+S24,4,in,4,4,4,4,4,4,4,4,4,,none,UNKNOWN,face too small in the image,0.0,LOW,,,,,15.55
+S25,5,in,5,5,5,5,5,5,5,5,5,,none,UNKNOWN,face too small in the image,0.0,LOW,,,,,8.7
+S26,5,in,4,4,4,4,4,4,4,4,4,over,none,UNKNOWN,face too small in the image,0.0,LOW,,,,,12.86
+S27,5,in,4,4,4,4,4,4,4,4,4,over,none,UNKNOWN,result changes with image size,0.0,LOW,,,,,17.96
+S28,5,in,4,4,4,4,4,4,4,4,5,over,none,UNKNOWN,face too small in the image,0.0,LOW,,,,,15.62
+S29,5,in,4,4,4,4,4,4,4,4,4,over,none,UNKNOWN,result changes with image size,0.0,LOW,,,,,20.4
+S30,5,in,4,4,4,3,3,3,3,3,3,over,none,RED_FLUSHING,,0.337,MODERATE,patient-rated pain 7/10,,,,18.12

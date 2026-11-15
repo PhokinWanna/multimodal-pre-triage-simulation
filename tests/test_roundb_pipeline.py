@@ -169,6 +169,25 @@ class RoundBDryRun(unittest.TestCase):
         self.assertEqual(self.calls, [], "a finished run must be read back from the cache")
         self.assertGreater(n_first, 0)
 
+    def test_no_qc_sensitivity_uses_the_other_skin_result(self):
+        seen = []
+        orig = run_roundB.analyse_photo
+
+        def analyse(vision, path):
+            seen.append(getattr(vision, "skin_pipeline", "?"))
+            return fake_analyse(vision, path)
+        run_roundB.analyse_photo = analyse
+        try:
+            self.assertEqual(self.run_test(["--no-qc"]), 0)
+        finally:
+            run_roundB.analyse_photo = orig
+        out = self.root / "roundB" / "run_main"
+        self.assertTrue((out / "vision_noQC.json").is_file())
+        recs = [json.loads(x) for x in (out / "records.jsonl").read_text(encoding="utf-8").splitlines()]
+        names = {r["config"] for r in recs}
+        self.assertTrue({"W50_noQC", "W60_noQC", "W40_noQC", "TS_noQC", "S_noQC", "PS_noQC", "W50_rules_noQC"} <= names)
+        self.assertNotIn("T_noQC", names)
+
     def test_a_folder_from_another_selection_is_never_mixed(self):
         self.assertEqual(self.run_test(), 0)
         args = run_roundB.parse_args(["--scenarios", str(self.scen)])
@@ -182,7 +201,7 @@ class RoundBDryRun(unittest.TestCase):
         except ImportError:
             self.skipTest("matplotlib not installed")
         import analyze_roundB
-        self.assertEqual(self.run_test(["--consistency"]), 0)
+        self.assertEqual(self.run_test(["--consistency", "--no-qc"]), 0)
         out = self.root / "analysis"
         rc = analyze_roundB.main(["--run", str(self.root / "roundB" / "run_main"), "--labels", str(self.labels),
                                   "--out", str(out), "--no-round-a"])
@@ -198,10 +217,14 @@ class RoundBDryRun(unittest.TestCase):
         self.assertIn("W50:high_and_moderate", res["floor_policies"])
         self.assertEqual(res["consistency"]["runs"], 10)
         for name in ("report.md", "per_case.csv", "fig_confusion.png", "fig_weights.png", "fig_weights_rules.png",
-                     "fig_modalities.png", "fig_contribution.png", "fig_rounds.png", "fig_recall.png"):
+                     "fig_modalities.png", "fig_contribution.png", "fig_rounds.png", "fig_recall.png",
+                     "fig_weights_noQC.png", "fig_contribution_noQC.png"):
             self.assertTrue((out / name).is_file(), name)
         report = (out / "report.md").read_text(encoding="utf-8")
-        for heading in ("In-scope scenarios", "Out-of-scope scenarios", "Posture : skin weights", "How much each input"):
+        self.assertIn("weights_noQC", res)
+        self.assertAlmostEqual(sum(res["contribution_noQC"]["llm_only"]["share"].values()), 1.0, places=6)
+        for heading in ("In-scope scenarios", "Out-of-scope scenarios", "Posture : skin weights", "How much each input",
+                        "skin part always answers"):
             self.assertIn(heading, report)
 
     def test_shapley_is_exact_for_an_additive_game(self):

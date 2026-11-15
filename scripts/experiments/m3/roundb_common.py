@@ -62,8 +62,9 @@ class LLMCache:
         return hashlib.sha256(blob.encode("utf-8")).hexdigest()
 
     def install(self, engine, model: str) -> None:
-        """Wrap ``engine._call_llm`` with the cache."""
-        real = engine._call_llm
+        """Wrap ``engine._call_llm_once`` (one Ollama request) with the cache; the retry logic of
+        ``_call_llm`` stays outside, so a cut-off answer is retried with a larger budget."""
+        real = engine._call_llm_once
         cache = self
         cache.path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -84,7 +85,7 @@ class LLMCache:
                     f.write(json.dumps(rec, ensure_ascii=False) + "\n")
             return out, reason, latency
 
-        engine._call_llm = cached
+        engine._call_llm_once = cached
         engine.last_call = {}
 
 
@@ -95,7 +96,7 @@ def make_engine(cache_path: Path, llm=None):
     engine = ReasoningEngine.__new__(ReasoningEngine)
     engine.endpoint = f"{SystemConfig.OLLAMA_HOST}/api/generate"
     if llm is not None:
-        engine._call_llm = llm
+        engine._call_llm_once = llm
     cache = LLMCache(cache_path)
     cache.install(engine, SystemConfig.OLLAMA_MODEL)
     return engine, cache

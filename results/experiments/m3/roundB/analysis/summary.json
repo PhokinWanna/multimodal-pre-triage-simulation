@@ -1,0 +1,3824 @@
+{
+  "config": {
+    "selection": {
+      "candidate": "v1",
+      "prompt_version": "v1",
+      "esi_from_steps": false
+    },
+    "scenarios_sha256": "a4a912f38816c01497ff9899f35403af3b46ae602f8597dda5070e058ca6216d",
+    "n_scenarios": 30,
+    "created": "2026-11-15T15:07:42",
+    "git_commit": "c989265fbb14de096359d5604ef71becde7ad54c",
+    "llm": "{\"name\": \"llama3.2:latest\", \"digest\": \"a80c4f17acd55265feec403c7aef86be0c25983ab279d83f3bcd3abbcb5b8b72\", \"details\": {\"parent_model\": \"\", \"format\": \"gguf\", \"family\": \"llama\", \"families\": [\"llama\"], \"parameter_size\": \"3.2B\", \"quantization_level\": \"Q4_K_M\", \"context_length\": 131072, \"embedding_length\": 3072, \"runner\": \"ggml\"}}",
+    "llm_model": "llama3.2:latest",
+    "llm_timeout_s": 90.0,
+    "primary_config": "W50",
+    "temperature": 0.0,
+    "seed": 0,
+    "configs": [
+      {
+        "name": "W50",
+        "text": true,
+        "posture": true,
+        "skin": true,
+        "fusion_mode": "weighted",
+        "weights": [
+          0.5,
+          0.5
+        ]
+      },
+      {
+        "name": "IND",
+        "text": true,
+        "posture": true,
+        "skin": true,
+        "fusion_mode": "independent",
+        "weights": [
+          0.5,
+          0.5
+        ]
+      },
+      {
+        "name": "W60",
+        "text": true,
+        "posture": true,
+        "skin": true,
+        "fusion_mode": "weighted",
+        "weights": [
+          0.6,
+          0.4
+        ]
+      },
+      {
+        "name": "W40",
+        "text": true,
+        "posture": true,
+        "skin": true,
+        "fusion_mode": "weighted",
+        "weights": [
+          0.4,
+          0.6
+        ]
+      },
+      {
+        "name": "T",
+        "text": true,
+        "posture": false,
+        "skin": false,
+        "fusion_mode": "weighted",
+        "weights": [
+          0.5,
+          0.5
+        ]
+      },
+      {
+        "name": "TP",
+        "text": true,
+        "posture": true,
+        "skin": false,
+        "fusion_mode": "weighted",
+        "weights": [
+          0.5,
+          0.5
+        ]
+      },
+      {
+        "name": "TS",
+        "text": true,
+        "posture": false,
+        "skin": true,
+        "fusion_mode": "weighted",
+        "weights": [
+          0.5,
+          0.5
+        ]
+      },
+      {
+        "name": "NONE",
+        "text": false,
+        "posture": false,
+        "skin": false,
+        "fusion_mode": "weighted",
+        "weights": [
+          0.5,
+          0.5
+        ]
+      },
+      {
+        "name": "P",
+        "text": false,
+        "posture": true,
+        "skin": false,
+        "fusion_mode": "weighted",
+        "weights": [
+          0.5,
+          0.5
+        ]
+      },
+      {
+        "name": "S",
+        "text": false,
+        "posture": false,
+        "skin": true,
+        "fusion_mode": "weighted",
+        "weights": [
+          0.5,
+          0.5
+        ]
+      },
+      {
+        "name": "PS",
+        "text": false,
+        "posture": true,
+        "skin": true,
+        "fusion_mode": "weighted",
+        "weights": [
+          0.5,
+          0.5
+        ]
+      }
+    ],
+    "rules_configs": [
+      "W50_rules",
+      "IND_rules",
+      "W60_rules",
+      "W40_rules"
+    ],
+    "cap_policy": "high_only",
+    "missing_policy": "zero",
+    "posture_rules": "v3",
+    "skin_pipeline": "patch_qc",
+    "skin_model": {
+      "name": "SkinCNN-FL-α0.75 (best checkpoint)",
+      "threshold": 0.5489389300346375
+    },
+    "consistency": null
+  },
+  "n": 30,
+  "n_in_scope": 24,
+  "n_out_of_scope": 6,
+  "systems": {
+    "A_original": {
+      "all": {
+        "n": 30,
+        "invalid_predictions": 0,
+        "accuracy": {
+          "value": 0.26666666666666666,
+          "ci_low": 0.13333333333333333,
+          "ci_high": 0.43333333333333335
+        },
+        "within_one": {
+          "value": 0.8,
+          "ci_low": 0.6333333333333333,
+          "ci_high": 0.9333333333333333
+        },
+        "kappa_linear": {
+          "value": 0.32038834951456296,
+          "ci_low": 0.1763589987383664,
+          "ci_high": 0.46433111380145253
+        },
+        "kappa_quadratic": {
+          "value": 0.5348837209302326,
+          "ci_low": 0.3464440958263883,
+          "ci_high": 0.6858044711798179
+        },
+        "under_triage": {
+          "value": 0.5666666666666667,
+          "ci_low": 0.4,
+          "ci_high": 0.7333333333333333
+        },
+        "over_triage": {
+          "value": 0.16666666666666666,
+          "ci_low": 0.03333333333333333,
+          "ci_high": 0.3
+        },
+        "high_acuity_sensitivity": {
+          "value": 0.25,
+          "ci_low": 0.0,
+          "ci_high": 0.5
+        },
+        "high_acuity_specificity": {
+          "value": 1.0,
+          "ci_low": 1.0,
+          "ci_high": 1.0
+        },
+        "recall_per_level": {
+          "1": 0.0,
+          "2": 0.0,
+          "3": 0.16666666666666666,
+          "4": 1.0,
+          "5": 0.16666666666666666
+        },
+        "auc_high_acuity": {
+          "value": 0.8611111111111112,
+          "ci_low": 0.7248387303485987,
+          "ci_high": 0.9841681985294117
+        }
+      },
+      "in_scope": {
+        "n": 24,
+        "invalid_predictions": 0,
+        "accuracy": {
+          "value": 0.3333333333333333,
+          "ci_low": 0.15375000000000003,
+          "ci_high": 0.5385416666666663
+        },
+        "within_one": {
+          "value": 0.875,
+          "ci_low": 0.7307692307692307,
+          "ci_high": 1.0
+        },
+        "kappa_linear": {
+          "value": 0.22448979591836737,
+          "ci_low": 0.06136815737125173,
+          "ci_high": 0.4049640210886293
+        },
+        "kappa_quadratic": {
+          "value": 0.3421052631578947,
+          "ci_low": 0.09393612485075893,
+          "ci_high": 0.5629590355540474
+        },
+        "under_triage": {
+          "value": 0.4583333333333333,
+          "ci_low": 0.25,
+          "ci_high": 0.6538461538461539
+        },
+        "over_triage": {
+          "value": 0.20833333333333334,
+          "ci_low": 0.045454545454545456,
+          "ci_high": 0.38095238095238093
+        },
+        "high_acuity_sensitivity": {
+          "value": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0
+        },
+        "high_acuity_specificity": {
+          "value": 1.0,
+          "ci_low": 1.0,
+          "ci_high": 1.0
+        },
+        "recall_per_level": {
+          "1": NaN,
+          "2": 0.0,
+          "3": 0.16666666666666666,
+          "4": 1.0,
+          "5": 0.16666666666666666
+        },
+        "auc_high_acuity": {
+          "value": 0.7361111111111112,
+          "ci_low": 0.5,
+          "ci_high": 0.975
+        },
+        "esi2_sensitivity": {
+          "value": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0
+        },
+        "esi3to5_specificity": {
+          "value": 1.0,
+          "ci_low": 1.0,
+          "ci_high": 1.0
+        },
+        "esi5_recall": {
+          "value": 0.16666666666666666,
+          "ci_low": 0.0,
+          "ci_high": 0.5714285714285714
+        }
+      },
+      "out_of_scope": {
+        "n": 6,
+        "detected_strict": {
+          "value": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0
+        },
+        "detected_lenient": {
+          "value": 0.5,
+          "ci_low": 0.0,
+          "ci_high": 1.0
+        }
+      }
+    },
+    "A_fixed": {
+      "all": {
+        "n": 30,
+        "invalid_predictions": 0,
+        "accuracy": {
+          "value": 0.4,
+          "ci_low": 0.23333333333333334,
+          "ci_high": 0.6
+        },
+        "within_one": {
+          "value": 0.9,
+          "ci_low": 0.7666666666666667,
+          "ci_high": 1.0
+        },
+        "kappa_linear": {
+          "value": 0.4927536231884059,
+          "ci_low": 0.3229148854309165,
+          "ci_high": 0.6473354231974922
+        },
+        "kappa_quadratic": {
+          "value": 0.6896551724137931,
+          "ci_low": 0.5013523901716824,
+          "ci_high": 0.8139008270657905
+        },
+        "under_triage": {
+          "value": 0.4,
+          "ci_low": 0.23333333333333334,
+          "ci_high": 0.5666666666666667
+        },
+        "over_triage": {
+          "value": 0.2,
+          "ci_low": 0.06666666666666667,
+          "ci_high": 0.36666666666666664
+        },
+        "high_acuity_sensitivity": {
+          "value": 0.6666666666666666,
+          "ci_low": 0.38461538461538464,
+          "ci_high": 0.9166666666666666
+        },
+        "high_acuity_specificity": {
+          "value": 0.9444444444444444,
+          "ci_low": 0.8125,
+          "ci_high": 1.0
+        },
+        "recall_per_level": {
+          "1": 0.0,
+          "2": 0.5,
+          "3": 0.5,
+          "4": 0.8333333333333334,
+          "5": 0.16666666666666666
+        },
+        "auc_high_acuity": {
+          "value": 0.8981481481481481,
+          "ci_low": 0.7622007575757576,
+          "ci_high": 0.9907407407407407
+        }
+      },
+      "in_scope": {
+        "n": 24,
+        "invalid_predictions": 0,
+        "accuracy": {
+          "value": 0.5,
+          "ci_low": 0.30434782608695654,
+          "ci_high": 0.7083333333333334
+        },
+        "within_one": {
+          "value": 0.9166666666666666,
+          "ci_low": 0.782608695652174,
+          "ci_high": 1.0
+        },
+        "kappa_linear": {
+          "value": 0.4716981132075472,
+          "ci_low": 0.2196959302454246,
+          "ci_high": 0.6949474361724949
+        },
+        "kappa_quadratic": {
+          "value": 0.6086956521739131,
+          "ci_low": 0.31374882336143173,
+          "ci_high": 0.8106306858395621
+        },
+        "under_triage": {
+          "value": 0.25,
+          "ci_low": 0.08325,
+          "ci_high": 0.43478260869565216
+        },
+        "over_triage": {
+          "value": 0.25,
+          "ci_low": 0.08333333333333333,
+          "ci_high": 0.4287267080745333
+        },
+        "high_acuity_sensitivity": {
+          "value": 0.5,
+          "ci_low": 0.0,
+          "ci_high": 1.0
+        },
+        "high_acuity_specificity": {
+          "value": 0.9444444444444444,
+          "ci_low": 0.8125,
+          "ci_high": 1.0
+        },
+        "recall_per_level": {
+          "1": NaN,
+          "2": 0.5,
+          "3": 0.5,
+          "4": 0.8333333333333334,
+          "5": 0.16666666666666666
+        },
+        "auc_high_acuity": {
+          "value": 0.8425925925925926,
+          "ci_low": 0.625,
+          "ci_high": 0.9888888888888889
+        },
+        "esi2_sensitivity": {
+          "value": 0.5,
+          "ci_low": 0.0,
+          "ci_high": 1.0
+        },
+        "esi3to5_specificity": {
+          "value": 0.9444444444444444,
+          "ci_low": 0.8125,
+          "ci_high": 1.0
+        },
+        "esi5_recall": {
+          "value": 0.16666666666666666,
+          "ci_low": 0.0,
+          "ci_high": 0.5714285714285714
+        }
+      },
+      "out_of_scope": {
+        "n": 6,
+        "detected_strict": {
+          "value": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0
+        },
+        "detected_lenient": {
+          "value": 0.8333333333333334,
+          "ci_low": 0.5,
+          "ci_high": 1.0
+        }
+      }
+    },
+    "B_llm_only": {
+      "all": {
+        "n": 30,
+        "invalid_predictions": 0,
+        "accuracy": {
+          "value": 0.43333333333333335,
+          "ci_low": 0.26666666666666666,
+          "ci_high": 0.6
+        },
+        "within_one": {
+          "value": 0.8333333333333334,
+          "ci_low": 0.7,
+          "ci_high": 0.9666666666666667
+        },
+        "kappa_linear": {
+          "value": 0.4334975369458127,
+          "ci_low": 0.2380879790940767,
+          "ci_high": 0.6110472670876879
+        },
+        "kappa_quadratic": {
+          "value": 0.5542168674698795,
+          "ci_low": 0.2856854140200947,
+          "ci_high": 0.7628917397228577
+        },
+        "under_triage": {
+          "value": 0.3333333333333333,
+          "ci_low": 0.16666666666666666,
+          "ci_high": 0.5
+        },
+        "over_triage": {
+          "value": 0.23333333333333334,
+          "ci_low": 0.1,
+          "ci_high": 0.4
+        },
+        "high_acuity_sensitivity": {
+          "value": 0.5,
+          "ci_low": 0.21428571428571427,
+          "ci_high": 0.8
+        },
+        "high_acuity_specificity": {
+          "value": 0.9444444444444444,
+          "ci_low": 0.8125,
+          "ci_high": 1.0
+        },
+        "recall_per_level": {
+          "1": 0.0,
+          "2": 0.3333333333333333,
+          "3": 1.0,
+          "4": 0.6666666666666666,
+          "5": 0.16666666666666666
+        },
+        "auc_high_acuity": {
+          "value": 0.75,
+          "ci_low": 0.5482599431818183,
+          "ci_high": 0.9166997354497353
+        }
+      },
+      "in_scope": {
+        "n": 24,
+        "invalid_predictions": 0,
+        "accuracy": {
+          "value": 0.5416666666666666,
+          "ci_low": 0.34615384615384615,
+          "ci_high": 0.7391304347826086
+        },
+        "within_one": {
+          "value": 0.875,
+          "ci_low": 0.72,
+          "ci_high": 1.0
+        },
+        "kappa_linear": {
+          "value": 0.46153846153846156,
+          "ci_low": 0.1961459913642199,
+          "ci_high": 0.6879446808510639
+        },
+        "kappa_quadratic": {
+          "value": 0.5454545454545454,
+          "ci_low": 0.20683635738240602,
+          "ci_high": 0.7854355241493944
+        },
+        "under_triage": {
+          "value": 0.16666666666666666,
+          "ci_low": 0.04,
+          "ci_high": 0.3181818181818182
+        },
+        "over_triage": {
+          "value": 0.2916666666666667,
+          "ci_low": 0.12,
+          "ci_high": 0.48
+        },
+        "high_acuity_sensitivity": {
+          "value": 0.3333333333333333,
+          "ci_low": 0.0,
+          "ci_high": 0.75
+        },
+        "high_acuity_specificity": {
+          "value": 0.9444444444444444,
+          "ci_low": 0.8125,
+          "ci_high": 1.0
+        },
+        "recall_per_level": {
+          "1": NaN,
+          "2": 0.3333333333333333,
+          "3": 1.0,
+          "4": 0.6666666666666666,
+          "5": 0.16666666666666666
+        },
+        "auc_high_acuity": {
+          "value": 0.6759259259259259,
+          "ci_low": 0.3893421052631579,
+          "ci_high": 0.9296524064171121
+        },
+        "esi2_sensitivity": {
+          "value": 0.3333333333333333,
+          "ci_low": 0.0,
+          "ci_high": 0.75
+        },
+        "esi3to5_specificity": {
+          "value": 0.9444444444444444,
+          "ci_low": 0.8125,
+          "ci_high": 1.0
+        },
+        "esi5_recall": {
+          "value": 0.16666666666666666,
+          "ci_low": 0.0,
+          "ci_high": 0.5714285714285714
+        }
+      },
+      "out_of_scope": {
+        "n": 6,
+        "detected_strict": {
+          "value": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0
+        },
+        "detected_lenient": {
+          "value": 0.6666666666666666,
+          "ci_low": 0.25,
+          "ci_high": 1.0
+        }
+      }
+    },
+    "B_independent": {
+      "all": {
+        "n": 30,
+        "invalid_predictions": 0,
+        "accuracy": {
+          "value": 0.5,
+          "ci_low": 0.3333333333333333,
+          "ci_high": 0.6666666666666666
+        },
+        "within_one": {
+          "value": 0.8333333333333334,
+          "ci_low": 0.7,
+          "ci_high": 0.9666666666666667
+        },
+        "kappa_linear": {
+          "value": 0.504950495049505,
+          "ci_low": 0.3017229339240994,
+          "ci_high": 0.6754458874940232
+        },
+        "kappa_quadratic": {
+          "value": 0.6341463414634146,
+          "ci_low": 0.40422547760340793,
+          "ci_high": 0.7963800904977375
+        },
+        "under_triage": {
+          "value": 0.26666666666666666,
+          "ci_low": 0.13333333333333333,
+          "ci_high": 0.43333333333333335
+        },
+        "over_triage": {
+          "value": 0.23333333333333334,
+          "ci_low": 0.1,
+          "ci_high": 0.4
+        },
+        "high_acuity_sensitivity": {
+          "value": 0.6666666666666666,
+          "ci_low": 0.375,
+          "ci_high": 0.9166666666666666
+        },
+        "high_acuity_specificity": {
+          "value": 0.9444444444444444,
+          "ci_low": 0.8125,
+          "ci_high": 1.0
+        },
+        "recall_per_level": {
+          "1": 0.0,
+          "2": 0.6666666666666666,
+          "3": 1.0,
+          "4": 0.6666666666666666,
+          "5": 0.16666666666666666
+        },
+        "auc_high_acuity": {
+          "value": 0.8518518518518519,
+          "ci_low": 0.6898148148148148,
+          "ci_high": 0.9722222222222222
+        }
+      },
+      "in_scope": {
+        "n": 24,
+        "invalid_predictions": 0,
+        "accuracy": {
+          "value": 0.625,
+          "ci_low": 0.4230769230769231,
+          "ci_high": 0.8076923076923077
+        },
+        "within_one": {
+          "value": 0.875,
+          "ci_low": 0.7198571428571429,
+          "ci_high": 1.0
+        },
+        "kappa_linear": {
+          "value": 0.5555555555555556,
+          "ci_low": 0.2757408174129059,
+          "ci_high": 0.7803001953325793
+        },
+        "kappa_quadratic": {
+          "value": 0.625,
+          "ci_low": 0.29405215527506545,
+          "ci_high": 0.8528189121338912
+        },
+        "under_triage": {
+          "value": 0.08333333333333333,
+          "ci_low": 0.0,
+          "ci_high": 0.21739130434782608
+        },
+        "over_triage": {
+          "value": 0.2916666666666667,
+          "ci_low": 0.12,
+          "ci_high": 0.48
+        },
+        "high_acuity_sensitivity": {
+          "value": 0.6666666666666666,
+          "ci_low": 0.2222222222222222,
+          "ci_high": 1.0
+        },
+        "high_acuity_specificity": {
+          "value": 0.9444444444444444,
+          "ci_low": 0.8125,
+          "ci_high": 1.0
+        },
+        "recall_per_level": {
+          "1": NaN,
+          "2": 0.6666666666666666,
+          "3": 1.0,
+          "4": 0.6666666666666666,
+          "5": 0.16666666666666666
+        },
+        "auc_high_acuity": {
+          "value": 0.8148148148148148,
+          "ci_low": 0.542061403508772,
+          "ci_high": 1.0
+        },
+        "esi2_sensitivity": {
+          "value": 0.6666666666666666,
+          "ci_low": 0.2222222222222222,
+          "ci_high": 1.0
+        },
+        "esi3to5_specificity": {
+          "value": 0.9444444444444444,
+          "ci_low": 0.8125,
+          "ci_high": 1.0
+        },
+        "esi5_recall": {
+          "value": 0.16666666666666666,
+          "ci_low": 0.0,
+          "ci_high": 0.5714285714285714
+        }
+      },
+      "out_of_scope": {
+        "n": 6,
+        "detected_strict": {
+          "value": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0
+        },
+        "detected_lenient": {
+          "value": 0.6666666666666666,
+          "ci_low": 0.25,
+          "ci_high": 1.0
+        }
+      }
+    },
+    "B_main": {
+      "all": {
+        "n": 30,
+        "invalid_predictions": 0,
+        "accuracy": {
+          "value": 0.5,
+          "ci_low": 0.3333333333333333,
+          "ci_high": 0.6666666666666666
+        },
+        "within_one": {
+          "value": 0.8,
+          "ci_low": 0.6333333333333333,
+          "ci_high": 0.9333333333333333
+        },
+        "kappa_linear": {
+          "value": 0.4607843137254901,
+          "ci_low": 0.24730373105324524,
+          "ci_high": 0.6536510837154453
+        },
+        "kappa_quadratic": {
+          "value": 0.5476190476190477,
+          "ci_low": 0.2749536571844357,
+          "ci_high": 0.7700074380034498
+        },
+        "under_triage": {
+          "value": 0.26666666666666666,
+          "ci_low": 0.13333333333333333,
+          "ci_high": 0.43333333333333335
+        },
+        "over_triage": {
+          "value": 0.23333333333333334,
+          "ci_low": 0.1,
+          "ci_high": 0.4
+        },
+        "high_acuity_sensitivity": {
+          "value": 0.6666666666666666,
+          "ci_low": 0.375,
+          "ci_high": 0.9166666666666666
+        },
+        "high_acuity_specificity": {
+          "value": 0.9444444444444444,
+          "ci_low": 0.8125,
+          "ci_high": 1.0
+        },
+        "recall_per_level": {
+          "1": 0.0,
+          "2": 0.6666666666666666,
+          "3": 1.0,
+          "4": 0.6666666666666666,
+          "5": 0.16666666666666666
+        },
+        "auc_high_acuity": {
+          "value": 0.7777777777777778,
+          "ci_low": 0.5666534391534391,
+          "ci_high": 0.9497667464114833
+        }
+      },
+      "in_scope": {
+        "n": 24,
+        "invalid_predictions": 0,
+        "accuracy": {
+          "value": 0.625,
+          "ci_low": 0.4230769230769231,
+          "ci_high": 0.8076923076923077
+        },
+        "within_one": {
+          "value": 0.8333333333333334,
+          "ci_low": 0.6663461538461538,
+          "ci_high": 0.96
+        },
+        "kappa_linear": {
+          "value": 0.5185185185185186,
+          "ci_low": 0.21590555450773297,
+          "ci_high": 0.7586743111697737
+        },
+        "kappa_quadratic": {
+          "value": 0.5625,
+          "ci_low": 0.1888398377603008,
+          "ci_high": 0.8240870619170876
+        },
+        "under_triage": {
+          "value": 0.08333333333333333,
+          "ci_low": 0.0,
+          "ci_high": 0.21739130434782608
+        },
+        "over_triage": {
+          "value": 0.2916666666666667,
+          "ci_low": 0.12,
+          "ci_high": 0.48
+        },
+        "high_acuity_sensitivity": {
+          "value": 0.6666666666666666,
+          "ci_low": 0.2222222222222222,
+          "ci_high": 1.0
+        },
+        "high_acuity_specificity": {
+          "value": 0.9444444444444444,
+          "ci_low": 0.8125,
+          "ci_high": 1.0
+        },
+        "recall_per_level": {
+          "1": NaN,
+          "2": 0.6666666666666666,
+          "3": 1.0,
+          "4": 0.6666666666666666,
+          "5": 0.16666666666666666
+        },
+        "auc_high_acuity": {
+          "value": 0.7407407407407407,
+          "ci_low": 0.4127673796791444,
+          "ci_high": 1.0
+        },
+        "esi2_sensitivity": {
+          "value": 0.6666666666666666,
+          "ci_low": 0.2222222222222222,
+          "ci_high": 1.0
+        },
+        "esi3to5_specificity": {
+          "value": 0.9444444444444444,
+          "ci_low": 0.8125,
+          "ci_high": 1.0
+        },
+        "esi5_recall": {
+          "value": 0.16666666666666666,
+          "ci_low": 0.0,
+          "ci_high": 0.5714285714285714
+        }
+      },
+      "out_of_scope": {
+        "n": 6,
+        "detected_strict": {
+          "value": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0
+        },
+        "detected_lenient": {
+          "value": 0.6666666666666666,
+          "ci_low": 0.25,
+          "ci_high": 1.0
+        }
+      }
+    }
+  },
+  "weights": {
+    "IND": {
+      "all": {
+        "n": 30,
+        "invalid_predictions": 0,
+        "accuracy": {
+          "value": 0.5,
+          "ci_low": 0.3333333333333333,
+          "ci_high": 0.6666666666666666
+        },
+        "within_one": {
+          "value": 0.8333333333333334,
+          "ci_low": 0.7,
+          "ci_high": 0.9666666666666667
+        },
+        "kappa_linear": {
+          "value": 0.504950495049505,
+          "ci_low": 0.3017229339240994,
+          "ci_high": 0.6754458874940232
+        },
+        "kappa_quadratic": {
+          "value": 0.6341463414634146,
+          "ci_low": 0.40422547760340793,
+          "ci_high": 0.7963800904977375
+        },
+        "under_triage": {
+          "value": 0.26666666666666666,
+          "ci_low": 0.13333333333333333,
+          "ci_high": 0.43333333333333335
+        },
+        "over_triage": {
+          "value": 0.23333333333333334,
+          "ci_low": 0.1,
+          "ci_high": 0.4
+        },
+        "high_acuity_sensitivity": {
+          "value": 0.6666666666666666,
+          "ci_low": 0.375,
+          "ci_high": 0.9166666666666666
+        },
+        "high_acuity_specificity": {
+          "value": 0.9444444444444444,
+          "ci_low": 0.8125,
+          "ci_high": 1.0
+        },
+        "recall_per_level": {
+          "1": 0.0,
+          "2": 0.6666666666666666,
+          "3": 1.0,
+          "4": 0.6666666666666666,
+          "5": 0.16666666666666666
+        },
+        "auc_high_acuity": {
+          "value": 0.8518518518518519,
+          "ci_low": 0.6898148148148148,
+          "ci_high": 0.9722222222222222
+        }
+      },
+      "in_scope": {
+        "n": 24,
+        "invalid_predictions": 0,
+        "accuracy": {
+          "value": 0.625,
+          "ci_low": 0.4230769230769231,
+          "ci_high": 0.8076923076923077
+        },
+        "within_one": {
+          "value": 0.875,
+          "ci_low": 0.7198571428571429,
+          "ci_high": 1.0
+        },
+        "kappa_linear": {
+          "value": 0.5555555555555556,
+          "ci_low": 0.2757408174129059,
+          "ci_high": 0.7803001953325793
+        },
+        "kappa_quadratic": {
+          "value": 0.625,
+          "ci_low": 0.29405215527506545,
+          "ci_high": 0.8528189121338912
+        },
+        "under_triage": {
+          "value": 0.08333333333333333,
+          "ci_low": 0.0,
+          "ci_high": 0.21739130434782608
+        },
+        "over_triage": {
+          "value": 0.2916666666666667,
+          "ci_low": 0.12,
+          "ci_high": 0.48
+        },
+        "high_acuity_sensitivity": {
+          "value": 0.6666666666666666,
+          "ci_low": 0.2222222222222222,
+          "ci_high": 1.0
+        },
+        "high_acuity_specificity": {
+          "value": 0.9444444444444444,
+          "ci_low": 0.8125,
+          "ci_high": 1.0
+        },
+        "recall_per_level": {
+          "1": NaN,
+          "2": 0.6666666666666666,
+          "3": 1.0,
+          "4": 0.6666666666666666,
+          "5": 0.16666666666666666
+        },
+        "auc_high_acuity": {
+          "value": 0.8148148148148148,
+          "ci_low": 0.542061403508772,
+          "ci_high": 1.0
+        },
+        "esi2_sensitivity": {
+          "value": 0.6666666666666666,
+          "ci_low": 0.2222222222222222,
+          "ci_high": 1.0
+        },
+        "esi3to5_specificity": {
+          "value": 0.9444444444444444,
+          "ci_low": 0.8125,
+          "ci_high": 1.0
+        },
+        "esi5_recall": {
+          "value": 0.16666666666666666,
+          "ci_low": 0.0,
+          "ci_high": 0.5714285714285714
+        }
+      },
+      "out_of_scope": {
+        "n": 6,
+        "detected_strict": {
+          "value": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0
+        },
+        "detected_lenient": {
+          "value": 0.6666666666666666,
+          "ci_low": 0.25,
+          "ci_high": 1.0
+        }
+      }
+    },
+    "IND_rules": {
+      "all": {
+        "n": 30,
+        "invalid_predictions": 0,
+        "accuracy": {
+          "value": 0.3,
+          "ci_low": 0.13333333333333333,
+          "ci_high": 0.4666666666666667
+        },
+        "within_one": {
+          "value": 0.6333333333333333,
+          "ci_low": 0.4666666666666667,
+          "ci_high": 0.8
+        },
+        "kappa_linear": {
+          "value": 0.10526315789473684,
+          "ci_low": -0.0505887684245675,
+          "ci_high": 0.27420524739502095
+        },
+        "kappa_quadratic": {
+          "value": 0.08571428571428574,
+          "ci_low": -0.1690561684868556,
+          "ci_high": 0.3307742782152226
+        },
+        "under_triage": {
+          "value": 0.3333333333333333,
+          "ci_low": 0.16666666666666666,
+          "ci_high": 0.5
+        },
+        "over_triage": {
+          "value": 0.36666666666666664,
+          "ci_low": 0.2,
+          "ci_high": 0.5333333333333333
+        },
+        "high_acuity_sensitivity": {
+          "value": 0.4166666666666667,
+          "ci_low": 0.125,
+          "ci_high": 0.7142857142857143
+        },
+        "high_acuity_specificity": {
+          "value": 0.8888888888888888,
+          "ci_low": 0.7142857142857143,
+          "ci_high": 1.0
+        },
+        "recall_per_level": {
+          "1": 0.0,
+          "2": 0.5,
+          "3": 0.8333333333333334,
+          "4": 0.16666666666666666,
+          "5": 0.0
+        },
+        "auc_high_acuity": {
+          "value": 0.6481481481481481,
+          "ci_low": 0.455,
+          "ci_high": 0.8281718749999998
+        }
+      },
+      "in_scope": {
+        "n": 24,
+        "invalid_predictions": 0,
+        "accuracy": {
+          "value": 0.375,
+          "ci_low": 0.18181818181818182,
+          "ci_high": 0.5769230769230769
+        },
+        "within_one": {
+          "value": 0.7083333333333334,
+          "ci_low": 0.5,
+          "ci_high": 0.88
+        },
+        "kappa_linear": {
+          "value": 0.13207547169811318,
+          "ci_low": -0.057630010231771854,
+          "ci_high": 0.3407481983891475
+        },
+        "kappa_quadratic": {
+          "value": 0.10869565217391308,
+          "ci_low": -0.12994439114522263,
+          "ci_high": 0.3666483895611025
+        },
+        "under_triage": {
+          "value": 0.16666666666666666,
+          "ci_low": 0.04,
+          "ci_high": 0.3333333333333333
+        },
+        "over_triage": {
+          "value": 0.4583333333333333,
+          "ci_low": 0.26916666666666667,
+          "ci_high": 0.6666666666666666
+        },
+        "high_acuity_sensitivity": {
+          "value": 0.5,
+          "ci_low": 0.0,
+          "ci_high": 1.0
+        },
+        "high_acuity_specificity": {
+          "value": 0.8888888888888888,
+          "ci_low": 0.7142857142857143,
+          "ci_high": 1.0
+        },
+        "recall_per_level": {
+          "1": NaN,
+          "2": 0.5,
+          "3": 0.8333333333333334,
+          "4": 0.16666666666666666,
+          "5": 0.0
+        },
+        "auc_high_acuity": {
+          "value": 0.7222222222222222,
+          "ci_low": 0.5,
+          "ci_high": 0.9401176470588234
+        },
+        "esi2_sensitivity": {
+          "value": 0.5,
+          "ci_low": 0.0,
+          "ci_high": 1.0
+        },
+        "esi3to5_specificity": {
+          "value": 0.8888888888888888,
+          "ci_low": 0.7142857142857143,
+          "ci_high": 1.0
+        },
+        "esi5_recall": {
+          "value": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0
+        }
+      },
+      "out_of_scope": {
+        "n": 6,
+        "detected_strict": {
+          "value": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0
+        },
+        "detected_lenient": {
+          "value": 0.3333333333333333,
+          "ci_low": 0.0,
+          "ci_high": 0.8
+        }
+      }
+    },
+    "W50": {
+      "all": {
+        "n": 30,
+        "invalid_predictions": 0,
+        "accuracy": {
+          "value": 0.5,
+          "ci_low": 0.3333333333333333,
+          "ci_high": 0.6666666666666666
+        },
+        "within_one": {
+          "value": 0.8,
+          "ci_low": 0.6333333333333333,
+          "ci_high": 0.9333333333333333
+        },
+        "kappa_linear": {
+          "value": 0.4607843137254901,
+          "ci_low": 0.24730373105324524,
+          "ci_high": 0.6536510837154453
+        },
+        "kappa_quadratic": {
+          "value": 0.5476190476190477,
+          "ci_low": 0.2749536571844357,
+          "ci_high": 0.7700074380034498
+        },
+        "under_triage": {
+          "value": 0.26666666666666666,
+          "ci_low": 0.13333333333333333,
+          "ci_high": 0.43333333333333335
+        },
+        "over_triage": {
+          "value": 0.23333333333333334,
+          "ci_low": 0.1,
+          "ci_high": 0.4
+        },
+        "high_acuity_sensitivity": {
+          "value": 0.6666666666666666,
+          "ci_low": 0.375,
+          "ci_high": 0.9166666666666666
+        },
+        "high_acuity_specificity": {
+          "value": 0.9444444444444444,
+          "ci_low": 0.8125,
+          "ci_high": 1.0
+        },
+        "recall_per_level": {
+          "1": 0.0,
+          "2": 0.6666666666666666,
+          "3": 1.0,
+          "4": 0.6666666666666666,
+          "5": 0.16666666666666666
+        },
+        "auc_high_acuity": {
+          "value": 0.7777777777777778,
+          "ci_low": 0.5666534391534391,
+          "ci_high": 0.9497667464114833
+        }
+      },
+      "in_scope": {
+        "n": 24,
+        "invalid_predictions": 0,
+        "accuracy": {
+          "value": 0.625,
+          "ci_low": 0.4230769230769231,
+          "ci_high": 0.8076923076923077
+        },
+        "within_one": {
+          "value": 0.8333333333333334,
+          "ci_low": 0.6663461538461538,
+          "ci_high": 0.96
+        },
+        "kappa_linear": {
+          "value": 0.5185185185185186,
+          "ci_low": 0.21590555450773297,
+          "ci_high": 0.7586743111697737
+        },
+        "kappa_quadratic": {
+          "value": 0.5625,
+          "ci_low": 0.1888398377603008,
+          "ci_high": 0.8240870619170876
+        },
+        "under_triage": {
+          "value": 0.08333333333333333,
+          "ci_low": 0.0,
+          "ci_high": 0.21739130434782608
+        },
+        "over_triage": {
+          "value": 0.2916666666666667,
+          "ci_low": 0.12,
+          "ci_high": 0.48
+        },
+        "high_acuity_sensitivity": {
+          "value": 0.6666666666666666,
+          "ci_low": 0.2222222222222222,
+          "ci_high": 1.0
+        },
+        "high_acuity_specificity": {
+          "value": 0.9444444444444444,
+          "ci_low": 0.8125,
+          "ci_high": 1.0
+        },
+        "recall_per_level": {
+          "1": NaN,
+          "2": 0.6666666666666666,
+          "3": 1.0,
+          "4": 0.6666666666666666,
+          "5": 0.16666666666666666
+        },
+        "auc_high_acuity": {
+          "value": 0.7407407407407407,
+          "ci_low": 0.4127673796791444,
+          "ci_high": 1.0
+        },
+        "esi2_sensitivity": {
+          "value": 0.6666666666666666,
+          "ci_low": 0.2222222222222222,
+          "ci_high": 1.0
+        },
+        "esi3to5_specificity": {
+          "value": 0.9444444444444444,
+          "ci_low": 0.8125,
+          "ci_high": 1.0
+        },
+        "esi5_recall": {
+          "value": 0.16666666666666666,
+          "ci_low": 0.0,
+          "ci_high": 0.5714285714285714
+        }
+      },
+      "out_of_scope": {
+        "n": 6,
+        "detected_strict": {
+          "value": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0
+        },
+        "detected_lenient": {
+          "value": 0.6666666666666666,
+          "ci_low": 0.25,
+          "ci_high": 1.0
+        }
+      }
+    },
+    "W50_rules": {
+      "all": {
+        "n": 30,
+        "invalid_predictions": 0,
+        "accuracy": {
+          "value": 0.4666666666666667,
+          "ci_low": 0.3,
+          "ci_high": 0.6333333333333333
+        },
+        "within_one": {
+          "value": 0.7666666666666667,
+          "ci_low": 0.6,
+          "ci_high": 0.9
+        },
+        "kappa_linear": {
+          "value": 0.354066985645933,
+          "ci_low": 0.1266998603537704,
+          "ci_high": 0.5774735332524951
+        },
+        "kappa_quadratic": {
+          "value": 0.3595505617977528,
+          "ci_low": 0.05391975454857049,
+          "ci_high": 0.6539732420941861
+        },
+        "under_triage": {
+          "value": 0.36666666666666664,
+          "ci_low": 0.2,
+          "ci_high": 0.5333333333333333
+        },
+        "over_triage": {
+          "value": 0.16666666666666666,
+          "ci_low": 0.03333333333333333,
+          "ci_high": 0.3
+        },
+        "high_acuity_sensitivity": {
+          "value": 0.4166666666666667,
+          "ci_low": 0.125,
+          "ci_high": 0.7142857142857143
+        },
+        "high_acuity_specificity": {
+          "value": 0.9444444444444444,
+          "ci_low": 0.8125,
+          "ci_high": 1.0
+        },
+        "recall_per_level": {
+          "1": 0.0,
+          "2": 0.5,
+          "3": 0.6666666666666666,
+          "4": 0.8333333333333334,
+          "5": 0.3333333333333333
+        },
+        "auc_high_acuity": {
+          "value": 0.7013888888888888,
+          "ci_low": 0.5047650717703349,
+          "ci_high": 0.8756947411141485
+        }
+      },
+      "in_scope": {
+        "n": 24,
+        "invalid_predictions": 0,
+        "accuracy": {
+          "value": 0.5833333333333334,
+          "ci_low": 0.38095238095238093,
+          "ci_high": 0.7727272727272727
+        },
+        "within_one": {
+          "value": 0.875,
+          "ci_low": 0.72,
+          "ci_high": 1.0
+        },
+        "kappa_linear": {
+          "value": 0.5185185185185186,
+          "ci_low": 0.22461946383373751,
+          "ci_high": 0.7429517627885442
+        },
+        "kappa_quadratic": {
+          "value": 0.6041666666666667,
+          "ci_low": 0.24151431311052943,
+          "ci_high": 0.8302031930333816
+        },
+        "under_triage": {
+          "value": 0.20833333333333334,
+          "ci_low": 0.055482456140350876,
+          "ci_high": 0.3889492753623185
+        },
+        "over_triage": {
+          "value": 0.20833333333333334,
+          "ci_low": 0.047619047619047616,
+          "ci_high": 0.38461538461538464
+        },
+        "high_acuity_sensitivity": {
+          "value": 0.5,
+          "ci_low": 0.0,
+          "ci_high": 1.0
+        },
+        "high_acuity_specificity": {
+          "value": 0.9444444444444444,
+          "ci_low": 0.8125,
+          "ci_high": 1.0
+        },
+        "recall_per_level": {
+          "1": NaN,
+          "2": 0.5,
+          "3": 0.6666666666666666,
+          "4": 0.8333333333333334,
+          "5": 0.3333333333333333
+        },
+        "auc_high_acuity": {
+          "value": 0.8194444444444444,
+          "ci_low": 0.5833333333333334,
+          "ci_high": 0.9761904761904762
+        },
+        "esi2_sensitivity": {
+          "value": 0.5,
+          "ci_low": 0.0,
+          "ci_high": 1.0
+        },
+        "esi3to5_specificity": {
+          "value": 0.9444444444444444,
+          "ci_low": 0.8125,
+          "ci_high": 1.0
+        },
+        "esi5_recall": {
+          "value": 0.3333333333333333,
+          "ci_low": 0.0,
+          "ci_high": 0.75
+        }
+      },
+      "out_of_scope": {
+        "n": 6,
+        "detected_strict": {
+          "value": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0
+        },
+        "detected_lenient": {
+          "value": 0.3333333333333333,
+          "ci_low": 0.0,
+          "ci_high": 0.8
+        }
+      }
+    },
+    "W60": {
+      "all": {
+        "n": 30,
+        "invalid_predictions": 0,
+        "accuracy": {
+          "value": 0.5,
+          "ci_low": 0.3333333333333333,
+          "ci_high": 0.6666666666666666
+        },
+        "within_one": {
+          "value": 0.8,
+          "ci_low": 0.6333333333333333,
+          "ci_high": 0.9333333333333333
+        },
+        "kappa_linear": {
+          "value": 0.4607843137254901,
+          "ci_low": 0.24730373105324524,
+          "ci_high": 0.6536510837154453
+        },
+        "kappa_quadratic": {
+          "value": 0.5476190476190477,
+          "ci_low": 0.2749536571844357,
+          "ci_high": 0.7700074380034498
+        },
+        "under_triage": {
+          "value": 0.26666666666666666,
+          "ci_low": 0.13333333333333333,
+          "ci_high": 0.43333333333333335
+        },
+        "over_triage": {
+          "value": 0.23333333333333334,
+          "ci_low": 0.1,
+          "ci_high": 0.4
+        },
+        "high_acuity_sensitivity": {
+          "value": 0.6666666666666666,
+          "ci_low": 0.375,
+          "ci_high": 0.9166666666666666
+        },
+        "high_acuity_specificity": {
+          "value": 0.9444444444444444,
+          "ci_low": 0.8125,
+          "ci_high": 1.0
+        },
+        "recall_per_level": {
+          "1": 0.0,
+          "2": 0.6666666666666666,
+          "3": 1.0,
+          "4": 0.6666666666666666,
+          "5": 0.16666666666666666
+        },
+        "auc_high_acuity": {
+          "value": 0.7777777777777778,
+          "ci_low": 0.5666534391534391,
+          "ci_high": 0.9497667464114833
+        }
+      },
+      "in_scope": {
+        "n": 24,
+        "invalid_predictions": 0,
+        "accuracy": {
+          "value": 0.625,
+          "ci_low": 0.4230769230769231,
+          "ci_high": 0.8076923076923077
+        },
+        "within_one": {
+          "value": 0.8333333333333334,
+          "ci_low": 0.6663461538461538,
+          "ci_high": 0.96
+        },
+        "kappa_linear": {
+          "value": 0.5185185185185186,
+          "ci_low": 0.21590555450773297,
+          "ci_high": 0.7586743111697737
+        },
+        "kappa_quadratic": {
+          "value": 0.5625,
+          "ci_low": 0.1888398377603008,
+          "ci_high": 0.8240870619170876
+        },
+        "under_triage": {
+          "value": 0.08333333333333333,
+          "ci_low": 0.0,
+          "ci_high": 0.21739130434782608
+        },
+        "over_triage": {
+          "value": 0.2916666666666667,
+          "ci_low": 0.12,
+          "ci_high": 0.48
+        },
+        "high_acuity_sensitivity": {
+          "value": 0.6666666666666666,
+          "ci_low": 0.2222222222222222,
+          "ci_high": 1.0
+        },
+        "high_acuity_specificity": {
+          "value": 0.9444444444444444,
+          "ci_low": 0.8125,
+          "ci_high": 1.0
+        },
+        "recall_per_level": {
+          "1": NaN,
+          "2": 0.6666666666666666,
+          "3": 1.0,
+          "4": 0.6666666666666666,
+          "5": 0.16666666666666666
+        },
+        "auc_high_acuity": {
+          "value": 0.7407407407407407,
+          "ci_low": 0.4127673796791444,
+          "ci_high": 1.0
+        },
+        "esi2_sensitivity": {
+          "value": 0.6666666666666666,
+          "ci_low": 0.2222222222222222,
+          "ci_high": 1.0
+        },
+        "esi3to5_specificity": {
+          "value": 0.9444444444444444,
+          "ci_low": 0.8125,
+          "ci_high": 1.0
+        },
+        "esi5_recall": {
+          "value": 0.16666666666666666,
+          "ci_low": 0.0,
+          "ci_high": 0.5714285714285714
+        }
+      },
+      "out_of_scope": {
+        "n": 6,
+        "detected_strict": {
+          "value": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0
+        },
+        "detected_lenient": {
+          "value": 0.6666666666666666,
+          "ci_low": 0.25,
+          "ci_high": 1.0
+        }
+      }
+    },
+    "W60_rules": {
+      "all": {
+        "n": 30,
+        "invalid_predictions": 0,
+        "accuracy": {
+          "value": 0.5,
+          "ci_low": 0.3333333333333333,
+          "ci_high": 0.6666666666666666
+        },
+        "within_one": {
+          "value": 0.7666666666666667,
+          "ci_low": 0.6,
+          "ci_high": 0.9
+        },
+        "kappa_linear": {
+          "value": 0.38095238095238093,
+          "ci_low": 0.1504241484873432,
+          "ci_high": 0.6090000578921466
+        },
+        "kappa_quadratic": {
+          "value": 0.37777777777777777,
+          "ci_low": 0.07461304588170259,
+          "ci_high": 0.6792956625998811
+        },
+        "under_triage": {
+          "value": 0.3333333333333333,
+          "ci_low": 0.16666666666666666,
+          "ci_high": 0.5
+        },
+        "over_triage": {
+          "value": 0.16666666666666666,
+          "ci_low": 0.03333333333333333,
+          "ci_high": 0.3
+        },
+        "high_acuity_sensitivity": {
+          "value": 0.5,
+          "ci_low": 0.2222222222222222,
+          "ci_high": 0.8
+        },
+        "high_acuity_specificity": {
+          "value": 0.9444444444444444,
+          "ci_low": 0.8125,
+          "ci_high": 1.0
+        },
+        "recall_per_level": {
+          "1": 0.0,
+          "2": 0.6666666666666666,
+          "3": 0.6666666666666666,
+          "4": 0.8333333333333334,
+          "5": 0.3333333333333333
+        },
+        "auc_high_acuity": {
+          "value": 0.7152777777777778,
+          "ci_low": 0.5133887235449734,
+          "ci_high": 0.8914262594990149
+        }
+      },
+      "in_scope": {
+        "n": 24,
+        "invalid_predictions": 0,
+        "accuracy": {
+          "value": 0.625,
+          "ci_low": 0.4230769230769231,
+          "ci_high": 0.8095238095238095
+        },
+        "within_one": {
+          "value": 0.875,
+          "ci_low": 0.72,
+          "ci_high": 1.0
+        },
+        "kappa_linear": {
+          "value": 0.5636363636363637,
+          "ci_low": 0.2702702702702702,
+          "ci_high": 0.7870471712656079
+        },
+        "kappa_quadratic": {
+          "value": 0.64,
+          "ci_low": 0.2928835064062264,
+          "ci_high": 0.8610801642655885
+        },
+        "under_triage": {
+          "value": 0.16666666666666666,
+          "ci_low": 0.038461538461538464,
+          "ci_high": 0.3333333333333333
+        },
+        "over_triage": {
+          "value": 0.20833333333333334,
+          "ci_low": 0.047619047619047616,
+          "ci_high": 0.38461538461538464
+        },
+        "high_acuity_sensitivity": {
+          "value": 0.6666666666666666,
+          "ci_low": 0.2222222222222222,
+          "ci_high": 1.0
+        },
+        "high_acuity_specificity": {
+          "value": 0.9444444444444444,
+          "ci_low": 0.8125,
+          "ci_high": 1.0
+        },
+        "recall_per_level": {
+          "1": NaN,
+          "2": 0.6666666666666666,
+          "3": 0.6666666666666666,
+          "4": 0.8333333333333334,
+          "5": 0.3333333333333333
+        },
+        "auc_high_acuity": {
+          "value": 0.8472222222222222,
+          "ci_low": 0.6077731092436974,
+          "ci_high": 1.0
+        },
+        "esi2_sensitivity": {
+          "value": 0.6666666666666666,
+          "ci_low": 0.2222222222222222,
+          "ci_high": 1.0
+        },
+        "esi3to5_specificity": {
+          "value": 0.9444444444444444,
+          "ci_low": 0.8125,
+          "ci_high": 1.0
+        },
+        "esi5_recall": {
+          "value": 0.3333333333333333,
+          "ci_low": 0.0,
+          "ci_high": 0.75
+        }
+      },
+      "out_of_scope": {
+        "n": 6,
+        "detected_strict": {
+          "value": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0
+        },
+        "detected_lenient": {
+          "value": 0.3333333333333333,
+          "ci_low": 0.0,
+          "ci_high": 0.8
+        }
+      }
+    },
+    "W40": {
+      "all": {
+        "n": 30,
+        "invalid_predictions": 0,
+        "accuracy": {
+          "value": 0.5,
+          "ci_low": 0.3333333333333333,
+          "ci_high": 0.6666666666666666
+        },
+        "within_one": {
+          "value": 0.8,
+          "ci_low": 0.6333333333333333,
+          "ci_high": 0.9333333333333333
+        },
+        "kappa_linear": {
+          "value": 0.4607843137254901,
+          "ci_low": 0.24730373105324524,
+          "ci_high": 0.6536510837154453
+        },
+        "kappa_quadratic": {
+          "value": 0.5476190476190477,
+          "ci_low": 0.2749536571844357,
+          "ci_high": 0.7700074380034498
+        },
+        "under_triage": {
+          "value": 0.26666666666666666,
+          "ci_low": 0.13333333333333333,
+          "ci_high": 0.43333333333333335
+        },
+        "over_triage": {
+          "value": 0.23333333333333334,
+          "ci_low": 0.1,
+          "ci_high": 0.4
+        },
+        "high_acuity_sensitivity": {
+          "value": 0.6666666666666666,
+          "ci_low": 0.375,
+          "ci_high": 0.9166666666666666
+        },
+        "high_acuity_specificity": {
+          "value": 0.9444444444444444,
+          "ci_low": 0.8125,
+          "ci_high": 1.0
+        },
+        "recall_per_level": {
+          "1": 0.0,
+          "2": 0.6666666666666666,
+          "3": 1.0,
+          "4": 0.6666666666666666,
+          "5": 0.16666666666666666
+        },
+        "auc_high_acuity": {
+          "value": 0.7777777777777778,
+          "ci_low": 0.5666534391534391,
+          "ci_high": 0.9497667464114833
+        }
+      },
+      "in_scope": {
+        "n": 24,
+        "invalid_predictions": 0,
+        "accuracy": {
+          "value": 0.625,
+          "ci_low": 0.4230769230769231,
+          "ci_high": 0.8076923076923077
+        },
+        "within_one": {
+          "value": 0.8333333333333334,
+          "ci_low": 0.6663461538461538,
+          "ci_high": 0.96
+        },
+        "kappa_linear": {
+          "value": 0.5185185185185186,
+          "ci_low": 0.21590555450773297,
+          "ci_high": 0.7586743111697737
+        },
+        "kappa_quadratic": {
+          "value": 0.5625,
+          "ci_low": 0.1888398377603008,
+          "ci_high": 0.8240870619170876
+        },
+        "under_triage": {
+          "value": 0.08333333333333333,
+          "ci_low": 0.0,
+          "ci_high": 0.21739130434782608
+        },
+        "over_triage": {
+          "value": 0.2916666666666667,
+          "ci_low": 0.12,
+          "ci_high": 0.48
+        },
+        "high_acuity_sensitivity": {
+          "value": 0.6666666666666666,
+          "ci_low": 0.2222222222222222,
+          "ci_high": 1.0
+        },
+        "high_acuity_specificity": {
+          "value": 0.9444444444444444,
+          "ci_low": 0.8125,
+          "ci_high": 1.0
+        },
+        "recall_per_level": {
+          "1": NaN,
+          "2": 0.6666666666666666,
+          "3": 1.0,
+          "4": 0.6666666666666666,
+          "5": 0.16666666666666666
+        },
+        "auc_high_acuity": {
+          "value": 0.7407407407407407,
+          "ci_low": 0.4127673796791444,
+          "ci_high": 1.0
+        },
+        "esi2_sensitivity": {
+          "value": 0.6666666666666666,
+          "ci_low": 0.2222222222222222,
+          "ci_high": 1.0
+        },
+        "esi3to5_specificity": {
+          "value": 0.9444444444444444,
+          "ci_low": 0.8125,
+          "ci_high": 1.0
+        },
+        "esi5_recall": {
+          "value": 0.16666666666666666,
+          "ci_low": 0.0,
+          "ci_high": 0.5714285714285714
+        }
+      },
+      "out_of_scope": {
+        "n": 6,
+        "detected_strict": {
+          "value": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0
+        },
+        "detected_lenient": {
+          "value": 0.6666666666666666,
+          "ci_low": 0.25,
+          "ci_high": 1.0
+        }
+      }
+    },
+    "W40_rules": {
+      "all": {
+        "n": 30,
+        "invalid_predictions": 0,
+        "accuracy": {
+          "value": 0.4,
+          "ci_low": 0.23333333333333334,
+          "ci_high": 0.5666666666666667
+        },
+        "within_one": {
+          "value": 0.6666666666666666,
+          "ci_low": 0.4666666666666667,
+          "ci_high": 0.8333333333333334
+        },
+        "kappa_linear": {
+          "value": 0.22330097087378642,
+          "ci_low": 0.027982326951399236,
+          "ci_high": 0.4277128280147736
+        },
+        "kappa_quadratic": {
+          "value": 0.2093023255813954,
+          "ci_low": -0.047648527728644315,
+          "ci_high": 0.4638515318845742
+        },
+        "under_triage": {
+          "value": 0.43333333333333335,
+          "ci_low": 0.26666666666666666,
+          "ci_high": 0.6
+        },
+        "over_triage": {
+          "value": 0.16666666666666666,
+          "ci_low": 0.03333333333333333,
+          "ci_high": 0.3
+        },
+        "high_acuity_sensitivity": {
+          "value": 0.08333333333333333,
+          "ci_low": 0.0,
+          "ci_high": 0.2727272727272727
+        },
+        "high_acuity_specificity": {
+          "value": 0.9444444444444444,
+          "ci_low": 0.8125,
+          "ci_high": 1.0
+        },
+        "recall_per_level": {
+          "1": 0.0,
+          "2": 0.16666666666666666,
+          "3": 0.6666666666666666,
+          "4": 0.8333333333333334,
+          "5": 0.3333333333333333
+        },
+        "auc_high_acuity": {
+          "value": 0.6111111111111112,
+          "ci_low": 0.42608563311688313,
+          "ci_high": 0.7933333333333333
+        }
+      },
+      "in_scope": {
+        "n": 24,
+        "invalid_predictions": 0,
+        "accuracy": {
+          "value": 0.5,
+          "ci_low": 0.2916666666666667,
+          "ci_high": 0.6923913043478256
+        },
+        "within_one": {
+          "value": 0.8333333333333334,
+          "ci_low": 0.6663461538461538,
+          "ci_high": 0.96
+        },
+        "kappa_linear": {
+          "value": 0.3846153846153846,
+          "ci_low": 0.10209537439679998,
+          "ci_high": 0.6202092021128717
+        },
+        "kappa_quadratic": {
+          "value": 0.4545454545454546,
+          "ci_low": 0.07303617859754606,
+          "ci_high": 0.7187346087955131
+        },
+        "under_triage": {
+          "value": 0.2916666666666667,
+          "ci_low": 0.125,
+          "ci_high": 0.5
+        },
+        "over_triage": {
+          "value": 0.20833333333333334,
+          "ci_low": 0.047619047619047616,
+          "ci_high": 0.38461538461538464
+        },
+        "high_acuity_sensitivity": {
+          "value": 0.16666666666666666,
+          "ci_low": 0.0,
+          "ci_high": 0.5
+        },
+        "high_acuity_specificity": {
+          "value": 0.9444444444444444,
+          "ci_low": 0.8125,
+          "ci_high": 1.0
+        },
+        "recall_per_level": {
+          "1": NaN,
+          "2": 0.16666666666666666,
+          "3": 0.6666666666666666,
+          "4": 0.8333333333333334,
+          "5": 0.3333333333333333
+        },
+        "auc_high_acuity": {
+          "value": 0.6944444444444444,
+          "ci_low": 0.4405555555555556,
+          "ci_high": 0.9105263157894737
+        },
+        "esi2_sensitivity": {
+          "value": 0.16666666666666666,
+          "ci_low": 0.0,
+          "ci_high": 0.5
+        },
+        "esi3to5_specificity": {
+          "value": 0.9444444444444444,
+          "ci_low": 0.8125,
+          "ci_high": 1.0
+        },
+        "esi5_recall": {
+          "value": 0.3333333333333333,
+          "ci_low": 0.0,
+          "ci_high": 0.75
+        }
+      },
+      "out_of_scope": {
+        "n": 6,
+        "detected_strict": {
+          "value": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0
+        },
+        "detected_lenient": {
+          "value": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0
+        }
+      }
+    }
+  },
+  "weights_changed_cases": [
+    {
+      "id": "S01",
+      "reference": 1,
+      "final_IND": 2,
+      "final_W50": 2,
+      "final_W60": 2,
+      "final_W40": 2,
+      "rules_IND": 2,
+      "rules_W50": 2,
+      "rules_W60": 2,
+      "rules_W40": 3,
+      "visual_W50": "0.5 HIGH",
+      "visual_W60": "0.6 HIGH",
+      "visual_W40": "0.4 MODERATE",
+      "camera": "chest / UNKNOWN"
+    },
+    {
+      "id": "S04",
+      "reference": 1,
+      "final_IND": 2,
+      "final_W50": 2,
+      "final_W60": 2,
+      "final_W40": 2,
+      "rules_IND": 2,
+      "rules_W50": 2,
+      "rules_W60": 2,
+      "rules_W40": 3,
+      "visual_W50": "0.5 HIGH",
+      "visual_W60": "0.6 HIGH",
+      "visual_W40": "0.4 MODERATE",
+      "camera": "chest / UNKNOWN"
+    },
+    {
+      "id": "S07",
+      "reference": 2,
+      "final_IND": 2,
+      "final_W50": 2,
+      "final_W60": 2,
+      "final_W40": 2,
+      "rules_IND": 2,
+      "rules_W50": 2,
+      "rules_W60": 2,
+      "rules_W40": 3,
+      "visual_W50": "0.5 HIGH",
+      "visual_W60": "0.6 HIGH",
+      "visual_W40": "0.4 MODERATE",
+      "camera": "chest / UNKNOWN"
+    },
+    {
+      "id": "S08",
+      "reference": 2,
+      "final_IND": 2,
+      "final_W50": 2,
+      "final_W60": 2,
+      "final_W40": 2,
+      "rules_IND": 2,
+      "rules_W50": 2,
+      "rules_W60": 2,
+      "rules_W40": 3,
+      "visual_W50": "0.5 HIGH",
+      "visual_W60": "0.6 HIGH",
+      "visual_W40": "0.4 MODERATE",
+      "camera": "chest / UNKNOWN"
+    },
+    {
+      "id": "S10",
+      "reference": 2,
+      "final_IND": 4,
+      "final_W50": 4,
+      "final_W60": 4,
+      "final_W40": 4,
+      "rules_IND": 3,
+      "rules_W50": 3,
+      "rules_W60": 3,
+      "rules_W40": 4,
+      "visual_W50": "0.3 MODERATE",
+      "visual_W60": "0.36 MODERATE",
+      "visual_W40": "0.24 LOW",
+      "camera": "head / UNKNOWN"
+    },
+    {
+      "id": "S11",
+      "reference": 2,
+      "final_IND": 2,
+      "final_W50": 2,
+      "final_W60": 2,
+      "final_W40": 2,
+      "rules_IND": 3,
+      "rules_W50": 3,
+      "rules_W60": 2,
+      "rules_W40": 3,
+      "visual_W50": "0.497 MODERATE",
+      "visual_W60": "0.538 HIGH",
+      "visual_W40": "0.457 MODERATE",
+      "camera": "abdomen / NORMAL"
+    }
+  ],
+  "modalities": {
+    "T": {
+      "all": {
+        "n": 30,
+        "invalid_predictions": 0,
+        "accuracy": {
+          "value": 0.3333333333333333,
+          "ci_low": 0.16666666666666666,
+          "ci_high": 0.5
+        },
+        "within_one": {
+          "value": 0.8,
+          "ci_low": 0.6333333333333333,
+          "ci_high": 0.9333333333333333
+        },
+        "kappa_linear": {
+          "value": 0.3349753694581281,
+          "ci_low": 0.15755073082059645,
+          "ci_high": 0.5096955211936005
+        },
+        "kappa_quadratic": {
+          "value": 0.4819277108433735,
+          "ci_low": 0.23340838866609698,
+          "ci_high": 0.6881502470212147
+        },
+        "under_triage": {
+          "value": 0.4666666666666667,
+          "ci_low": 0.3,
+          "ci_high": 0.6333333333333333
+        },
+        "over_triage": {
+          "value": 0.2,
+          "ci_low": 0.06666666666666667,
+          "ci_high": 0.3333333333333333
+        },
+        "high_acuity_sensitivity": {
+          "value": 0.3333333333333333,
+          "ci_low": 0.07692307692307693,
+          "ci_high": 0.6153846153846154
+        },
+        "high_acuity_specificity": {
+          "value": 1.0,
+          "ci_low": 1.0,
+          "ci_high": 1.0
+        },
+        "recall_per_level": {
+          "1": 0.0,
+          "2": 0.16666666666666666,
+          "3": 0.5,
+          "4": 0.8333333333333334,
+          "5": 0.16666666666666666
+        },
+        "auc_high_acuity": {
+          "value": 0.7893518518518519,
+          "ci_low": 0.6177179487179487,
+          "ci_high": 0.9366727941176469
+        }
+      },
+      "in_scope": {
+        "n": 24,
+        "invalid_predictions": 0,
+        "accuracy": {
+          "value": 0.4166666666666667,
+          "ci_low": 0.22727272727272727,
+          "ci_high": 0.6088628762541797
+        },
+        "within_one": {
+          "value": 0.875,
+          "ci_low": 0.7272727272727273,
+          "ci_high": 1.0
+        },
+        "kappa_linear": {
+          "value": 0.31999999999999995,
+          "ci_low": 0.07999203187250992,
+          "ci_high": 0.5527711246149157
+        },
+        "kappa_quadratic": {
+          "value": 0.42500000000000004,
+          "ci_low": 0.09089952153110051,
+          "ci_high": 0.6893712768712769
+        },
+        "under_triage": {
+          "value": 0.3333333333333333,
+          "ci_low": 0.14285714285714285,
+          "ci_high": 0.5217391304347826
+        },
+        "over_triage": {
+          "value": 0.25,
+          "ci_low": 0.08695652173913043,
+          "ci_high": 0.42857142857142855
+        },
+        "high_acuity_sensitivity": {
+          "value": 0.16666666666666666,
+          "ci_low": 0.0,
+          "ci_high": 0.5714285714285714
+        },
+        "high_acuity_specificity": {
+          "value": 1.0,
+          "ci_low": 1.0,
+          "ci_high": 1.0
+        },
+        "recall_per_level": {
+          "1": NaN,
+          "2": 0.16666666666666666,
+          "3": 0.5,
+          "4": 0.8333333333333334,
+          "5": 0.16666666666666666
+        },
+        "auc_high_acuity": {
+          "value": 0.7268518518518519,
+          "ci_low": 0.4703548085901027,
+          "ci_high": 0.945551948051948
+        },
+        "esi2_sensitivity": {
+          "value": 0.16666666666666666,
+          "ci_low": 0.0,
+          "ci_high": 0.5714285714285714
+        },
+        "esi3to5_specificity": {
+          "value": 1.0,
+          "ci_low": 1.0,
+          "ci_high": 1.0
+        },
+        "esi5_recall": {
+          "value": 0.16666666666666666,
+          "ci_low": 0.0,
+          "ci_high": 0.5714285714285714
+        }
+      },
+      "out_of_scope": {
+        "n": 6,
+        "detected_strict": {
+          "value": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0
+        },
+        "detected_lenient": {
+          "value": 0.5,
+          "ci_low": 0.0,
+          "ci_high": 1.0
+        }
+      }
+    },
+    "T_llm": {
+      "all": {
+        "n": 30,
+        "invalid_predictions": 0,
+        "accuracy": {
+          "value": 0.3333333333333333,
+          "ci_low": 0.16666666666666666,
+          "ci_high": 0.5
+        },
+        "within_one": {
+          "value": 0.8333333333333334,
+          "ci_low": 0.7,
+          "ci_high": 0.9666666666666667
+        },
+        "kappa_linear": {
+          "value": 0.3627450980392156,
+          "ci_low": 0.19402438135057612,
+          "ci_high": 0.5247157697428348
+        },
+        "kappa_quadratic": {
+          "value": 0.5238095238095238,
+          "ci_low": 0.29549727107337787,
+          "ci_high": 0.7161822097116773
+        },
+        "under_triage": {
+          "value": 0.4666666666666667,
+          "ci_low": 0.3,
+          "ci_high": 0.6333333333333333
+        },
+        "over_triage": {
+          "value": 0.2,
+          "ci_low": 0.06666666666666667,
+          "ci_high": 0.3333333333333333
+        },
+        "high_acuity_sensitivity": {
+          "value": 0.3333333333333333,
+          "ci_low": 0.07692307692307693,
+          "ci_high": 0.6153846153846154
+        },
+        "high_acuity_specificity": {
+          "value": 1.0,
+          "ci_low": 1.0,
+          "ci_high": 1.0
+        },
+        "recall_per_level": {
+          "1": 0.0,
+          "2": 0.16666666666666666,
+          "3": 0.5,
+          "4": 0.8333333333333334,
+          "5": 0.16666666666666666
+        },
+        "auc_high_acuity": {
+          "value": 0.8078703703703703,
+          "ci_low": 0.640609375,
+          "ci_high": 0.9520038277511961
+        }
+      },
+      "in_scope": {
+        "n": 24,
+        "invalid_predictions": 0,
+        "accuracy": {
+          "value": 0.4166666666666667,
+          "ci_low": 0.22727272727272727,
+          "ci_high": 0.6088628762541797
+        },
+        "within_one": {
+          "value": 0.9166666666666666,
+          "ci_low": 0.7916666666666666,
+          "ci_high": 1.0
+        },
+        "kappa_linear": {
+          "value": 0.36,
+          "ci_low": 0.13301988020739464,
+          "ci_high": 0.5796622722559619
+        },
+        "kappa_quadratic": {
+          "value": 0.5,
+          "ci_low": 0.2369610213753748,
+          "ci_high": 0.7324388379204892
+        },
+        "under_triage": {
+          "value": 0.3333333333333333,
+          "ci_low": 0.14285714285714285,
+          "ci_high": 0.5217391304347826
+        },
+        "over_triage": {
+          "value": 0.25,
+          "ci_low": 0.08695652173913043,
+          "ci_high": 0.42857142857142855
+        },
+        "high_acuity_sensitivity": {
+          "value": 0.16666666666666666,
+          "ci_low": 0.0,
+          "ci_high": 0.5714285714285714
+        },
+        "high_acuity_specificity": {
+          "value": 1.0,
+          "ci_low": 1.0,
+          "ci_high": 1.0
+        },
+        "recall_per_level": {
+          "1": NaN,
+          "2": 0.16666666666666666,
+          "3": 0.5,
+          "4": 0.8333333333333334,
+          "5": 0.16666666666666666
+        },
+        "auc_high_acuity": {
+          "value": 0.75,
+          "ci_low": 0.5078781512605042,
+          "ci_high": 0.960031746031746
+        },
+        "esi2_sensitivity": {
+          "value": 0.16666666666666666,
+          "ci_low": 0.0,
+          "ci_high": 0.5714285714285714
+        },
+        "esi3to5_specificity": {
+          "value": 1.0,
+          "ci_low": 1.0,
+          "ci_high": 1.0
+        },
+        "esi5_recall": {
+          "value": 0.16666666666666666,
+          "ci_low": 0.0,
+          "ci_high": 0.5714285714285714
+        }
+      },
+      "out_of_scope": {
+        "n": 6,
+        "detected_strict": {
+          "value": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0
+        },
+        "detected_lenient": {
+          "value": 0.5,
+          "ci_low": 0.0,
+          "ci_high": 1.0
+        }
+      }
+    },
+    "TP": {
+      "all": {
+        "n": 30,
+        "invalid_predictions": 0,
+        "accuracy": {
+          "value": 0.5,
+          "ci_low": 0.3333333333333333,
+          "ci_high": 0.6666666666666666
+        },
+        "within_one": {
+          "value": 0.8666666666666667,
+          "ci_low": 0.7333333333333333,
+          "ci_high": 0.9666666666666667
+        },
+        "kappa_linear": {
+          "value": 0.504950495049505,
+          "ci_low": 0.3091930291153416,
+          "ci_high": 0.6797436965245702
+        },
+        "kappa_quadratic": {
+          "value": 0.6097560975609756,
+          "ci_low": 0.34898891966758994,
+          "ci_high": 0.805697989609216
+        },
+        "under_triage": {
+          "value": 0.26666666666666666,
+          "ci_low": 0.13333333333333333,
+          "ci_high": 0.43333333333333335
+        },
+        "over_triage": {
+          "value": 0.23333333333333334,
+          "ci_low": 0.1,
+          "ci_high": 0.4
+        },
+        "high_acuity_sensitivity": {
+          "value": 0.6666666666666666,
+          "ci_low": 0.375,
+          "ci_high": 0.9166666666666666
+        },
+        "high_acuity_specificity": {
+          "value": 0.9444444444444444,
+          "ci_low": 0.8125,
+          "ci_high": 1.0
+        },
+        "recall_per_level": {
+          "1": 0.0,
+          "2": 0.6666666666666666,
+          "3": 1.0,
+          "4": 0.6666666666666666,
+          "5": 0.16666666666666666
+        },
+        "auc_high_acuity": {
+          "value": 0.8518518518518519,
+          "ci_low": 0.6990950226244343,
+          "ci_high": 0.9722379336349923
+        }
+      },
+      "in_scope": {
+        "n": 24,
+        "invalid_predictions": 0,
+        "accuracy": {
+          "value": 0.625,
+          "ci_low": 0.4230769230769231,
+          "ci_high": 0.8076923076923077
+        },
+        "within_one": {
+          "value": 0.9166666666666666,
+          "ci_low": 0.782608695652174,
+          "ci_high": 1.0
+        },
+        "kappa_linear": {
+          "value": 0.5925925925925926,
+          "ci_low": 0.3550436061784175,
+          "ci_high": 0.7954658355984626
+        },
+        "kappa_quadratic": {
+          "value": 0.6875,
+          "ci_low": 0.4117509620670698,
+          "ci_high": 0.8722630780965659
+        },
+        "under_triage": {
+          "value": 0.08333333333333333,
+          "ci_low": 0.0,
+          "ci_high": 0.21739130434782608
+        },
+        "over_triage": {
+          "value": 0.2916666666666667,
+          "ci_low": 0.12,
+          "ci_high": 0.48
+        },
+        "high_acuity_sensitivity": {
+          "value": 0.6666666666666666,
+          "ci_low": 0.2222222222222222,
+          "ci_high": 1.0
+        },
+        "high_acuity_specificity": {
+          "value": 0.9444444444444444,
+          "ci_low": 0.8125,
+          "ci_high": 1.0
+        },
+        "recall_per_level": {
+          "1": NaN,
+          "2": 0.6666666666666666,
+          "3": 1.0,
+          "4": 0.6666666666666666,
+          "5": 0.16666666666666666
+        },
+        "auc_high_acuity": {
+          "value": 0.8888888888888888,
+          "ci_low": 0.7360294117647059,
+          "ci_high": 1.0
+        },
+        "esi2_sensitivity": {
+          "value": 0.6666666666666666,
+          "ci_low": 0.2222222222222222,
+          "ci_high": 1.0
+        },
+        "esi3to5_specificity": {
+          "value": 0.9444444444444444,
+          "ci_low": 0.8125,
+          "ci_high": 1.0
+        },
+        "esi5_recall": {
+          "value": 0.16666666666666666,
+          "ci_low": 0.0,
+          "ci_high": 0.5714285714285714
+        }
+      },
+      "out_of_scope": {
+        "n": 6,
+        "detected_strict": {
+          "value": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0
+        },
+        "detected_lenient": {
+          "value": 0.6666666666666666,
+          "ci_low": 0.25,
+          "ci_high": 1.0
+        }
+      }
+    },
+    "TP_llm": {
+      "all": {
+        "n": 30,
+        "invalid_predictions": 0,
+        "accuracy": {
+          "value": 0.4666666666666667,
+          "ci_low": 0.3,
+          "ci_high": 0.6666666666666666
+        },
+        "within_one": {
+          "value": 0.9,
+          "ci_low": 0.8,
+          "ci_high": 1.0
+        },
+        "kappa_linear": {
+          "value": 0.5,
+          "ci_low": 0.32558139534883723,
+          "ci_high": 0.6634794776119403
+        },
+        "kappa_quadratic": {
+          "value": 0.625,
+          "ci_low": 0.3773470207031026,
+          "ci_high": 0.8087059491230957
+        },
+        "under_triage": {
+          "value": 0.3,
+          "ci_low": 0.13333333333333333,
+          "ci_high": 0.4666666666666667
+        },
+        "over_triage": {
+          "value": 0.23333333333333334,
+          "ci_low": 0.1,
+          "ci_high": 0.4
+        },
+        "high_acuity_sensitivity": {
+          "value": 0.5833333333333334,
+          "ci_low": 0.3,
+          "ci_high": 0.8666666666666667
+        },
+        "high_acuity_specificity": {
+          "value": 1.0,
+          "ci_low": 1.0,
+          "ci_high": 1.0
+        },
+        "recall_per_level": {
+          "1": 0.0,
+          "2": 0.5,
+          "3": 1.0,
+          "4": 0.6666666666666666,
+          "5": 0.16666666666666666
+        },
+        "auc_high_acuity": {
+          "value": 0.8564814814814815,
+          "ci_low": 0.7120317352484472,
+          "ci_high": 0.9709092807777018
+        }
+      },
+      "in_scope": {
+        "n": 24,
+        "invalid_predictions": 0,
+        "accuracy": {
+          "value": 0.5833333333333334,
+          "ci_low": 0.38461538461538464,
+          "ci_high": 0.7692307692307693
+        },
+        "within_one": {
+          "value": 0.9583333333333334,
+          "ci_low": 0.8636363636363636,
+          "ci_high": 1.0
+        },
+        "kappa_linear": {
+          "value": 0.5769230769230769,
+          "ci_low": 0.3559296038265572,
+          "ci_high": 0.7610642696211646
+        },
+        "kappa_quadratic": {
+          "value": 0.7045454545454546,
+          "ci_low": 0.4705256570713392,
+          "ci_high": 0.8606511698372791
+        },
+        "under_triage": {
+          "value": 0.125,
+          "ci_low": 0.0,
+          "ci_high": 0.2692307692307692
+        },
+        "over_triage": {
+          "value": 0.2916666666666667,
+          "ci_low": 0.12,
+          "ci_high": 0.48
+        },
+        "high_acuity_sensitivity": {
+          "value": 0.5,
+          "ci_low": 0.0,
+          "ci_high": 1.0
+        },
+        "high_acuity_specificity": {
+          "value": 1.0,
+          "ci_low": 1.0,
+          "ci_high": 1.0
+        },
+        "recall_per_level": {
+          "1": NaN,
+          "2": 0.5,
+          "3": 1.0,
+          "4": 0.6666666666666666,
+          "5": 0.16666666666666666
+        },
+        "auc_high_acuity": {
+          "value": 0.875,
+          "ci_low": 0.7333333333333333,
+          "ci_high": 1.0
+        },
+        "esi2_sensitivity": {
+          "value": 0.5,
+          "ci_low": 0.0,
+          "ci_high": 1.0
+        },
+        "esi3to5_specificity": {
+          "value": 1.0,
+          "ci_low": 1.0,
+          "ci_high": 1.0
+        },
+        "esi5_recall": {
+          "value": 0.16666666666666666,
+          "ci_low": 0.0,
+          "ci_high": 0.5714285714285714
+        }
+      },
+      "out_of_scope": {
+        "n": 6,
+        "detected_strict": {
+          "value": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0
+        },
+        "detected_lenient": {
+          "value": 0.6666666666666666,
+          "ci_low": 0.25,
+          "ci_high": 1.0
+        }
+      }
+    },
+    "TS": {
+      "all": {
+        "n": 30,
+        "invalid_predictions": 0,
+        "accuracy": {
+          "value": 0.36666666666666664,
+          "ci_low": 0.2,
+          "ci_high": 0.5333333333333333
+        },
+        "within_one": {
+          "value": 0.7333333333333333,
+          "ci_low": 0.5666666666666667,
+          "ci_high": 0.8666666666666667
+        },
+        "kappa_linear": {
+          "value": 0.3137254901960784,
+          "ci_low": 0.12866554388745796,
+          "ci_high": 0.4949824739936678
+        },
+        "kappa_quadratic": {
+          "value": 0.4285714285714286,
+          "ci_low": 0.177203414777745,
+          "ci_high": 0.6550813624418838
+        },
+        "under_triage": {
+          "value": 0.43333333333333335,
+          "ci_low": 0.26666666666666666,
+          "ci_high": 0.6
+        },
+        "over_triage": {
+          "value": 0.2,
+          "ci_low": 0.06666666666666667,
+          "ci_high": 0.3333333333333333
+        },
+        "high_acuity_sensitivity": {
+          "value": 0.3333333333333333,
+          "ci_low": 0.07692307692307693,
+          "ci_high": 0.6153846153846154
+        },
+        "high_acuity_specificity": {
+          "value": 1.0,
+          "ci_low": 1.0,
+          "ci_high": 1.0
+        },
+        "recall_per_level": {
+          "1": 0.0,
+          "2": 0.16666666666666666,
+          "3": 0.6666666666666666,
+          "4": 0.8333333333333334,
+          "5": 0.16666666666666666
+        },
+        "auc_high_acuity": {
+          "value": 0.6921296296296297,
+          "ci_low": 0.490375,
+          "ci_high": 0.8725200791855203
+        }
+      },
+      "in_scope": {
+        "n": 24,
+        "invalid_predictions": 0,
+        "accuracy": {
+          "value": 0.4583333333333333,
+          "ci_low": 0.2692307692307692,
+          "ci_high": 0.6554597701149409
+        },
+        "within_one": {
+          "value": 0.7916666666666666,
+          "ci_low": 0.6206486042692939,
+          "ci_high": 0.9500595238095234
+        },
+        "kappa_linear": {
+          "value": 0.28,
+          "ci_low": 0.02813844142700511,
+          "ci_high": 0.527153933196429
+        },
+        "kappa_quadratic": {
+          "value": 0.30000000000000004,
+          "ci_low": -0.05861782508022915,
+          "ci_high": 0.624170765391418
+        },
+        "under_triage": {
+          "value": 0.2916666666666667,
+          "ci_low": 0.12,
+          "ci_high": 0.47619047619047616
+        },
+        "over_triage": {
+          "value": 0.25,
+          "ci_low": 0.08695652173913043,
+          "ci_high": 0.42857142857142855
+        },
+        "high_acuity_sensitivity": {
+          "value": 0.16666666666666666,
+          "ci_low": 0.0,
+          "ci_high": 0.5714285714285714
+        },
+        "high_acuity_specificity": {
+          "value": 1.0,
+          "ci_low": 1.0,
+          "ci_high": 1.0
+        },
+        "recall_per_level": {
+          "1": NaN,
+          "2": 0.16666666666666666,
+          "3": 0.6666666666666666,
+          "4": 0.8333333333333334,
+          "5": 0.16666666666666666
+        },
+        "auc_high_acuity": {
+          "value": 0.5462962962962963,
+          "ci_low": 0.2907120743034056,
+          "ci_high": 0.8223684210526315
+        },
+        "esi2_sensitivity": {
+          "value": 0.16666666666666666,
+          "ci_low": 0.0,
+          "ci_high": 0.5714285714285714
+        },
+        "esi3to5_specificity": {
+          "value": 1.0,
+          "ci_low": 1.0,
+          "ci_high": 1.0
+        },
+        "esi5_recall": {
+          "value": 0.16666666666666666,
+          "ci_low": 0.0,
+          "ci_high": 0.5714285714285714
+        }
+      },
+      "out_of_scope": {
+        "n": 6,
+        "detected_strict": {
+          "value": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0
+        },
+        "detected_lenient": {
+          "value": 0.5,
+          "ci_low": 0.0,
+          "ci_high": 1.0
+        }
+      }
+    },
+    "TS_llm": {
+      "all": {
+        "n": 30,
+        "invalid_predictions": 0,
+        "accuracy": {
+          "value": 0.36666666666666664,
+          "ci_low": 0.2,
+          "ci_high": 0.5333333333333333
+        },
+        "within_one": {
+          "value": 0.7,
+          "ci_low": 0.5333333333333333,
+          "ci_high": 0.8666666666666667
+        },
+        "kappa_linear": {
+          "value": 0.29268292682926833,
+          "ci_low": 0.11256329916263527,
+          "ci_high": 0.4788550705026593
+        },
+        "kappa_quadratic": {
+          "value": 0.4,
+          "ci_low": 0.14632438341190138,
+          "ci_high": 0.6231969309462915
+        },
+        "under_triage": {
+          "value": 0.43333333333333335,
+          "ci_low": 0.26666666666666666,
+          "ci_high": 0.6
+        },
+        "over_triage": {
+          "value": 0.2,
+          "ci_low": 0.06666666666666667,
+          "ci_high": 0.3333333333333333
+        },
+        "high_acuity_sensitivity": {
+          "value": 0.3333333333333333,
+          "ci_low": 0.07692307692307693,
+          "ci_high": 0.6153846153846154
+        },
+        "high_acuity_specificity": {
+          "value": 1.0,
+          "ci_low": 1.0,
+          "ci_high": 1.0
+        },
+        "recall_per_level": {
+          "1": 0.0,
+          "2": 0.16666666666666666,
+          "3": 0.6666666666666666,
+          "4": 0.8333333333333334,
+          "5": 0.16666666666666666
+        },
+        "auc_high_acuity": {
+          "value": 0.6527777777777778,
+          "ci_low": 0.45970155423280423,
+          "ci_high": 0.8426925505050499
+        }
+      },
+      "in_scope": {
+        "n": 24,
+        "invalid_predictions": 0,
+        "accuracy": {
+          "value": 0.4583333333333333,
+          "ci_low": 0.2692307692307692,
+          "ci_high": 0.6554597701149409
+        },
+        "within_one": {
+          "value": 0.75,
+          "ci_low": 0.5652173913043478,
+          "ci_high": 0.9130434782608695
+        },
+        "kappa_linear": {
+          "value": 0.24,
+          "ci_low": -0.02049872998745129,
+          "ci_high": 0.4986859585282735
+        },
+        "kappa_quadratic": {
+          "value": 0.22499999999999998,
+          "ci_low": -0.12443256954629606,
+          "ci_high": 0.5522653231305401
+        },
+        "under_triage": {
+          "value": 0.2916666666666667,
+          "ci_low": 0.12,
+          "ci_high": 0.47619047619047616
+        },
+        "over_triage": {
+          "value": 0.25,
+          "ci_low": 0.08695652173913043,
+          "ci_high": 0.42857142857142855
+        },
+        "high_acuity_sensitivity": {
+          "value": 0.16666666666666666,
+          "ci_low": 0.0,
+          "ci_high": 0.5714285714285714
+        },
+        "high_acuity_specificity": {
+          "value": 1.0,
+          "ci_low": 1.0,
+          "ci_high": 1.0
+        },
+        "recall_per_level": {
+          "1": NaN,
+          "2": 0.16666666666666666,
+          "3": 0.6666666666666666,
+          "4": 0.8333333333333334,
+          "5": 0.16666666666666666
+        },
+        "auc_high_acuity": {
+          "value": 0.4675925925925926,
+          "ci_low": 0.25,
+          "ci_high": 0.7336111111111108
+        },
+        "esi2_sensitivity": {
+          "value": 0.16666666666666666,
+          "ci_low": 0.0,
+          "ci_high": 0.5714285714285714
+        },
+        "esi3to5_specificity": {
+          "value": 1.0,
+          "ci_low": 1.0,
+          "ci_high": 1.0
+        },
+        "esi5_recall": {
+          "value": 0.16666666666666666,
+          "ci_low": 0.0,
+          "ci_high": 0.5714285714285714
+        }
+      },
+      "out_of_scope": {
+        "n": 6,
+        "detected_strict": {
+          "value": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0
+        },
+        "detected_lenient": {
+          "value": 0.5,
+          "ci_low": 0.0,
+          "ci_high": 1.0
+        }
+      }
+    },
+    "W50": {
+      "all": {
+        "n": 30,
+        "invalid_predictions": 0,
+        "accuracy": {
+          "value": 0.5,
+          "ci_low": 0.3333333333333333,
+          "ci_high": 0.6666666666666666
+        },
+        "within_one": {
+          "value": 0.8,
+          "ci_low": 0.6333333333333333,
+          "ci_high": 0.9333333333333333
+        },
+        "kappa_linear": {
+          "value": 0.4607843137254901,
+          "ci_low": 0.24730373105324524,
+          "ci_high": 0.6536510837154453
+        },
+        "kappa_quadratic": {
+          "value": 0.5476190476190477,
+          "ci_low": 0.2749536571844357,
+          "ci_high": 0.7700074380034498
+        },
+        "under_triage": {
+          "value": 0.26666666666666666,
+          "ci_low": 0.13333333333333333,
+          "ci_high": 0.43333333333333335
+        },
+        "over_triage": {
+          "value": 0.23333333333333334,
+          "ci_low": 0.1,
+          "ci_high": 0.4
+        },
+        "high_acuity_sensitivity": {
+          "value": 0.6666666666666666,
+          "ci_low": 0.375,
+          "ci_high": 0.9166666666666666
+        },
+        "high_acuity_specificity": {
+          "value": 0.9444444444444444,
+          "ci_low": 0.8125,
+          "ci_high": 1.0
+        },
+        "recall_per_level": {
+          "1": 0.0,
+          "2": 0.6666666666666666,
+          "3": 1.0,
+          "4": 0.6666666666666666,
+          "5": 0.16666666666666666
+        },
+        "auc_high_acuity": {
+          "value": 0.7777777777777778,
+          "ci_low": 0.5666534391534391,
+          "ci_high": 0.9497667464114833
+        }
+      },
+      "in_scope": {
+        "n": 24,
+        "invalid_predictions": 0,
+        "accuracy": {
+          "value": 0.625,
+          "ci_low": 0.4230769230769231,
+          "ci_high": 0.8076923076923077
+        },
+        "within_one": {
+          "value": 0.8333333333333334,
+          "ci_low": 0.6663461538461538,
+          "ci_high": 0.96
+        },
+        "kappa_linear": {
+          "value": 0.5185185185185186,
+          "ci_low": 0.21590555450773297,
+          "ci_high": 0.7586743111697737
+        },
+        "kappa_quadratic": {
+          "value": 0.5625,
+          "ci_low": 0.1888398377603008,
+          "ci_high": 0.8240870619170876
+        },
+        "under_triage": {
+          "value": 0.08333333333333333,
+          "ci_low": 0.0,
+          "ci_high": 0.21739130434782608
+        },
+        "over_triage": {
+          "value": 0.2916666666666667,
+          "ci_low": 0.12,
+          "ci_high": 0.48
+        },
+        "high_acuity_sensitivity": {
+          "value": 0.6666666666666666,
+          "ci_low": 0.2222222222222222,
+          "ci_high": 1.0
+        },
+        "high_acuity_specificity": {
+          "value": 0.9444444444444444,
+          "ci_low": 0.8125,
+          "ci_high": 1.0
+        },
+        "recall_per_level": {
+          "1": NaN,
+          "2": 0.6666666666666666,
+          "3": 1.0,
+          "4": 0.6666666666666666,
+          "5": 0.16666666666666666
+        },
+        "auc_high_acuity": {
+          "value": 0.7407407407407407,
+          "ci_low": 0.4127673796791444,
+          "ci_high": 1.0
+        },
+        "esi2_sensitivity": {
+          "value": 0.6666666666666666,
+          "ci_low": 0.2222222222222222,
+          "ci_high": 1.0
+        },
+        "esi3to5_specificity": {
+          "value": 0.9444444444444444,
+          "ci_low": 0.8125,
+          "ci_high": 1.0
+        },
+        "esi5_recall": {
+          "value": 0.16666666666666666,
+          "ci_low": 0.0,
+          "ci_high": 0.5714285714285714
+        }
+      },
+      "out_of_scope": {
+        "n": 6,
+        "detected_strict": {
+          "value": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0
+        },
+        "detected_lenient": {
+          "value": 0.6666666666666666,
+          "ci_low": 0.25,
+          "ci_high": 1.0
+        }
+      }
+    },
+    "W50_llm": {
+      "all": {
+        "n": 30,
+        "invalid_predictions": 0,
+        "accuracy": {
+          "value": 0.43333333333333335,
+          "ci_low": 0.26666666666666666,
+          "ci_high": 0.6
+        },
+        "within_one": {
+          "value": 0.8333333333333334,
+          "ci_low": 0.7,
+          "ci_high": 0.9666666666666667
+        },
+        "kappa_linear": {
+          "value": 0.4334975369458127,
+          "ci_low": 0.2380879790940767,
+          "ci_high": 0.6110472670876879
+        },
+        "kappa_quadratic": {
+          "value": 0.5542168674698795,
+          "ci_low": 0.2856854140200947,
+          "ci_high": 0.7628917397228577
+        },
+        "under_triage": {
+          "value": 0.3333333333333333,
+          "ci_low": 0.16666666666666666,
+          "ci_high": 0.5
+        },
+        "over_triage": {
+          "value": 0.23333333333333334,
+          "ci_low": 0.1,
+          "ci_high": 0.4
+        },
+        "high_acuity_sensitivity": {
+          "value": 0.5,
+          "ci_low": 0.21428571428571427,
+          "ci_high": 0.8
+        },
+        "high_acuity_specificity": {
+          "value": 0.9444444444444444,
+          "ci_low": 0.8125,
+          "ci_high": 1.0
+        },
+        "recall_per_level": {
+          "1": 0.0,
+          "2": 0.3333333333333333,
+          "3": 1.0,
+          "4": 0.6666666666666666,
+          "5": 0.16666666666666666
+        },
+        "auc_high_acuity": {
+          "value": 0.75,
+          "ci_low": 0.5482599431818183,
+          "ci_high": 0.9166997354497353
+        }
+      },
+      "in_scope": {
+        "n": 24,
+        "invalid_predictions": 0,
+        "accuracy": {
+          "value": 0.5416666666666666,
+          "ci_low": 0.34615384615384615,
+          "ci_high": 0.7391304347826086
+        },
+        "within_one": {
+          "value": 0.875,
+          "ci_low": 0.72,
+          "ci_high": 1.0
+        },
+        "kappa_linear": {
+          "value": 0.46153846153846156,
+          "ci_low": 0.1961459913642199,
+          "ci_high": 0.6879446808510639
+        },
+        "kappa_quadratic": {
+          "value": 0.5454545454545454,
+          "ci_low": 0.20683635738240602,
+          "ci_high": 0.7854355241493944
+        },
+        "under_triage": {
+          "value": 0.16666666666666666,
+          "ci_low": 0.04,
+          "ci_high": 0.3181818181818182
+        },
+        "over_triage": {
+          "value": 0.2916666666666667,
+          "ci_low": 0.12,
+          "ci_high": 0.48
+        },
+        "high_acuity_sensitivity": {
+          "value": 0.3333333333333333,
+          "ci_low": 0.0,
+          "ci_high": 0.75
+        },
+        "high_acuity_specificity": {
+          "value": 0.9444444444444444,
+          "ci_low": 0.8125,
+          "ci_high": 1.0
+        },
+        "recall_per_level": {
+          "1": NaN,
+          "2": 0.3333333333333333,
+          "3": 1.0,
+          "4": 0.6666666666666666,
+          "5": 0.16666666666666666
+        },
+        "auc_high_acuity": {
+          "value": 0.6759259259259259,
+          "ci_low": 0.3893421052631579,
+          "ci_high": 0.9296524064171121
+        },
+        "esi2_sensitivity": {
+          "value": 0.3333333333333333,
+          "ci_low": 0.0,
+          "ci_high": 0.75
+        },
+        "esi3to5_specificity": {
+          "value": 0.9444444444444444,
+          "ci_low": 0.8125,
+          "ci_high": 1.0
+        },
+        "esi5_recall": {
+          "value": 0.16666666666666666,
+          "ci_low": 0.0,
+          "ci_high": 0.5714285714285714
+        }
+      },
+      "out_of_scope": {
+        "n": 6,
+        "detected_strict": {
+          "value": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0
+        },
+        "detected_lenient": {
+          "value": 0.6666666666666666,
+          "ci_low": 0.25,
+          "ci_high": 1.0
+        }
+      }
+    }
+  },
+  "contribution": {
+    "llm_only": {
+      "mean_abs_levels": {
+        "text": 0.5,
+        "posture": 0.4444444444444444,
+        "skin": 0.07777777777777777
+      },
+      "share": {
+        "text": 0.48913043478260876,
+        "posture": 0.43478260869565216,
+        "skin": 0.07608695652173912
+      },
+      "mean_signed_levels": {
+        "text": 0.36666666666666664,
+        "posture": 0.43333333333333335,
+        "skin": -0.03333333333333333
+      }
+    },
+    "final": {
+      "mean_abs_levels": {
+        "text": 0.5111111111111111,
+        "posture": 0.47222222222222215,
+        "skin": 0.03888888888888889
+      },
+      "share": {
+        "text": 0.5,
+        "posture": 0.4619565217391304,
+        "skin": 0.03804347826086957
+      },
+      "mean_signed_levels": {
+        "text": 0.4222222222222223,
+        "posture": 0.47222222222222215,
+        "skin": -0.027777777777777776
+      }
+    },
+    "llm_only_camera_finding": {
+      "mean_abs_levels": {
+        "text": 0.4230769230769231,
+        "posture": 1.0256410256410253,
+        "skin": 0.14102564102564102
+      },
+      "share": {
+        "text": 0.26612903225806456,
+        "posture": 0.6451612903225806,
+        "skin": 0.08870967741935486
+      },
+      "mean_signed_levels": {
+        "text": 0.2692307692307692,
+        "posture": 0.9999999999999999,
+        "skin": -0.03846153846153847
+      }
+    },
+    "final_camera_finding": {
+      "mean_abs_levels": {
+        "text": 0.4487179487179487,
+        "posture": 1.0897435897435896,
+        "skin": 0.05128205128205128
+      },
+      "share": {
+        "text": 0.282258064516129,
+        "posture": 0.6854838709677419,
+        "skin": 0.03225806451612903
+      },
+      "mean_signed_levels": {
+        "text": 0.39743589743589747,
+        "posture": 1.0897435897435896,
+        "skin": -0.025641025641025644
+      }
+    },
+    "n_with_camera_finding": 13
+  },
+  "answer_changes_when_input_removed": {
+    "text": {
+      "llm_only": 11,
+      "final": 10
+    },
+    "posture": {
+      "llm_only": 8,
+      "final": 7
+    },
+    "skin": {
+      "llm_only": 5,
+      "final": 2
+    }
+  },
+  "floor_policies": {
+    "W50:none": {
+      "all": {
+        "n": 30,
+        "invalid_predictions": 0,
+        "accuracy": 0.43333333333333335,
+        "within_one": 0.8,
+        "kappa_linear": 0.40594059405940597,
+        "kappa_quadratic": 0.5121951219512195,
+        "under_triage": 0.3333333333333333,
+        "over_triage": 0.23333333333333334,
+        "high_acuity_sensitivity": 0.5,
+        "high_acuity_specificity": 0.9444444444444444,
+        "recall_per_level": {
+          "1": 0.0,
+          "2": 0.3333333333333333,
+          "3": 1.0,
+          "4": 0.6666666666666666,
+          "5": 0.16666666666666666
+        },
+        "auc_high_acuity": 0.7361111111111112
+      },
+      "in_scope": {
+        "n": 24,
+        "invalid_predictions": 0,
+        "accuracy": 0.5416666666666666,
+        "within_one": 0.8333333333333334,
+        "kappa_linear": 0.42307692307692313,
+        "kappa_quadratic": 0.4772727272727273,
+        "under_triage": 0.16666666666666666,
+        "over_triage": 0.2916666666666667,
+        "high_acuity_sensitivity": 0.3333333333333333,
+        "high_acuity_specificity": 0.9444444444444444,
+        "recall_per_level": {
+          "1": NaN,
+          "2": 0.3333333333333333,
+          "3": 1.0,
+          "4": 0.6666666666666666,
+          "5": 0.16666666666666666
+        },
+        "auc_high_acuity": 0.6574074074074074,
+        "esi2_sensitivity": 0.3333333333333333,
+        "esi3to5_specificity": 0.9444444444444444,
+        "esi5_recall": 0.16666666666666666
+      },
+      "out_of_scope": {
+        "n": 6,
+        "detected_strict": 0.0,
+        "detected_lenient": 0.6666666666666666
+      }
+    },
+    "W60:none": {
+      "all": {
+        "n": 30,
+        "invalid_predictions": 0,
+        "accuracy": 0.5,
+        "within_one": 0.8,
+        "kappa_linear": 0.4607843137254901,
+        "kappa_quadratic": 0.5476190476190477,
+        "under_triage": 0.26666666666666666,
+        "over_triage": 0.23333333333333334,
+        "high_acuity_sensitivity": 0.6666666666666666,
+        "high_acuity_specificity": 0.9444444444444444,
+        "recall_per_level": {
+          "1": 0.0,
+          "2": 0.6666666666666666,
+          "3": 1.0,
+          "4": 0.6666666666666666,
+          "5": 0.16666666666666666
+        },
+        "auc_high_acuity": 0.7777777777777778
+      },
+      "in_scope": {
+        "n": 24,
+        "invalid_predictions": 0,
+        "accuracy": 0.625,
+        "within_one": 0.8333333333333334,
+        "kappa_linear": 0.5185185185185186,
+        "kappa_quadratic": 0.5625,
+        "under_triage": 0.08333333333333333,
+        "over_triage": 0.2916666666666667,
+        "high_acuity_sensitivity": 0.6666666666666666,
+        "high_acuity_specificity": 0.9444444444444444,
+        "recall_per_level": {
+          "1": NaN,
+          "2": 0.6666666666666666,
+          "3": 1.0,
+          "4": 0.6666666666666666,
+          "5": 0.16666666666666666
+        },
+        "auc_high_acuity": 0.7407407407407407,
+        "esi2_sensitivity": 0.6666666666666666,
+        "esi3to5_specificity": 0.9444444444444444,
+        "esi5_recall": 0.16666666666666666
+      },
+      "out_of_scope": {
+        "n": 6,
+        "detected_strict": 0.0,
+        "detected_lenient": 0.6666666666666666
+      }
+    },
+    "W40:none": {
+      "all": {
+        "n": 30,
+        "invalid_predictions": 0,
+        "accuracy": 0.5,
+        "within_one": 0.8,
+        "kappa_linear": 0.4607843137254901,
+        "kappa_quadratic": 0.5476190476190477,
+        "under_triage": 0.26666666666666666,
+        "over_triage": 0.23333333333333334,
+        "high_acuity_sensitivity": 0.6666666666666666,
+        "high_acuity_specificity": 0.9444444444444444,
+        "recall_per_level": {
+          "1": 0.0,
+          "2": 0.6666666666666666,
+          "3": 1.0,
+          "4": 0.6666666666666666,
+          "5": 0.16666666666666666
+        },
+        "auc_high_acuity": 0.7777777777777778
+      },
+      "in_scope": {
+        "n": 24,
+        "invalid_predictions": 0,
+        "accuracy": 0.625,
+        "within_one": 0.8333333333333334,
+        "kappa_linear": 0.5185185185185186,
+        "kappa_quadratic": 0.5625,
+        "under_triage": 0.08333333333333333,
+        "over_triage": 0.2916666666666667,
+        "high_acuity_sensitivity": 0.6666666666666666,
+        "high_acuity_specificity": 0.9444444444444444,
+        "recall_per_level": {
+          "1": NaN,
+          "2": 0.6666666666666666,
+          "3": 1.0,
+          "4": 0.6666666666666666,
+          "5": 0.16666666666666666
+        },
+        "auc_high_acuity": 0.7407407407407407,
+        "esi2_sensitivity": 0.6666666666666666,
+        "esi3to5_specificity": 0.9444444444444444,
+        "esi5_recall": 0.16666666666666666
+      },
+      "out_of_scope": {
+        "n": 6,
+        "detected_strict": 0.0,
+        "detected_lenient": 0.6666666666666666
+      }
+    },
+    "W50:high_only": {
+      "all": {
+        "n": 30,
+        "invalid_predictions": 0,
+        "accuracy": 0.5,
+        "within_one": 0.8,
+        "kappa_linear": 0.4607843137254901,
+        "kappa_quadratic": 0.5476190476190477,
+        "under_triage": 0.26666666666666666,
+        "over_triage": 0.23333333333333334,
+        "high_acuity_sensitivity": 0.6666666666666666,
+        "high_acuity_specificity": 0.9444444444444444,
+        "recall_per_level": {
+          "1": 0.0,
+          "2": 0.6666666666666666,
+          "3": 1.0,
+          "4": 0.6666666666666666,
+          "5": 0.16666666666666666
+        },
+        "auc_high_acuity": 0.7777777777777778
+      },
+      "in_scope": {
+        "n": 24,
+        "invalid_predictions": 0,
+        "accuracy": 0.625,
+        "within_one": 0.8333333333333334,
+        "kappa_linear": 0.5185185185185186,
+        "kappa_quadratic": 0.5625,
+        "under_triage": 0.08333333333333333,
+        "over_triage": 0.2916666666666667,
+        "high_acuity_sensitivity": 0.6666666666666666,
+        "high_acuity_specificity": 0.9444444444444444,
+        "recall_per_level": {
+          "1": NaN,
+          "2": 0.6666666666666666,
+          "3": 1.0,
+          "4": 0.6666666666666666,
+          "5": 0.16666666666666666
+        },
+        "auc_high_acuity": 0.7407407407407407,
+        "esi2_sensitivity": 0.6666666666666666,
+        "esi3to5_specificity": 0.9444444444444444,
+        "esi5_recall": 0.16666666666666666
+      },
+      "out_of_scope": {
+        "n": 6,
+        "detected_strict": 0.0,
+        "detected_lenient": 0.6666666666666666
+      }
+    },
+    "W60:high_only": {
+      "all": {
+        "n": 30,
+        "invalid_predictions": 0,
+        "accuracy": 0.5,
+        "within_one": 0.8,
+        "kappa_linear": 0.4607843137254901,
+        "kappa_quadratic": 0.5476190476190477,
+        "under_triage": 0.26666666666666666,
+        "over_triage": 0.23333333333333334,
+        "high_acuity_sensitivity": 0.6666666666666666,
+        "high_acuity_specificity": 0.9444444444444444,
+        "recall_per_level": {
+          "1": 0.0,
+          "2": 0.6666666666666666,
+          "3": 1.0,
+          "4": 0.6666666666666666,
+          "5": 0.16666666666666666
+        },
+        "auc_high_acuity": 0.7777777777777778
+      },
+      "in_scope": {
+        "n": 24,
+        "invalid_predictions": 0,
+        "accuracy": 0.625,
+        "within_one": 0.8333333333333334,
+        "kappa_linear": 0.5185185185185186,
+        "kappa_quadratic": 0.5625,
+        "under_triage": 0.08333333333333333,
+        "over_triage": 0.2916666666666667,
+        "high_acuity_sensitivity": 0.6666666666666666,
+        "high_acuity_specificity": 0.9444444444444444,
+        "recall_per_level": {
+          "1": NaN,
+          "2": 0.6666666666666666,
+          "3": 1.0,
+          "4": 0.6666666666666666,
+          "5": 0.16666666666666666
+        },
+        "auc_high_acuity": 0.7407407407407407,
+        "esi2_sensitivity": 0.6666666666666666,
+        "esi3to5_specificity": 0.9444444444444444,
+        "esi5_recall": 0.16666666666666666
+      },
+      "out_of_scope": {
+        "n": 6,
+        "detected_strict": 0.0,
+        "detected_lenient": 0.6666666666666666
+      }
+    },
+    "W40:high_only": {
+      "all": {
+        "n": 30,
+        "invalid_predictions": 0,
+        "accuracy": 0.5,
+        "within_one": 0.8,
+        "kappa_linear": 0.4607843137254901,
+        "kappa_quadratic": 0.5476190476190477,
+        "under_triage": 0.26666666666666666,
+        "over_triage": 0.23333333333333334,
+        "high_acuity_sensitivity": 0.6666666666666666,
+        "high_acuity_specificity": 0.9444444444444444,
+        "recall_per_level": {
+          "1": 0.0,
+          "2": 0.6666666666666666,
+          "3": 1.0,
+          "4": 0.6666666666666666,
+          "5": 0.16666666666666666
+        },
+        "auc_high_acuity": 0.7777777777777778
+      },
+      "in_scope": {
+        "n": 24,
+        "invalid_predictions": 0,
+        "accuracy": 0.625,
+        "within_one": 0.8333333333333334,
+        "kappa_linear": 0.5185185185185186,
+        "kappa_quadratic": 0.5625,
+        "under_triage": 0.08333333333333333,
+        "over_triage": 0.2916666666666667,
+        "high_acuity_sensitivity": 0.6666666666666666,
+        "high_acuity_specificity": 0.9444444444444444,
+        "recall_per_level": {
+          "1": NaN,
+          "2": 0.6666666666666666,
+          "3": 1.0,
+          "4": 0.6666666666666666,
+          "5": 0.16666666666666666
+        },
+        "auc_high_acuity": 0.7407407407407407,
+        "esi2_sensitivity": 0.6666666666666666,
+        "esi3to5_specificity": 0.9444444444444444,
+        "esi5_recall": 0.16666666666666666
+      },
+      "out_of_scope": {
+        "n": 6,
+        "detected_strict": 0.0,
+        "detected_lenient": 0.6666666666666666
+      }
+    },
+    "W50:high_and_moderate": {
+      "all": {
+        "n": 30,
+        "invalid_predictions": 0,
+        "accuracy": 0.5,
+        "within_one": 0.8333333333333334,
+        "kappa_linear": 0.48275862068965514,
+        "kappa_quadratic": 0.5783132530120482,
+        "under_triage": 0.26666666666666666,
+        "over_triage": 0.23333333333333334,
+        "high_acuity_sensitivity": 0.6666666666666666,
+        "high_acuity_specificity": 0.9444444444444444,
+        "recall_per_level": {
+          "1": 0.0,
+          "2": 0.6666666666666666,
+          "3": 1.0,
+          "4": 0.6666666666666666,
+          "5": 0.16666666666666666
+        },
+        "auc_high_acuity": 0.8148148148148148
+      },
+      "in_scope": {
+        "n": 24,
+        "invalid_predictions": 0,
+        "accuracy": 0.625,
+        "within_one": 0.875,
+        "kappa_linear": 0.5555555555555556,
+        "kappa_quadratic": 0.625,
+        "under_triage": 0.08333333333333333,
+        "over_triage": 0.2916666666666667,
+        "high_acuity_sensitivity": 0.6666666666666666,
+        "high_acuity_specificity": 0.9444444444444444,
+        "recall_per_level": {
+          "1": NaN,
+          "2": 0.6666666666666666,
+          "3": 1.0,
+          "4": 0.6666666666666666,
+          "5": 0.16666666666666666
+        },
+        "auc_high_acuity": 0.8148148148148148,
+        "esi2_sensitivity": 0.6666666666666666,
+        "esi3to5_specificity": 0.9444444444444444,
+        "esi5_recall": 0.16666666666666666
+      },
+      "out_of_scope": {
+        "n": 6,
+        "detected_strict": 0.0,
+        "detected_lenient": 0.6666666666666666
+      }
+    },
+    "W60:high_and_moderate": {
+      "all": {
+        "n": 30,
+        "invalid_predictions": 0,
+        "accuracy": 0.5,
+        "within_one": 0.8333333333333334,
+        "kappa_linear": 0.48275862068965514,
+        "kappa_quadratic": 0.5783132530120482,
+        "under_triage": 0.26666666666666666,
+        "over_triage": 0.23333333333333334,
+        "high_acuity_sensitivity": 0.6666666666666666,
+        "high_acuity_specificity": 0.9444444444444444,
+        "recall_per_level": {
+          "1": 0.0,
+          "2": 0.6666666666666666,
+          "3": 1.0,
+          "4": 0.6666666666666666,
+          "5": 0.16666666666666666
+        },
+        "auc_high_acuity": 0.8148148148148148
+      },
+      "in_scope": {
+        "n": 24,
+        "invalid_predictions": 0,
+        "accuracy": 0.625,
+        "within_one": 0.875,
+        "kappa_linear": 0.5555555555555556,
+        "kappa_quadratic": 0.625,
+        "under_triage": 0.08333333333333333,
+        "over_triage": 0.2916666666666667,
+        "high_acuity_sensitivity": 0.6666666666666666,
+        "high_acuity_specificity": 0.9444444444444444,
+        "recall_per_level": {
+          "1": NaN,
+          "2": 0.6666666666666666,
+          "3": 1.0,
+          "4": 0.6666666666666666,
+          "5": 0.16666666666666666
+        },
+        "auc_high_acuity": 0.8148148148148148,
+        "esi2_sensitivity": 0.6666666666666666,
+        "esi3to5_specificity": 0.9444444444444444,
+        "esi5_recall": 0.16666666666666666
+      },
+      "out_of_scope": {
+        "n": 6,
+        "detected_strict": 0.0,
+        "detected_lenient": 0.6666666666666666
+      }
+    },
+    "W40:high_and_moderate": {
+      "all": {
+        "n": 30,
+        "invalid_predictions": 0,
+        "accuracy": 0.5,
+        "within_one": 0.8,
+        "kappa_linear": 0.4607843137254901,
+        "kappa_quadratic": 0.5476190476190477,
+        "under_triage": 0.26666666666666666,
+        "over_triage": 0.23333333333333334,
+        "high_acuity_sensitivity": 0.6666666666666666,
+        "high_acuity_specificity": 0.9444444444444444,
+        "recall_per_level": {
+          "1": 0.0,
+          "2": 0.6666666666666666,
+          "3": 1.0,
+          "4": 0.6666666666666666,
+          "5": 0.16666666666666666
+        },
+        "auc_high_acuity": 0.7777777777777778
+      },
+      "in_scope": {
+        "n": 24,
+        "invalid_predictions": 0,
+        "accuracy": 0.625,
+        "within_one": 0.8333333333333334,
+        "kappa_linear": 0.5185185185185186,
+        "kappa_quadratic": 0.5625,
+        "under_triage": 0.08333333333333333,
+        "over_triage": 0.2916666666666667,
+        "high_acuity_sensitivity": 0.6666666666666666,
+        "high_acuity_specificity": 0.9444444444444444,
+        "recall_per_level": {
+          "1": NaN,
+          "2": 0.6666666666666666,
+          "3": 1.0,
+          "4": 0.6666666666666666,
+          "5": 0.16666666666666666
+        },
+        "auc_high_acuity": 0.7407407407407407,
+        "esi2_sensitivity": 0.6666666666666666,
+        "esi3to5_specificity": 0.9444444444444444,
+        "esi5_recall": 0.16666666666666666
+      },
+      "out_of_scope": {
+        "n": 6,
+        "detected_strict": 0.0,
+        "detected_lenient": 0.6666666666666666
+      }
+    }
+  },
+  "camera": {
+    "round_B": {
+      "posture_correct": 25,
+      "skin_answered": 8,
+      "skin_correct_of_answered": 5,
+      "true_flushing_n": 14,
+      "true_flushing_called_yes": 2,
+      "true_normal_n": 16,
+      "true_normal_called_yes": 0,
+      "skin_not_answered_reasons": {
+        "image too blurry": 5,
+        "result changes with image size": 5,
+        "face too small in the image": 12
+      }
+    },
+    "A_original": {
+      "posture_correct": 16,
+      "skin_answered": 30,
+      "skin_correct_of_answered": 16,
+      "true_flushing_called_yes": 0,
+      "true_normal_called_yes": 0
+    },
+    "A_fixed": {
+      "posture_correct": 24,
+      "skin_answered": 29,
+      "skin_correct_of_answered": 17,
+      "true_flushing_called_yes": 10,
+      "true_normal_called_yes": 8
+    }
+  },
+  "reliability": {
+    "llm_invalid_outputs_main": 2,
+    "fallback_reasons_main": {
+      "DETERMINISTIC_FALLBACK_JSON_PARSE_ERROR": 2
+    },
+    "floor_changed_answer_main": 3,
+    "latency_median_s": 11.885,
+    "latency_p90_s": 16.322000000000003,
+    "latency_max_s": 20.4,
+    "level_field_vs_steps_disagree": 0
+  }
+}

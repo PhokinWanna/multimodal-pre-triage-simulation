@@ -412,6 +412,16 @@ Output ONLY valid JSON:
         return verdict
 
     def _call_llm(self, prompt: str, temperature: float, seed: int | None, timeout: float, num_predict: int):
+        """One Ollama call; if the JSON comes back cut off or broken, ask once more with twice the
+        token budget (Thai SOAP text can exceed the first budget). Returns (parsed JSON or None,
+        fallback reason or None, latency in s or None)."""
+        out, reason, latency = self._call_llm_once(prompt, temperature, seed, timeout, num_predict)
+        if reason == "DETERMINISTIC_FALLBACK_JSON_PARSE_ERROR":
+            out, reason, latency2 = self._call_llm_once(prompt, temperature, seed, timeout, num_predict * 2)
+            latency = latency2
+        return out, reason, latency
+
+    def _call_llm_once(self, prompt: str, temperature: float, seed: int | None, timeout: float, num_predict: int):
         """One Ollama call. Returns (parsed JSON or None, fallback reason or None, latency in s or None)."""
         payload = {
             "model": SystemConfig.OLLAMA_MODEL,

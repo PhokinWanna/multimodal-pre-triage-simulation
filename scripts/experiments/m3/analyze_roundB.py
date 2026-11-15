@@ -126,6 +126,12 @@ def load_round_a(name: str) -> dict:
         return {r["id"]: r for r in csv.DictReader(f)}
 
 
+def truth_of(cam: dict) -> dict | None:
+    """True flushing of the photo the skin result came from."""
+    rec = {r.file: r for r in read_sources() if r.set == "test"}.get(cam.get("image_file_skin") or cam.get("image_file"))
+    return {"flush": rec.true_flushing} if rec else None
+
+
 def int_or_none(x):
     try:
         return int(float(x))
@@ -156,10 +162,10 @@ def shapley(values: dict) -> dict:
     return phi
 
 
-def contribution(by: dict, ids: list[str], getter) -> dict:
+def contribution(by: dict, ids: list[str], getter, coalitions: dict = COALITION_CONFIG) -> dict:
     per_case = {}
     for i in ids:
-        vals = {c: 6 - getter(by[cfg][i]) for c, cfg in COALITION_CONFIG.items()}
+        vals = {c: 6 - getter(by[cfg][i]) for c, cfg in coalitions.items()}
         per_case[i] = shapley(vals)
     mean_abs = {p: float(np.mean([abs(per_case[i][p]) for i in ids])) for p in PLAYERS}
     total = sum(mean_abs.values()) or 1.0
@@ -304,8 +310,8 @@ def main(argv=None) -> int:
     res["systems"] = {k: with_ci(ref, p) for k, _, p in systems}
     labels_of = {k: lab for k, lab, _ in systems}
 
-    def table(title, keys, rows_spec, note=None):
-        md.append(f"\n## {title}\n")
+    def table(title, keys, rows_spec, note=None, level="##"):
+        md.append(f"\n{level} {title}\n")
         md.append("| | " + " | ".join(labels_of.get(k, k) for k in keys) + " |")
         md.append("| --- |" + " --- |" * len(keys))
         for group, metric, label, pct in rows_spec:
@@ -400,6 +406,43 @@ def main(argv=None) -> int:
             md.append(f"| {label} | " + " | ".join(f"{100 * c['share'][p]:.0f}% ({c['mean_abs_levels'][p]:.2f} levels)" for p in PLAYERS) + " |")
     md.append(f"| Scenarios whose answer changes when this input is removed (LLM alone / whole system) | "
               + " | ".join(f"{flips[p]['llm_only']} / {flips[p]['final']} of {len(ids)}" for p in PLAYERS) + " |")
+
+    # ---- 3b. exploratory: skin without the image check (amendment 2)
+    if "W50_noQC" in by:
+        vision_noqc = json.loads((args.run / "vision_noQC.json").read_text(encoding="utf-8"))["cases"]
+        noqc = {}
+        for cfg, label in WEIGHT_CONFIGS:
+            noqc[cfg + "_noQC"] = with_ci(ref, preds(cfg + "_noQC"))
+            labels_of[cfg + "_noQC"] = label.replace("\n", " ")
+            if cfg != "IND":
+                noqc[cfg + "_rules_noQC"] = with_ci(ref, preds(cfg + "_rules_noQC"))
+                labels_of[cfg + "_rules_noQC"] = label.replace("\n", " ") + " — rules only"
+        res["weights_noQC"] = noqc
+        res_lookup = noqc
+        n_skin = sum(vision_noqc[i]["skin_status"] in ("NORMAL", "RED_FLUSHING") for i in ids)
+        md.append(f"\n## 6b. Exploratory: the same weights when the skin part always answers\n")
+        md.append(f"Added after the first round-B run (protocol amendment 2). The skin result comes from the round-A "
+                  f"patch pipeline without the image check, so it answered for {n_skin} of {len(ids)} scenarios "
+                  f"(main system: {sum(vision[i]['skin_status'] in ('NORMAL', 'RED_FLUSHING') for i in ids)}). "
+                  "Posture and everything else are unchanged.\n")
+        table("LLM + safety floor, skin without the image check", [c + "_noQC" for c, _ in WEIGHT_CONFIGS], w_rows,
+              level="###")
+        table("Rule-based path only, skin without the image check",
+              [c + "_rules_noQC" for c, _ in WEIGHT_CONFIGS if c != "IND"], w_rows, level="###")
+        coal = {c: (cfg + "_noQC" if "skin" in c else cfg) for c, cfg in COALITION_CONFIG.items()}
+        c_noqc = {"llm_only": contribution(by, ids, llm_only, coal), "final": contribution(by, ids, lambda r: r["esi_final"], coal)}
+        res["contribution_noQC"] = {k: {kk: vv for kk, vv in v.items() if kk != "per_case"} for k, v in c_noqc.items()}
+        md.append("\n| Input share, skin without the image check | Patient's words | Posture | Skin |")
+        md.append("| --- | --- | --- | --- |")
+        for key, label in (("llm_only", "LLM alone"), ("final", "Whole system")):
+            c = c_noqc[key]
+            md.append(f"| {label} | " + " | ".join(f"{100 * c['share'][p]:.0f}% ({c['mean_abs_levels'][p]:.2f} levels)" for p in PLAYERS) + " |")
+        res["camera_noQC_skin"] = {
+            "answered": n_skin,
+            "true_flushing_called_yes": int(sum(vision_noqc[i]["skin_status"] == "RED_FLUSHING" for i in ids
+                                               if (truth_of(vision_noqc[i]) or {}).get("flush") == "yes")),
+            "true_normal_called_yes": int(sum(vision_noqc[i]["skin_status"] == "RED_FLUSHING" for i in ids
+                                             if (truth_of(vision_noqc[i]) or {}).get("flush") == "no"))}
 
     # ---- 4. floor policy
     policies = {}
@@ -563,6 +606,17 @@ def main(argv=None) -> int:
             shares += [(f"LLM alone, camera\nfound something (n={len(with_finding)})", contrib["llm_only_camera_finding"]["share"]),
                        (f"Whole system, camera\nfound something", contrib["final_camera_finding"]["share"])]
         fig_contribution(shares, out / "fig_contribution")
+        if "weights_noQC" in res:
+            nq = res["weights_noQC"]
+            fig_bars([lab for _, lab in WEIGHT_CONFIGS],
+                     [(lab, col, [100 * nq[c + "_noQC"]["in_scope"][m]["value"] for c, _ in WEIGHT_CONFIGS])
+                      for (m, lab), col in zip(three, (BLUE, ORANGE, AQUA))],
+                     f"% of the {res['n_in_scope']} in-scope scenarios",
+                     "Posture : skin weights, skin without the image check (exploratory)",
+                     out / "fig_weights_noQC", figsize=(6.8, 3.6))
+            fig_contribution([("LLM alone", res["contribution_noQC"]["llm_only"]["share"]),
+                              ("Whole system", res["contribution_noQC"]["final"]["share"])],
+                             out / "fig_contribution_noQC")
 
     (out / "summary.json").write_text(json.dumps(res, indent=2, ensure_ascii=False, default=float), encoding="utf-8")
     (out / "report.md").write_text("\n".join(md) + "\n", encoding="utf-8")
