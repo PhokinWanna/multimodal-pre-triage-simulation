@@ -6,8 +6,8 @@
   },
   "scenarios_sha256": "a4a912f38816c01497ff9899f35403af3b46ae602f8597dda5070e058ca6216d",
   "n_scenarios": 30,
-  "created": "2026-11-15T15:07:42",
-  "git_commit": "c989265fbb14de096359d5604ef71becde7ad54c",
+  "created": "2026-11-15T15:59:12",
+  "git_commit": "7bad6e321f4d9ff965fcf2dd661bd7f89a2f016e",
   "llm": "{\"name\": \"llama3.2:latest\", \"digest\": \"a80c4f17acd55265feec403c7aef86be0c25983ab279d83f3bcd3abbcb5b8b72\", \"details\": {\"parent_model\": \"\", \"format\": \"gguf\", \"family\": \"llama\", \"families\": [\"llama\"], \"parameter_size\": \"3.2B\", \"quantization_level\": \"Q4_K_M\", \"context_length\": 131072, \"embedding_length\": 3072, \"runner\": \"ggml\"}}",
   "llm_model": "llama3.2:latest",
   "llm_timeout_s": 90.0,
@@ -151,5 +151,6 @@
     "name": "SkinCNN-FL-α0.75 (best checkpoint)",
     "threshold": 0.5489389300346375
   },
-  "consistency": null
+  "consistency": null,
+  "noqc_sensitivity": true
 }
