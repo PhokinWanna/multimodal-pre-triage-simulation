@@ -42,7 +42,10 @@ class FinalVerdictSafetyTests(unittest.TestCase):
 
     @patch("triage_kiosk.triage.reasoning.requests.post", return_value=ollama(GOOD))
     def test_flushing_caps_at_3_and_ams_at_2(self, _p):
-        self.assertEqual(self.run_case(skin="RED_FLUSHING")["esi_level"], 3)
+        # Old separate rule (FUSION_MODE=independent): flushing alone caps at ESI 3.
+        self.assertEqual(self.run_case(skin="RED_FLUSHING", fusion_mode="independent")["esi_level"], 3)
+        # Default weighted 50:50 score: flushing alone (0.5 x 0.9 = 0.45) is MODERATE, which does not cap.
+        self.assertEqual(self.run_case(skin="RED_FLUSHING", skin_probability=0.9)["esi_level"], 4)
         self.assertEqual(self.run_case("AMS_3_STRIKES")["esi_level"], 2)
 
     @patch("triage_kiosk.triage.reasoning.requests.post", return_value=ollama(GOOD, status=404))

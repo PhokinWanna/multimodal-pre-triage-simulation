@@ -214,7 +214,7 @@ class SystemConfig:
     TRIAGE_ESI_FROM_STEPS = os.getenv("TRIAGE_ESI_FROM_STEPS", "0").strip().lower() in {"1", "true", "yes"}
     # Camera fusion: "independent" = posture and skin are two separate findings (up to round A);
     # "weighted" = one visual risk score = w_posture x posture + w_skin x skin (triage/fusion.py).
-    FUSION_MODE = os.getenv("FUSION_MODE", "independent").strip().lower()
+    FUSION_MODE = os.getenv("FUSION_MODE", "weighted").strip().lower()
     FUSION_W_POSTURE = float(os.getenv("FUSION_W_POSTURE", "0.5"))
     FUSION_W_SKIN = float(os.getenv("FUSION_W_SKIN", "0.5"))
     FUSION_CAP_POLICY = os.getenv("FUSION_CAP_POLICY", "high_only")   # none | high_only | high_and_moderate
